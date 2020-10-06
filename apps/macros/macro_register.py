@@ -11,7 +11,6 @@
 import inspect
 import importlib
 import sys
-import imp
 import os
 
 from flask import current_app
@@ -32,7 +31,7 @@ def load_module(module):
     :param module: name of he module
     """
     try:
-        imp.reload(sys.modules[module])
+        importlib.reload(sys.modules[module])
     except (AttributeError, KeyError):
         try:
             importlib.import_module(module)
@@ -54,7 +53,8 @@ def register_macros():
                      not m.startswith('__')]
     # DO NOT REMOVE: This is a hack introduced long time back to solve the problem
     # where macros were not getting loaded for celery jobs.
-    print(macro_modules, file=open(os.devnull, 'w'))
+    with open(os.devnull, 'w') as file:
+        print(macro_modules, file=file)
 
     for macro_module in macro_modules:
         replace_type = macro_module.replace_type if hasattr(macro_module, 'replace_type') else 'no-replace'

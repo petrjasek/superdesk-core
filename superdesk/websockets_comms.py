@@ -169,8 +169,7 @@ class SocketCommunication:
             'publish_queue:update': 5,
         }
 
-    @asyncio.coroutine
-    def _client_loop(self, websocket):
+    async def _client_loop(self, websocket):
         """Client loop - send it ping every `beat_delay` seconds to keep it alive.
 
         Nginx would close the connection after 2 minutes of inactivity, that's why.
@@ -182,14 +181,13 @@ class SocketCommunication:
         """
         pings = 0
         while True:
-            yield from asyncio.sleep(5)
+            await asyncio.sleep(5)
             if not websocket.open:
                 break
             pings += 1
-            yield from websocket.send(json.dumps({'ping': pings, 'clients': len(websocket.ws_server.websockets)}))
+            await websocket.send(json.dumps({'ping': pings, 'clients': len(websocket.ws_server.websockets)}))
 
-    @asyncio.coroutine
-    def broadcast(self, message):
+    async def broadcast(self, message):
         """Broadcast message to all clients.
 
         If event is in `event_interval` it will only send such event every x seconds.
@@ -213,19 +211,18 @@ class SocketCommunication:
         for websocket in self.clients.copy():
             try:
                 if websocket.open:
-                    yield from websocket.send(message)
+                    await websocket.send(message)
             except Exception:
                 yield
 
-    @asyncio.coroutine
-    def _server_loop(self, websocket):
+    async def _server_loop(self, websocket):
         """Server loop - wait for message and broadcast it.
 
         :param websocket: websocket protocol instance
         """
         while True:
-            message = yield from websocket.recv()
-            yield from self.broadcast(message)
+            message = await websocket.recv()
+            await self.broadcast(message)
 
     def _log(self, message, websocket):
         """Log message with some websocket data like address.
@@ -236,8 +233,7 @@ class SocketCommunication:
         host, port = websocket.remote_address
         logger.info('%s address=%s:%s' % (message, host, port))
 
-    @asyncio.coroutine
-    def _connection_handler(self, websocket, path):
+    async def _connection_handler(self, websocket, path):
         """Handle incomming connections.
 
         When this function returns the session is over and it closes the socket,
@@ -248,12 +244,12 @@ class SocketCommunication:
         """
         if 'server' in path:
             self._log('server open', websocket)
-            yield from self._server_loop(websocket)
+            await self._server_loop(websocket)
             self._log('server done', websocket)
         else:
             self._log('client open', websocket)
             self.clients.add(websocket)
-            yield from self._client_loop(websocket)
+            await self._client_loop(websocket)
             self.clients.remove(websocket)
             self._log('client done', websocket)
 
