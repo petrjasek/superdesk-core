@@ -127,6 +127,7 @@ class NINJSFormatter(Formatter):
             ninjs = self._transform_to_ninjs(article, subscriber)
             return [(pub_seq_num, json.dumps(ninjs, default=json_serialize_datetime_objectId))]
         except Exception as ex:
+            raise
             raise FormatterError.ninjsFormatterError(ex, subscriber)
 
     def _transform_to_ninjs(self, article, subscriber, recursive=True):
