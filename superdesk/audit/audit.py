@@ -28,6 +28,9 @@ class AuditResource(Resource):
         "user": Resource.rel("users", False),
     }
     exclude = {endpoint_name, "activity", "dictionaries", "macros", "archive_history", "formatters"}
+    mongo_indexes = {
+        "_updated_1": ([("_updated", 1)], {"background": True}),
+    }
 
 
 class AuditService(BaseService):
