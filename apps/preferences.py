@@ -47,17 +47,15 @@ def get_available_preferences():
 
 def enhance_document_with_default_prefs(doc):
     user_prefs = doc.get(_user_preferences_key, {})
-    default_prefs = get_available_preferences()
-    default_prefs.update(user_prefs)
-    # always populate label/category from default preferences
-    # to get those in user language
     for pref, specs in superdesk.default_user_preferences.items():
-        if not default_prefs.get(pref):
-            continue
-        for field in ["label", "category_label"]:
+        default = specs["value"].copy()
+        user_prefs.setdefault(pref, default)
+        # always populate label/category from defaults
+        # to return those in currently selected language
+        for field in ("label", "category_label"):
             if specs.get(field):
-                default_prefs[pref][field] = str(specs[field])
-    doc[_user_preferences_key] = default_prefs
+                user_prefs[pref][field] = str(specs[field])
+    doc[_user_preferences_key] = user_prefs
 
 
 class PreferencesResource(Resource):
