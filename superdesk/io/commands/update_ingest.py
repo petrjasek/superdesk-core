@@ -607,8 +607,8 @@ def ingest_item(item, provider, feeding_service, rule_set=None, routing_scheme=N
             assoc_name = assoc.get("headline") or assoc.get("slugline") or guid
             if guid:
                 ingested = ingest_service.find_one(req=None, guid=guid)
-                logger.info("assoc ingested before %s", assoc_name)
                 if ingested is not None:
+                    logger.info("assoc ingested before %s", assoc_name)
                     assoc["_id"] = ingested["_id"]
                     if is_new_version(assoc, ingested) and assoc.get("renditions"):  # new version
                         logger.info("new assoc version - re-transfer renditions for %s", assoc_name)
