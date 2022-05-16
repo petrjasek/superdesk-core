@@ -36,7 +36,7 @@ jobs:
         pip install -r dev-requirements.txt
 
     - name: Pytest
-      run: pytest tests apps superdesk/macros
+      run: pytest -v tests apps superdesk/macros
 
   behave:
     runs-on: ubuntu-latest
@@ -146,4 +146,4 @@ jobs:
         pip install -r dev-requirements.txt
 
     - name: prodapi-pytest
-      run: cd prod_api && time pytest tests
+      run: cd prod_api && time pytest -v tests
