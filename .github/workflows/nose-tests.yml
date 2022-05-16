@@ -36,7 +36,7 @@ jobs:
         pip install -r dev-requirements.txt
 
     - name: Pytest
-      run: pytest --logging-level=ERROR
+      run: pytest
 
   behave:
     runs-on: ubuntu-latest
