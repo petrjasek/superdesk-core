@@ -3,7 +3,7 @@ name: "Test"
 on: [push, pull_request]
 
 jobs:
-  nose:
+  pytest:
     runs-on: ubuntu-latest
 
     strategy:
@@ -35,8 +35,8 @@ jobs:
         python -m pip install --upgrade 'pip<21.3' wheel setuptools
         pip install -r dev-requirements.txt
 
-    - name: Nosetests
-      run: nosetests --logging-level=ERROR
+    - name: Pytest
+      run: pytest --logging-level=ERROR
 
   behave:
     runs-on: ubuntu-latest
