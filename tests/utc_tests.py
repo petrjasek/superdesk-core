@@ -10,6 +10,7 @@
 
 
 import pytz
+import pytest
 import unittest
 from datetime import datetime, timedelta
 from superdesk.utc import (
@@ -22,7 +23,6 @@ from superdesk.utc import (
     query_datetime,
 )
 from pytz import utc, timezone  # flake8: noqa
-from nose.tools import assert_raises
 
 
 class UTCTestCase(unittest.TestCase):
@@ -69,7 +69,7 @@ class UTCTestCase(unittest.TestCase):
         self.assertEqual(date1.second, date2.second)
 
     def test_get_expiry_date_bad_offset_raises_error(self):
-        with assert_raises(TypeError) as error_context:
+        with pytest.raises(TypeError):
             offset = "01.02.2013 13:30"
             get_expiry_date(minutes=5, offset=offset)
 

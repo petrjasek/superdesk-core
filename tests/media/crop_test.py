@@ -8,8 +8,9 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import pytest
+
 from unittest import mock
-from nose.tools import assert_raises
 
 from superdesk.tests import TestCase
 from superdesk.media.crop import CropService
@@ -40,13 +41,13 @@ class CropTestCase(TestCase):
     def test_validate_aspect_ratio_fails(self):
         doc = {"CropLeft": 0, "CropRight": 80, "CropTop": 0, "CropBottom": 60}
         crop = {"height": 700, "width": 70}
-        with assert_raises(SuperdeskApiError):
+        with pytest.raises(SuperdeskApiError):
             self.service._validate_aspect_ratio(crop, doc)
 
     def test_validate_aspect_ratio_fails_with_cropsize_less(self):
         doc = {"CropLeft": 0, "CropRight": 80, "CropTop": 0, "CropBottom": 60}
         crop = {"height": 600, "width": 800}
-        with assert_raises(SuperdeskApiError):
+        with pytest.raises(SuperdeskApiError):
             self.service._validate_aspect_ratio(crop, doc)
 
     def test_validate_aspect_ratio_succeeds(self):

@@ -8,10 +8,10 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import pytest
 
 from superdesk import get_resource_service
 from superdesk.tests import TestCase
-from nose.tools import assert_raises
 
 
 class SequencesTestCase(TestCase):
@@ -23,7 +23,7 @@ class SequencesTestCase(TestCase):
 
     def test_empty_sequence_name_fails(self):
         with self.app.app_context():
-            with assert_raises(KeyError):
+            with pytest.raises(KeyError):
                 self.service.get_next_sequence_number(None)
                 self.service.get_next_sequence_number("")
 

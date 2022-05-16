@@ -8,7 +8,8 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from nose.tools import raises
+import pytest
+
 from superdesk.tests import TestCase
 from superdesk.privilege import privilege, get_privilege_list, _privileges
 
@@ -35,6 +36,6 @@ class PrivilegeTestCase(TestCase):
 
         self.assertEqual(2, len(get_privilege_list()))
 
-    @raises(Exception)
     def test_privilege_name_has_no_dots(self):
-        privilege(name="test.")
+        with pytest.raises(Exception):
+            privilege(name="test.")

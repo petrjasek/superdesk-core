@@ -9,14 +9,15 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import os
+import pytest
 import mimetypes
+
 from io import BytesIO
 from datetime import timedelta, datetime
 from unittest.mock import patch
 
 from bson import ObjectId
 from eve.utils import ParsedRequest
-from nose.tools import assert_raises
 
 from superdesk import get_resource_service, etree
 from superdesk.utc import utcnow
@@ -115,10 +116,10 @@ class UpdateIngestTest(TestCase):
             "config": {"path": "/"},
         }
 
-        with assert_raises(SuperdeskApiError) as error_context:
+        with pytest.raises(SuperdeskApiError) as error_context:
             aap = self._get_provider_service(provider)
             aap.update(provider, {})
-        ex = error_context.exception
+        ex = error_context.value
         self.assertTrue(ex.status_code == 500)
 
     def test_ingest_provider_closed_when_critical_error_raised(self):
@@ -141,7 +142,7 @@ class UpdateIngestTest(TestCase):
         provider_service = self._get_provider_service(provider)
         provider_service.provider = provider
         provider_service._update = mock_update
-        with assert_raises(ProviderError):
+        with pytest.raises(ProviderError):
             provider_service.update(provider, {})
         provider = self._get_provider(provider_name)
         self.assertTrue(provider.get("is_closed"))

@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from nose.tools import assert_raises
+import pytest
 
 from apps.archive.common import get_item_expiry
 from apps.tasks import (
@@ -66,7 +66,7 @@ class TasksTestCase(TestCase):
         update = {"headline": "x"}
         stage = {"incoming_macro": "take_key_validator"}
         with self.app.app_context():
-            with assert_raises(SuperdeskApiError):
+            with pytest.raises(SuperdeskApiError):
                 apply_stage_rule(doc, update, stage, MACRO_INCOMING)
 
     def test_apply_stage_incoming_validation_rule_passes(self):
@@ -95,7 +95,7 @@ class TasksTestCase(TestCase):
         update = {"headline": "x"}
         stage = {"outgoing_macro": "take_key_validator"}
         with self.app.app_context():
-            with assert_raises(SuperdeskApiError):
+            with pytest.raises(SuperdeskApiError):
                 apply_stage_rule(doc, update, stage, MACRO_OUTGOING)
 
     def test_apply_on_stage_validation_rule(self):
@@ -103,7 +103,7 @@ class TasksTestCase(TestCase):
         update = {"headline": "x"}
         stage = {"onstage_macro": "take_key_validator"}
         with self.app.app_context():
-            with assert_raises(SuperdeskApiError):
+            with pytest.raises(SuperdeskApiError):
                 apply_stage_rule(doc, update, stage, MACRO_ONSTAGE)
 
     def test_apply_onstage_rule(self):
@@ -112,7 +112,7 @@ class TasksTestCase(TestCase):
         self.app.data.insert("stages", stages)
 
         with self.app.app_context():
-            with assert_raises(SuperdeskApiError):
+            with pytest.raises(SuperdeskApiError):
                 apply_onstage_rule(doc, 1)
 
     def test_apply_onstage_rule_applies(self):
