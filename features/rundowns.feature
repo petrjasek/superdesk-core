@@ -394,6 +394,9 @@ Feature: Rundowns
         {"duration": 160}
         """
 
+        When we delete "/rundowns/#rundowns._id#"
+        Then we get OK response
+
     @auth
     Scenario: Create rundown for today
         Given "shows"
