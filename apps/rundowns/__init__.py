@@ -14,6 +14,7 @@ from . import (  # noqa: E402
     rundowns,
     rundown_items,
     tasks,
+    export,
 )
 
 
@@ -34,3 +35,15 @@ def init_app(app: SuperdeskApp) -> None:
     superdesk.register_resource(
         "rundown_templates", templates.TemplatesResource, service_instance=templates.templates_service, _app=app
     )
+    superdesk.register_resource(
+        "rundown_export", export.ExportResource, service_instance=export.export_service, _app=app
+    )
+
+    from .formatters.html import HtmlFormatter, rundown_item_content
+
+    export.available_services.append(
+        HtmlFormatter("prompter-pdf", "Prompter", "rundown_export_prompter.html"),
+    )
+
+    superdesk.register_jinja_filter("rundown_item_content", rundown_item_content)
+

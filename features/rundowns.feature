@@ -525,3 +525,75 @@ Feature: Rundowns
         {"title": "bar"}
         """
         Then we get ok response
+    
+    @wip
+    @auth
+    Scenario: Export
+        When we get "/rundown_export"
+        Then we get list with 1 items
+        """
+        {"_items": [
+            {"name": "Prompter", "_id": "prompter-pdf"}
+        ]}
+        """
+
+        Given "shows"
+        """
+        [
+            {"title": "Test", "shortcode": "MRK"}
+        ]
+        """
+
+        And "rundown_items"
+        """
+        [
+            {
+                "title": "sample",
+                "duration": 80,
+                "planned_duration": 120,
+                "item_type": "test",
+                "content": "<p>some text</p>",
+                "subitems": ["wall", "video"],
+                "body_html": "<p>foo</p><p>bar</p>"
+            }
+        ]
+        """
+
+        And "rundowns"
+        """
+        [
+            {
+                "show": "#shows._id#",
+                "airtime_time": "06:00",
+                "airtime_date": "2030-01-01",
+                "planned_duration": 3600,
+                "items": [
+                    {"_id": "#rundown_items._id#"},
+                    {"_id": "#rundown_items._id#"}
+                ]
+            }
+        ]
+        """
+
+        When we post to "rundown_export"
+        """
+        {"format": "prompter-pdf", "rundown": "#rundowns._id#"}
+        """
+        Then we get response code 201
+        """
+        {"content": "__any_value__", "content_type": "text/html"}
+        """
+        And the content is
+        """
+        <!DOCTYPE html>
+        <html>
+        <head>
+        </head>
+        <body>
+            <p>TEST-MRK-SAMPLE</p>
+            <p>foo<br />bar<br /></p>
+            <p>TEST-MRK-SAMPLE</p>
+            <p>foo<br />bar<br /></p>
+        </body>
+        </html>
+        """
