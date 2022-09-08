@@ -21,12 +21,12 @@ class PrompterPDFFormatter(BaseFormatter):
         output = io.BytesIO()
 
         margin = 15
-        doc = SimpleDocTemplate(output, leftMargin=margin, rightMargin=margin, topMargin=margin, bottomMargin=margin)
+        doc = SimpleDocTemplate(
+            output, leftMargin=margin, rightMargin=margin, topMargin=margin, bottomMargin=margin, title=rundown["title"]
+        )
         contents = []
         for item in items:
-            for i in range(50):
-                self.export_item(contents, show, rundown, item)
-
+            self.export_item(contents, show, rundown, item)
         doc.build(contents)
 
         return output.getvalue(), self.MIMETYPE, filename
@@ -41,7 +41,7 @@ class PrompterPDFFormatter(BaseFormatter):
         )
         contents.append(Paragraph(title, styles["Heading2"]))
         if item.get("content"):
-            text = get_text(item["content"], "html", lf_on_block=True).strip() * 50
+            text = get_text(item["content"], "html", lf_on_block=True).strip()
             contents.append(Paragraph(text, styles["BodyText"]))
 
         contents.append(Paragraph("", styles["BodyText"]))
