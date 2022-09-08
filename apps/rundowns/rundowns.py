@@ -89,7 +89,7 @@ class RundownsService(superdesk.Service):
             "airtime_time": doc["airtime_time"],
             "scheduled_on": None,
             "template": None,
-            "items": doc["items"] or [],
+            "items": doc["items"] if doc.get("items") else [],
         }
 
         super().create([rundown])

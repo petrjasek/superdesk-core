@@ -552,9 +552,8 @@ Feature: Rundowns
                 "duration": 80,
                 "planned_duration": 120,
                 "item_type": "test",
-                "content": "<p>some text</p>",
                 "subitems": ["wall", "video"],
-                "body_html": "<p>foo</p><p>bar</p>"
+                "content": "<p>foo</p><p>bar</p>"
             }
         ]
         """
@@ -564,6 +563,7 @@ Feature: Rundowns
         [
             {
                 "show": "#shows._id#",
+                "title": "Rundown Title",
                 "airtime_time": "06:00",
                 "airtime_date": "2030-01-01",
                 "planned_duration": 3600,
@@ -581,19 +581,10 @@ Feature: Rundowns
         """
         Then we get response code 201
         """
-        {"content": "__any_value__", "content_type": "text/html"}
+        {"href": "__any_value__"}
         """
-        And the content is
-        """
-        <!DOCTYPE html>
-        <html>
-        <head>
-        </head>
-        <body>
-            <p>TEST-MRK-SAMPLE</p>
-            <p>foo<br />bar<br /></p>
-            <p>TEST-MRK-SAMPLE</p>
-            <p>foo<br />bar<br /></p>
-        </body>
-        </html>
-        """
+
+        When we get "#rundown_export.href#"
+        Then we get response code 200
+        And we get "Content-Disposition" header with "attachment; filename="Rundown Title.pdf"" type
+        And we get "Content-Type" header with "application/pdf" type

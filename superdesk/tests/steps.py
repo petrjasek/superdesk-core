@@ -2740,13 +2740,3 @@ def when_lock_expires(context, url):
         orig = context.app.data.find_one(resource, req=None, _id=_id)
         assert orig is not None, "could not find {}/{}".format(resource, _id)
         context.app.data.update(resource, orig["_id"], {"_lock_time": utcnow() - timedelta(hours=48)}, orig)
-
-@then('the content is')
-def then_the_content_is(context):
-    data = context.response.get_json()
-    tested = list(filter(None, filter(lambda x: x.strip(),  data["content"].strip().splitlines())))
-    expected = list(filter(None, filter(lambda x: x.strip(), context.text.strip().splitlines())))
-    print("TESTED", tested)
-    print("EXPECTED", expected)
-    for i, line in enumerate(expected):
-        assert line.strip() == tested[i].strip(), "{} != {}".format(line.strip(), tested[i].strip())
