@@ -1,10 +1,17 @@
+import copy
+import logging
 import superdesk
 
 from typing import Optional
+from flask import current_app as app
+from datetime import timedelta
 
 from apps.auth import get_user_id
 
-from . import privileges, types, rundown_items
+from . import privileges, types, rundown_items, utils
+
+
+logger = logging.getLogger(__name__)
 
 
 class TemplatesResource(superdesk.Resource):
@@ -65,6 +72,7 @@ class TemplatesResource(superdesk.Resource):
                 },
             },
         },
+        "create_before_seconds": {"type": "number"},
         "title_template": {
             "type": "dict",
             "nullable": True,
@@ -85,7 +93,7 @@ class TemplatesResource(superdesk.Resource):
             "readonly": True,
             "nullable": True,
         },
-        "last_scheduled_on": {
+        "create_before": {
             "type": "datetime",
             "readonly": True,
             "nullable": True,
@@ -123,8 +131,26 @@ class TemplatesService(superdesk.Service):
         """Reset current schedule when schedule config changes."""
         if original is None:
             original = {}
-        if any([updates.get(field) != original.get(field) for field in ["schedule", "airtime_time", "repeat"]]):
-            updates["scheduled_on"] = None
+
+        updated = copy.copy(original)
+        updated.update(updates)
+
+        if any([updates.get(field) != original.get(field) for field in ["schedule", "airtime_time", "repeat", "create_before_seconds"]]):
+            time = utils.parse_time(updated["airtime_time"]) if updated.get("airtime_time") else None
+            date = utils.parse_date(updated["airtime_date"]) if updated.get("airtime_date") else None
+            if not time or not updated.get("repeat") or not updated.get("schedule"):
+                updates["scheduled_on"] = updates["create_after"] = None
+                return
+            local_start = utils.get_local_date(time=time, date=date)
+            create_after_delta = timedelta(seconds=updated["create_before_seconds"]) if updated.get("create_before_seconds") else (
+                timedelta(hours=app.config["RUNDOWNS_SCHEDULE_HOURS"])
+            )
+            updates["scheduled_on"] = utils.get_next_date(updated["schedule"], local_start)
+            updates["create_after"] = updates["scheduled_on"] + create_after_delta if updates.get("scheduled_on") else None
+            if not updates["scheduled_on"]:
+                logger.warning("Could not schedule next Rundown for template %s", updated["title"])
+            else:
+                logger.info("Next rundown for template %s scheduled on %s", updated["title"], updates["scheduled_on"].isoformat())
 
     def on_create(self, docs):
         for doc in docs:

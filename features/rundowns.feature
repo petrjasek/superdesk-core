@@ -35,6 +35,7 @@ Feature: Rundowns
         When we get "/shows"
         Then we get list with 0 items
 
+    @wip
     @auth
     Scenario: Templates CRUD
         Given "shows"
@@ -60,7 +61,8 @@ Feature: Rundowns
                 "by_month": [1],
                 "by_month_day": [1, -1],
                 "by_day": [1]
-            }
+            },
+            "create_before_seconds": 3600
         }
         """
         Then we get new resource
@@ -74,7 +76,8 @@ Feature: Rundowns
             },
             "airtime_date": "2050-06-22",
             "airtime_time": "06:00",
-            "created_by": "#CONTEXT_USER_ID#"
+            "created_by": "#CONTEXT_USER_ID#",
+            "scheduled_on": "2050-06-22T06:00:00+0000"
         }
         """
 

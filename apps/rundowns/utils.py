@@ -2,6 +2,9 @@ import datetime
 import dateutil.rrule as rrule
 
 from typing import Optional
+from flask import current_app as app
+
+from superdesk.utc import utcnow, utc_to_local
 
 
 def parse_time(timestr: str) -> datetime.time:
@@ -27,7 +30,15 @@ def combine_date_time(
     )
 
 
-def get_next_date(start_date: datetime.datetime, schedule) -> Optional[datetime.datetime]:
+def get_local_date(time: datetime.time, date: Optional[datetime.date] = None) -> datetime.datetime:
+    now = utcnow()
+    local_date = utc_to_local(app.config["RUNDOWNS_TIMEZONE"], now)
+    if date is None:
+        date = local_date.date()
+    return combine_date_time(date, time, local_date.tzinfo)
+
+
+def get_next_date(schedule, start_date: datetime.datetime) -> Optional[datetime.datetime]:
     assert start_date.tzinfo is not None, "start_date must be time zone aware"
     if not schedule.get("freq"):
         return None
