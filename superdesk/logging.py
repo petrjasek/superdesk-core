@@ -8,9 +8,9 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import yaml
 import logging
 import logging.config
-import yaml
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("superdesk")
@@ -46,8 +46,9 @@ def configure_logging(file_path):
 
     try:
         with open(file_path, "r") as f:
-            logging_dict = yaml.load(f)
+            logging_dict = yaml.load(f, Loader=yaml.SafeLoader)
 
         logging.config.dictConfig(logging_dict)
     except Exception:
+        raise
         logger.warn("Cannot load logging config. File: %s", file_path)
