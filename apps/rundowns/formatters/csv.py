@@ -8,11 +8,9 @@ class TableCSVFormatter(BaseFormatter):
     COLUMNS = [
         "Order",
         "Type",
-        "Title",
-        "Tone/Off",
+        "Technical Title",
+        "Subitem(s)",
         "Additional realizer info",
-        "Live Captions",
-        "Part of the last spoken sentence",
         "Duration",
     ]
 

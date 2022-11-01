@@ -526,6 +526,7 @@ Feature: Rundowns
         """
         Then we get ok response
 
+    @wip
     @auth
     Scenario: Export
         When we get "/rundown_export"
@@ -533,8 +534,8 @@ Feature: Rundowns
         """
         {"_items": [
             {"name": "Prompter PDF", "_id": "prompter-pdf"},
-            {"name": "Realizer CSV", "_id": "table-csv"},
-            {"name": "Realizer PDF", "_id": "table-pdf"}
+            {"name": "Technical CSV", "_id": "table-csv"},
+            {"name": "Technical PDF", "_id": "table-pdf"}
         ]}
         """
 
