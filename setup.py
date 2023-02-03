@@ -13,55 +13,42 @@ from setuptools import setup, find_packages
 LONG_DESCRIPTION = "Superdesk Server Core"
 
 install_requires = [
-    # temporary requirement to get urllib in a version compatible with requests
-    # to be kept until requests update its requirements
-    # (cf. https://github.com/psf/requests/issues/5654
-    # and https://github.com/psf/requests/pull/5651)
-    "urllib3<1.26",
-    "eve==1.1.2",
-    "eve-elastic>=7.3.0,<7.4.0",
-    "flask>=1.1,<1.2",
+    "eve>=2.0,<2.1",
+    "eve-elastic>=7.3,<7.4",
+    "flask<2.2",  # based on eve
     "flask-mail>=0.9,<0.10",
-    "flask-script>=2.0.5,<3.0",
-    "flask-babel>=1.0,<1.1",
+    "flask-script==2.0.6",  # deprecated
+    "flask-babel>=3.0,<3.1",
     "pillow>=9.2,<9.3",
-    "arrow>=0.4,<=0.13",
+    "arrow>=1.2,<=1.3",
     "bcrypt>=3.1.1,<3.2",
-    "blinker>=1.3,<1.5",
-    "celery[redis]>=4.4.0,<4.5",
-    "cerberus>=1.3.2,<1.4",
-    "redis>=3.2.0,<3.3",
-    "kombu>=4.6,<4.7",
-    "feedparser>=6.0.8,<6.1",
-    "hachoir<=3.0a3",
-    "HermesCache>=0.10.0,<0.11.0",
+    "celery[redis]>=4.4.0,<5",
+    "redis>=3.2,<3.3",
+    "feedparser>=6.0,<6.1",
+    "hachoir>=3.2,<3.3",
+    "HermesCache>=0.10,<0.11",
     "python-magic>=0.4,<0.5",
     "ldap3>=2.2.4,<2.6",
     "pytz>=2015.4",
-    "tzlocal>=2.1,<3.0",
-    "raven[flask]>=5.10,<7.0",
-    "requests>=2.7.0,<3.0",
-    "boto3>=1.18.42,<2",
-    "websockets==10.3",
-    "mongolock>=1.3.4,<1.4",
-    "PyYAML>=5.3.1,<6.0",
+    "tzlocal>=2.1,<3",
+    "requests>=2.28,<3",
+    "boto3>=1.18,<2",
+    "websockets>=10.3,<11",
+    "mongolock==1.3.4",  # deprecated
     "lxml>=4,<4.7",
     "python-twitter==3.5",
-    "chardet<4.0",
-    "pymongo>=3.8,<3.12",
-    "croniter<0.4",
-    "python-dateutil<2.8",
-    "unidecode==0.04.21",
-    "authlib>0.14,<0.15",
+    "chardet>=5.1,<6.0",
+    "pymongo>=3.8,<4.0",
+    "croniter>=1.3,<1.4",
+    "python-dateutil>=2.8,<3.0",
+    "unidecode>=1.3,<1.4",
+    "authlib>=1.2,<1.3",
     "draftjs-exporter[lxml]<2.2",
-    "werkzeug>=1.0,<1.1",
-    "regex==2020.7.14",
+    "regex",
     "flask-oidc-ex==0.5.5",
     # to be replaced by stdlib version when we use Python 3.8+
     "typing_extensions>=3.7.4",
     "elastic-apm[flask]>=6.7,<7",
-    # Fix an issue with MarkupSafe 2.1.0 not exporting `soft_unicode`
-    "MarkupSafe<2.1",
 ]
 
 package_data = {
