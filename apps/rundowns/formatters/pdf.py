@@ -22,8 +22,14 @@ styles = getSampleStyleSheet()
 
 FONT_NAME = "DejaVuSans"
 MONO_FONT_NAME = "DejaVuSansMono"
-pdfmetrics.registerFont(TTFont(FONT_NAME, "DejaVuSans.ttf"))
-pdfmetrics.registerFont(TTFont(MONO_FONT_NAME, "DejaVuSansMono.ttf"))
+
+try:
+    pdfmetrics.registerFont(TTFont(FONT_NAME, "DejaVuSans.ttf"))
+    pdfmetrics.registerFont(TTFont(MONO_FONT_NAME, "DejaVuSansMono.ttf"))
+    fonts_loaded = True
+except BaseException:
+    fonts_loaded = False
+
 
 FONT_SIZE = 14
 ORDERED_TYPE = "1"

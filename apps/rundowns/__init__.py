@@ -43,13 +43,18 @@ def init_app(app: SuperdeskApp) -> None:
         "rundown_comments", comments.RundownCommentsResource, service_instance=comments.comments_service, _app=app
     )
 
-    from .formatters.pdf import PrompterPDFFormatter, TablePDFFormatter
+    from .formatters.pdf import PrompterPDFFormatter, TablePDFFormatter, fonts_loaded
     from .formatters.csv import TableCSVFormatter
 
-    export.available_services = [
-        PrompterPDFFormatter("prompter-pdf", "Prompter PDF"),
-        TableCSVFormatter("table-csv", "Technical CSV"),
-        TablePDFFormatter("table-pdf", "Technical PDF"),
-    ]
+    if fonts_loaded:
+        export.available_services = [
+            PrompterPDFFormatter("prompter-pdf", "Prompter PDF"),
+            TableCSVFormatter("table-csv", "Technical CSV"),
+            TablePDFFormatter("table-pdf", "Technical PDF"),
+        ]
+    else:
+        export.available_services = [
+            TableCSVFormatter("table-csv", "Technical CSV"),
+        ]
 
     app.register_blueprint(export.blueprint)
