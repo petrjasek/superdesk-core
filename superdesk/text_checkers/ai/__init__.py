@@ -88,6 +88,7 @@ class AIService(BaseService):
         docs[0].update({"analysis": analyzed_data})
         return [0]
 
+
 class AIDataOpResource(Resource):
     schema = {
         "service": {

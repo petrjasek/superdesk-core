@@ -217,14 +217,14 @@ class IMatrics(AIServiceBase):
         )
 
     def search_images(self, items: list) -> dict:
-        """fetch image suggestions"""
+        """Fetch image suggestions"""
         if not self.base_url or not self.user or not self.key:
             logger.warning("IMatrics is not configured properly, can't fetch images")
             return {"result": []}
         data = items
         try:
             r_data = self._search_images(data)
-        except:
+        except Exception:
             return {"result": []}
         return [image for image in r_data if type(image["imageUrl"]) == str and image["imageUrl"] != ""]
 
@@ -232,9 +232,7 @@ class IMatrics(AIServiceBase):
         return self._request_images(
             "images/search",
             data,
-            params=dict(
-                **params
-            ),
+            params=dict(**params),
         )
 
     def search2(self, reg: dict) -> dict:
@@ -385,7 +383,9 @@ class IMatrics(AIServiceBase):
 
     def _request_images(self, service, data=None, method="POST", params=None):
         url = urljoin(self.image_base_url, service)
-        r = session.request(method, url, json=data, headers={"x-api-key": self.image_key}, params=params, timeout=TIMEOUT)
+        r = session.request(
+            method, url, json=data, headers={"x-api-key": self.image_key}, params=params, timeout=TIMEOUT
+        )
         if r.status_code != 200:
             raise SuperdeskApiError.proxyError(
                 "Unexpected return code ({status_code}) from {name}: {msg}".format(
