@@ -105,7 +105,7 @@ def get_queue_items(retries=False, subscriber_id=None, priority=None):
     request = ParsedRequest()
     request.max_results = app.config.get("MAX_TRANSMIT_QUERY_LIMIT", 100)  # limit per subscriber now
     request.sort = '[("_created", 1), ("published_seq_num", 1)]'
-    return get_resource_service(PUBLISH_QUEUE).get(req=request, lookup=lookup)
+    return get_resource_service(PUBLISH_QUEUE).get_from_mongo(req=request, lookup=lookup)
 
 
 def _get_queue(priority=None):
@@ -189,7 +189,6 @@ def transmit_item(queue_item_id, is_async=False):
             updates = {config.LAST_UPDATED: utcnow()}
 
             if orig_item.get("retry_attempt", 0) < max_retry_attempt and not isinstance(e, PublishHTTPPushClientError):
-
                 updates["retry_attempt"] = orig_item.get("retry_attempt", 0) + 1
                 updates["state"] = QueueState.RETRYING.value
                 updates["next_retry_attempt_at"] = utcnow() + timedelta(minutes=retry_attempt_delay)
