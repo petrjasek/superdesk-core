@@ -11,13 +11,13 @@
 """Superdesk"""
 
 import eve
+import click
 import blinker
 import logging as logging_lib
 
 from typing import Any, Dict, NamedTuple, Optional
 from flask import abort, json, Blueprint, current_app
 from flask_babel.speaklater import LazyString
-from flask_script import Command as BaseCommand, Option
 from eve.utils import config  # noqa
 from eve.methods.common import document_link  # noqa
 from werkzeug.exceptions import HTTPException
@@ -37,7 +37,6 @@ __version__ = "2.7.0dev"
 API_NAME = "Superdesk API"
 SCHEMA_VERSION = 2
 DOMAIN = {}
-COMMANDS = {}
 JINJA_FILTERS = dict()
 app_components: Dict[str, BaseComponent] = dict()
 app_models: Dict[str, BaseModel] = dict()
@@ -49,30 +48,23 @@ logger = logging_lib.getLogger(__name__)
 app: Optional[eve.Eve] = None
 
 
+@click.group()
+def cli():
+    pass
+
+
+class Command(click.Command):
+    def run(self):
+        pass
+
+    def invoke(self, ctx):
+        self.run()
+
+
 class UserPreference(NamedTuple):
     value: Any
     label: Optional[LazyString] = None
     category: Optional[LazyString] = None
-
-
-class Command(BaseCommand):
-    """Superdesk Command.
-
-    The Eve framework changes introduced with https://github.com/nicolaiarocci/eve/issues/213 make the commands fail.
-    Reason being the flask-script's run the commands using test_request_context() which is invalid.
-    That's the reason we are inheriting the Flask-Script's Command to overcome this issue.
-    """
-
-    def __call__(self, _app=None, *args, **kwargs):
-        try:
-            with app.app_context():
-                res = self.run(*args, **kwargs)
-                logger.info("Command finished with: {}".format(res))
-                return 0
-        except Exception as ex:
-            logger.info("Uhoh, an exception occured while running the command...")
-            logger.exception(ex)
-            return 1
 
 
 def get_headers(self, environ=None):
@@ -97,9 +89,9 @@ def domain(resource, res_config):
     app.register_resource(resource, res_config)
 
 
-def command(name, command):
+def command(name: str, command: click.Command):
     """Register command"""
-    COMMANDS[name] = command
+    cli.add_command(command, name)
 
 
 def blueprint(blueprint, app, **kwargs):

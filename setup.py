@@ -64,6 +64,7 @@ install_requires = [
     "Werkzeug>=1.0,<1.1",
     "Jinja2>=2.11,<3.0",
     "itsdangerous>=1.1,<2.0",
+    "Click>=8.0.3,<9.0",
 ]
 
 package_data = {

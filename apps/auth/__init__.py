@@ -49,7 +49,7 @@ def init_app(app) -> None:
 @celery.task
 def session_purge():
     try:
-        RemoveExpiredSessions().run()
+        RemoveExpiredSessions("session:gc").run()
     except Exception as ex:
         logger.error(ex)
 
@@ -89,4 +89,4 @@ def is_current_user_admin(required=False):
     return user.get("user_type", "") == "administrator"
 
 
-superdesk.command("session:gc", RemoveExpiredSessions())
+superdesk.command("session:gc", RemoveExpiredSessions("session:gc"))
