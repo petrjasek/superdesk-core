@@ -20,7 +20,7 @@ install_requires = [
     "urllib3<1.26",
     "eve==1.1.2",
     "eve-elastic>=7.3.2,<7.4.0",
-    "flask>=1.1,<1.2",
+    "flask>=2.0,<3.0",
     "flask-mail>=0.9,<0.10",
     "flask-script>=2.0.5,<3.0",
     "flask-babel>=1.0,<1.1",
@@ -61,10 +61,7 @@ install_requires = [
     "elastic-apm[flask]>=6.15.1,<7.0",
     # Fix an issue with MarkupSafe 2.1.0 not exporting `soft_unicode`
     "MarkupSafe<2.1",
-    "Werkzeug>=1.0,<1.1",
-    "Jinja2>=2.11,<3.0",
     "Click>=8.0.3,<9.0",
-    "itsdangerous>=1.1,<2.0",
     "pymemcache>=4.0,<4.1",
 ]
 

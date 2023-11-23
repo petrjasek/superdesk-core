@@ -2,17 +2,12 @@ mypy
 mypy-extensions
 toml
 types-chardet
-types-click
 types-croniter
-types-Flask
-types-Jinja2
-types-MarkupSafe
 types-python-dateutil
 types-pytz
 types-PyYAML
 types-redis
 types-requests
 types-tzlocal
-types-Werkzeug
 typing-extensions
 boto3-stubs[s3,sqs]
