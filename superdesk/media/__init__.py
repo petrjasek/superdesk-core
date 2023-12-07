@@ -8,16 +8,18 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from .media_references import MediaReferencesResource
+from .media_references import MediaReferencesResource, MediaReference
 from .media_editor import MediaEditorService, MediaEditorResource
 from superdesk.services import BaseService
 import superdesk
 
 
+media_references_service = BaseService[MediaReference]("media_references", backend=superdesk.get_backend())
+
+
 def init_app(app) -> None:
     endpoint_name = "media_references"
-    service = BaseService(endpoint_name, backend=superdesk.get_backend())
-    MediaReferencesResource(endpoint_name, app=app, service=service)
+    MediaReferencesResource(endpoint_name, app=app, service=media_references_service)
 
     endpoint_name = "media_editor"
     service = MediaEditorService(endpoint_name, backend=superdesk.get_backend())

@@ -8,6 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from typing import Any, Dict, TypedDict
 import flask
 import logging
 from flask_babel import _
@@ -26,24 +27,31 @@ from .service import UserSessionClearService, AuthService
 logger = logging.getLogger(__name__)
 
 
+class AuthUser(TypedDict):
+    username: str
+    password: str
+    is_active: bool
+    is_enabled: bool
+
+
+class Session(TypedDict):
+    user: Any
+    session_preferences: Dict[str, Any]
+
+
+auth_users_service = BaseService[AuthUser]("auth_users", backend=superdesk.get_backend())
+sessions_service = BaseService[Session]("sessions", backend=superdesk.get_backend())
+clear_sessions_service = UserSessionClearService("clear_sessions", backend=superdesk.get_backend())
+auth_service = AuthService("auth", backend=superdesk.get_backend())
+
+
 def init_app(app) -> None:
     app.auth = SuperdeskTokenAuth()  # Overwrite the app default auth
 
-    endpoint_name = "auth_users"
-    service = BaseService(endpoint_name, backend=superdesk.get_backend())
-    AuthUsersResource(endpoint_name, app=app, service=service)
-
-    endpoint_name = "sessions"
-    service = BaseService(endpoint_name, backend=superdesk.get_backend())
-    SessionsResource(endpoint_name, app=app, service=service)
-
-    endpoint_name = "clear_sessions"
-    service = UserSessionClearService(endpoint_name, backend=superdesk.get_backend())
-    UserSessionClearResource(endpoint_name, app=app, service=service)
-
-    endpoint_name = "auth"
-    service = AuthService(endpoint_name, backend=superdesk.get_backend())
-    AuthResource(endpoint_name, app=app, service=service)
+    AuthUsersResource(auth_users_service.datasource, app=app, service=auth_users_service)
+    SessionsResource(sessions_service.datasource, app=app, service=sessions_service)
+    UserSessionClearResource(clear_sessions_service.datasource, app=app, service=clear_sessions_service)
+    AuthResource(auth_service.datasource, app=app, service=auth_service)
 
 
 @celery.task

@@ -8,10 +8,12 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import bson
 import flask
 import logging
 import superdesk
 
+from typing import TypedDict
 from datetime import timedelta
 from flask import request, current_app as app, session
 from eve.auth import TokenAuth
@@ -25,6 +27,8 @@ from superdesk import (
 )
 from superdesk.utc import utcnow
 from flask_babel import _
+
+from .import auth_service
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +54,13 @@ class AuthUsersResource(Resource):
     item_methods = []
     resource_methods = []
     internal_resource = True
+
+
+class AuthData(TypedDict):
+    username: str
+    password: str
+    token: str
+    user: bson.ObjectId
 
 
 class AuthResource(Resource):
@@ -142,7 +153,6 @@ class SuperdeskTokenAuth(TokenAuth):
 
         If token is valid it updates session and checks permissions.
         """
-        auth_service = get_resource_service("auth")
         user_service = get_resource_service("users")
         auth_token = auth_service.find_one(token=token, req=None)
         if auth_token:

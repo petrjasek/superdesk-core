@@ -12,11 +12,13 @@ import random
 import pymongo
 import logging
 
-from typing import Dict, Any, List, Optional, Union
+from abc import abstractmethod
+from typing import Dict, Any, List, Optional, Union, Generic, Iterable, TypeVar
 from flask import current_app as app, json, g
 from eve.utils import ParsedRequest, config
 from eve.methods.common import resolve_document_etag
 from superdesk.errors import SuperdeskApiError
+from superdesk.types import Entity
 from superdesk.utc import utcnow
 from superdesk.cache import cache
 
@@ -24,7 +26,20 @@ from superdesk.cache import cache
 logger = logging.getLogger(__name__)
 
 
-class BaseService:
+T = TypeVar("T", covariant=True)
+
+
+class MongoCursor(Iterable[T]):
+    @abstractmethod
+    def sort(self, field: str) -> Iterable[T]:
+        pass
+
+    @abstractmethod
+    def next(self) -> T:
+        pass
+
+
+class BaseService(Generic[T]):
     """
     Base service for all endpoints, defines the basic implementation for CRUD datalayer functionality.
     """
@@ -103,30 +118,30 @@ class BaseService:
     def delete_docs(self, docs):
         return self.backend.delete_docs(self.datasource, docs)
 
-    def find_one(self, req, **lookup):
+    def find_one(self, req, **lookup) -> Optional[T]:
         res = self.backend.find_one(self.datasource, req=req, **lookup)
         return res
 
-    def find(self, where, **kwargs):
+    def find(self, where, **kwargs) -> Iterable[T]:
         """Find items in service collection using mongo query.
 
         :param dict where:
         """
         return self.backend.find(self.datasource, where, **kwargs)
 
-    def get(self, req, lookup):
+    def get(self, req, lookup) -> Iterable[T]:
         if req is None:
             req = ParsedRequest()
         return self.backend.get(self.datasource, req=req, lookup=lookup)
 
-    def get_from_mongo(self, req, lookup, projection=None):
+    def get_from_mongo(self, req, lookup, projection=None) -> MongoCursor[T]:
         if req is None:
             req = ParsedRequest()
         if not req.projection and projection:
             req.projection = json.dumps(projection)
         return self.backend.get_from_mongo(self.datasource, req=req, lookup=lookup)
 
-    def get_all(self):
+    def get_all(self) -> Iterable[T]:
         return self.get_from_mongo(None, {}).sort("_id")
 
     def find_and_modify(self, query, update, **kwargs):
@@ -271,7 +286,10 @@ class Service(BaseService):
     pass
 
 
-class CacheableService(BaseService):
+TEntity = TypeVar("TEntity", bound=Entity)
+
+
+class CacheableService(BaseService[TEntity]):
     """Handles caching for the resource, will invalidate on any changes to the resource."""
 
     datasource: str
@@ -281,7 +299,7 @@ class CacheableService(BaseService):
     def cache_key(self) -> str:
         return "cached:{}".format(self.datasource)
 
-    def get_cached(self) -> List[Dict[str, Any]]:
+    def get_cached(self) -> List[TEntity]:
         @cache(
             ttl=3600 + random.randrange(1, 300),
             tags=(self.datasource,),
@@ -295,7 +313,7 @@ class CacheableService(BaseService):
 
         return getattr(g, self.cache_key)
 
-    def get_cached_by_id(self, _id):
+    def get_cached_by_id(self, _id) -> Optional[TEntity]:
         cached = self.get_cached()
         for item in cached:
             if item.get("_id") == _id:

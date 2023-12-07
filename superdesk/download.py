@@ -10,6 +10,7 @@
 
 """Download module"""
 import logging
+from typing import IO, TypedDict
 import superdesk
 from superdesk.errors import SuperdeskApiError
 from superdesk.auth.decorator import blueprint_auth
@@ -44,12 +45,18 @@ def download_url(media_id):
     return url_for("download_raw.download_file", id=media_id, _external=True, _scheme=prefered_url_scheme)
 
 
+class Download(TypedDict):
+    file: IO
+
+
+download_service = BaseService[Download]("download", backend=superdesk.get_backend())
+
+
 def init_app(app) -> None:
     endpoint_name = "download"
     app.download_url = download_url
     superdesk.blueprint(bp, app)
-    service = BaseService(endpoint_name, backend=superdesk.get_backend())
-    DownloadResource(endpoint_name, app=app, service=service)
+    DownloadResource(endpoint_name, app=app, service=download_service)
 
 
 class DownloadResource(Resource):

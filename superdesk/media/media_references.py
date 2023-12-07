@@ -8,7 +8,15 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from typing import Optional, TypedDict
 from superdesk import Resource
+
+
+class MediaReference(TypedDict):
+    item_id: str
+    media_id: str
+    associated_id: str
+    published: Optional[bool]
 
 
 class MediaReferencesResource(Resource):

@@ -9,16 +9,22 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 
+from typing import TypedDict
 from superdesk.resource import Resource
 from superdesk.services import BaseService
 from superdesk import get_backend
 from superdesk.metadata.item import metadata_schema
 
 
+class Spikes(TypedDict):
+    pass
+
+
+spikes_service = BaseService[Spikes]("spikes", backend=get_backend())
+
+
 def init_app(app) -> None:
-    endpoint_name = "spikes"
-    service = BaseService(endpoint_name, backend=get_backend())
-    SpikesResource(endpoint_name, app=app, service=service)
+    SpikesResource(spikes_service.datasource , app=app, service=spikes_service)
 
 
 class SpikesResource(Resource):

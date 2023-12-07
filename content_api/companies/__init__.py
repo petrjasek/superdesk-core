@@ -8,12 +8,14 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from content_api.companies.resource import CompaniesResource
 import superdesk
+
+from content_api.companies.resource import CompaniesResource, Company
 from superdesk.services import BaseService
 
 
+companies_service = BaseService[Company]("companies", backend=superdesk.get_backend())
+
+
 def init_app(app) -> None:
-    endpoint_name = "companies"
-    service = BaseService(endpoint_name, backend=superdesk.get_backend())
-    CompaniesResource(endpoint_name, app=app, service=service)
+    CompaniesResource(companies_service.datasource, app=app, service=companies_service)

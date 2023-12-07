@@ -9,12 +9,21 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import logging
-from superdesk.resource import Resource
 import superdesk
+
+from typing import TypedDict
+from superdesk.resource import Resource
 from content_api import MONGO_PREFIX
 
 
 logger = logging.getLogger(__name__)
+
+
+class AuthUser(TypedDict):
+    email: str
+    password: str
+    is_enabled: bool
+    is_approved: bool
 
 
 class AuthUsersResource(Resource):

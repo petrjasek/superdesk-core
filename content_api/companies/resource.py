@@ -10,6 +10,19 @@
 
 from superdesk.resource import Resource
 from content_api import MONGO_PREFIX
+from superdesk.types import Entity
+
+
+class BaseCompany(Entity):
+    name: str
+
+
+class Company(BaseCompany, total=False):
+    sd_subsciber_id: str
+    is_enabled: bool
+    contact_name: str
+    phone: str
+    country: str
 
 
 class CompaniesResource(Resource):

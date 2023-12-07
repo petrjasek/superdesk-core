@@ -8,16 +8,17 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from apps.auth import AuthResource
 import superdesk
+
+from apps.auth.auth import AuthData, AuthResource
 from superdesk.services import BaseService
-from .auth import AuthUsersResource
+from .auth import AuthUsersResource, AuthUser
+
+
+auth_service = BaseService[AuthData]("auth", backend=superdesk.get_backend())
+auth_user_service = BaseService[AuthUser]("auth_user", backend=superdesk.get_backend())
 
 
 def init_app(app) -> None:
-    endpoint_name = "auth"
-    service = BaseService("auth", backend=superdesk.get_backend())
-    AuthResource(endpoint_name, app=app, service=service)
-
-    service = BaseService("auth_user", backend=superdesk.get_backend())
-    AuthUsersResource("auth_user", app=app, service=service)
+    AuthResource(auth_service.datasource, app=app, service=auth_service)
+    AuthUsersResource("auth_user", app=app, service=auth_user_service)
