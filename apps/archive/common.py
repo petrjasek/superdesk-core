@@ -502,7 +502,7 @@ def remove_media_files(doc, published=False):
 
     for renditions in references:
         for rendition in renditions.values():
-            if not rendition.get("media"):
+            if not rendition or not rendition.get("media"):
                 continue
             media = rendition.get("media") if isinstance(rendition.get("media"), str) else str(rendition.get("media"))
             try:
