@@ -21,7 +21,7 @@ install_requires = [
     "eve>=1.1.2,<=2.1.0",
     "eve-elastic>=7.4.0,<7.5.0",
     "elasticsearch<7.14",  # we are using oss version on test server
-    "flask>=1.1,<1.2",
+    "flask>=2.1,<3.0",
     "flask-mail>=0.9,<0.10",
     "flask-script>=2.0.5,<3.0",
     "flask-babel>=1.0,<4.1",
@@ -60,14 +60,8 @@ install_requires = [
     # to be replaced by stdlib version when we use Python 3.8+
     "typing_extensions>=3.7.4",
     "elastic-apm[flask]>=6.15.1,<7.0",
-    # Fix an issue with MarkupSafe 2.1.0 not exporting `soft_unicode`
-    "MarkupSafe<2.1",
     "reportlab>=3.6.11,<3.7",
     "pyjwt>=2.4.0,<2.5",
-    "Werkzeug>=1.0,<1.1",
-    "Jinja2>=2.11,<3.0",
-    "Click>=8.0.3,<9.0",
-    "itsdangerous>=1.1,<2.0",
     "pymemcache>=4.0,<4.1",
 ]
 
