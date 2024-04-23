@@ -1,6 +1,3 @@
-from nose.plugins.attrib import attr
-
-
 def wip(f):
     """Allows to run a single test using a @wip decorator
 
@@ -17,5 +14,4 @@ def wip(f):
     then run with:
     nosetests -a wip
     """
-
-    return attr("wip")(f)
+    pass

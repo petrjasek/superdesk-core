@@ -9,8 +9,8 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 
+import pytest
 import unittest
-from nose.tools import assert_raises
 
 from superdesk.macros.take_key_validator import validate
 
@@ -18,17 +18,17 @@ from superdesk.macros.take_key_validator import validate
 class TakeKeyValidatorTestCase(unittest.TestCase):
     def test_validation_fails(self):
         item = {"body_html": "$100"}
-        with assert_raises(KeyError):
+        with pytest.raises(KeyError):
             validate(item)
 
     def test_validation_fails_empty(self):
         item = {"body_html": "$100", "anpa_take_key": ""}
-        with assert_raises(KeyError):
+        with pytest.raises(KeyError):
             validate(item)
 
     def test_validation_fails_white_space(self):
         item = {"body_html": "$100", "anpa_take_key": "  "}
-        with assert_raises(KeyError):
+        with pytest.raises(KeyError):
             validate(item)
 
     def test_validation_succeeds(self):

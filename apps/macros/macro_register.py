@@ -11,7 +11,6 @@
 import inspect
 import importlib
 import sys
-import imp
 import os
 
 from flask import current_app
@@ -32,12 +31,9 @@ def load_module(module):
     :param module: name of he module
     """
     try:
-        imp.reload(sys.modules[module])
-    except (AttributeError, KeyError):
-        try:
-            importlib.import_module(module)
-        except ImportError:
-            return
+        importlib.import_module(module)
+    except ImportError:
+        return
 
     m = sys.modules[module]
     if getattr(m, "init_app", None):

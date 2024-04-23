@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.8', '3.10', '3.12']
 
     steps:
     - uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.10', '3.12']
 
     steps:
     - uses: actions/checkout@v3
@@ -36,14 +36,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - run: pip install -U pip wheel setuptools pip-tools
-    - run: pip-compile -U --resolver=backtracking setup.py
+    - run: pip-compile -U setup.py
 
   behave:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.8', '3.10', '3.12']
 
     steps:
     - uses: actions/checkout@v3
@@ -64,7 +64,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.8', '3.10', '3.12']
 
     steps:
     - uses: actions/checkout@v3
@@ -87,7 +87,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.8', '3.10', '3.12']
 
     steps:
     - uses: actions/checkout@v3

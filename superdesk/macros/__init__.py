@@ -6,14 +6,9 @@ Use `superdesk.macro_register.macros.register` for registration.
 """
 
 import os
-import sys
-import imp
 import logging
 import importlib
 import logging
-
-
-logger = logging.getLogger(__name__)
 
 
 logger = logging.getLogger(__name__)
@@ -34,11 +29,7 @@ def load_macros(path, package_prefix="superdesk.macros"):
     for macro in macros:
         module = "{}.{}".format(package_prefix, macro)
         try:
-            if module in sys.modules.keys():
-                m = sys.modules[module]
-                imp.reload(m)
-            else:
-                importlib.import_module(module)
+            importlib.import_module(module)
         except Exception as e:
             logger.warning("Can't import macro {module}: {reason}".format(module=module, reason=e))
 

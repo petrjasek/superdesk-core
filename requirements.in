@@ -1,0 +1,21 @@
+# requirements for tests
+
+flake8
+flake8-bugbear
+flake8-docstrings
+pep8
+pyflakes
+pydocstyle<7.0
+httmock==1.4.0
+watchdog==4.0.0
+wooper==0.4.4
+requests-mock==1.11.0
+responses>=0.15
+pytest
+pytest-env
+python3-saml>=1.9,<1.17
+typing_extensions>=3.7.4
+moto[sqs,s3]>=5.0,<5.1
+
+-e git+https://github.com/superdesk/superdesk-planning.git@develop#egg=superdesk-planning
+-e git+https://github.com/superdesk/sams.git@develop#egg=sams_client&subdirectory=src/clients/python/

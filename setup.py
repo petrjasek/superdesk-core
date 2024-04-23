@@ -13,11 +13,7 @@ from setuptools import setup, find_packages
 LONG_DESCRIPTION = "Superdesk Server Core"
 
 install_requires = [
-    # temporary requirement to get urllib in a version compatible with requests
-    # to be kept until requests update its requirements
-    # (cf. https://github.com/psf/requests/issues/5654
-    # and https://github.com/psf/requests/pull/5651)
-    "urllib3<1.26",
+    "urllib3>=1.25.4,<1.27",
     "eve>=1.1.2,<=2.1.0",
     "eve-elastic>=7.4.0,<7.5.0",
     "elasticsearch<7.14",  # we are using oss version on test server
@@ -29,10 +25,10 @@ install_requires = [
     "arrow>=0.4,<=0.13",
     "bcrypt>=3.1.1,<4.2",
     "blinker>=1.3,<1.8",
-    "celery[redis]>=5.2.7,<5.3",
+    "celery[redis]>=5.4.0,<5.5",
     "cerberus>=1.3.2,<1.4",
     "redis>=4.5.2,<5.1",
-    "kombu>=5.2.4,<5.3",
+    "kombu>=5.3.7,<5.5",
     "feedparser>=6.0.8,<6.1",
     "hachoir<=3.0a3",
     "HermesCache>=0.10.0,<0.11.0",
@@ -46,7 +42,7 @@ install_requires = [
     "websockets==10.3",
     "mongolock>=1.3.4,<1.4",
     "PyYAML>=6.0.1",
-    "lxml>=4,<4.7",
+    "lxml>=4.9.3,<5.3.0",
     "python-twitter==3.5",
     "chardet<6.0",
     "pymongo>=3.8,<3.12",

@@ -15,7 +15,7 @@ class TestClient:
         self.path = path
         self.id = uuid4()
 
-    def send(self, message):
+    async def send(self, message):
         self.messages.append(message)
 
 

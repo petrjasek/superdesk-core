@@ -10,7 +10,7 @@
 
 from unittest import TestCase, mock
 import boto3
-from moto import mock_sqs
+from moto import mock_aws
 
 import json
 
@@ -18,7 +18,7 @@ from superdesk.publish.transmitters.amazon_sqs_fifo import AmazonSQSFIFOPublishS
 from superdesk.errors import PublishAmazonSQSError
 
 
-@mock_sqs
+@mock_aws
 class AmazonSQSFIFOPublishServiceTestCase(TestCase):
     def setUp(self):
         self.config = {
@@ -79,7 +79,7 @@ class AmazonSQSFIFOPublishServiceTestCase(TestCase):
 
     @mock.patch("superdesk.errors.notifications_enabled", return_value=False)
     def test_connection_error(self, _notifications_enabled):
-        self.config["endpoint_url"] = "https://localhost.localdomain"
+        self.config["endpoint_url"] = "http://localhost:9999"
 
         with self.assertRaises(PublishAmazonSQSError) as context:
             self.service._transmit(self.item, {})

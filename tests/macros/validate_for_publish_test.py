@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from nose.tools import assert_raises
+import pytest
 
 from superdesk.tests import TestCase
 from superdesk.macros.validate_for_publish import validate_for_publish, ValidationError
@@ -26,6 +26,6 @@ class ValidateForPublishTests(TestCase):
         self.app.data.insert("archive", [{"_id": 1, "type": "text", "headline": "123456"}])
         self.app.data.insert("validators", [self.validator])
         with self.app.app_context():
-            with assert_raises(ValidationError):
+            with pytest.raises(ValidationError):
                 item = {"_id": 1}
                 validate_for_publish(item)
