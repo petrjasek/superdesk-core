@@ -21,7 +21,7 @@ jobs:
     - run: pip install -U pip wheel setuptools
     - run: pip install -r dev-requirements.txt
 
-    - run: pytest --log-level=ERROR --disable-warnings
+    - run: pytest --log-level=ERROR --disable-warnings -v
 
   pip-compile:
     runs-on: ubuntu-latest
