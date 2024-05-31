@@ -13,8 +13,7 @@ from setuptools import setup, find_packages
 LONG_DESCRIPTION = "Superdesk Server Core"
 
 install_requires = [
-    "urllib3>=1.26,<1.27; python_version < '3.10'",
-    "urllib3>=2.2.1,<2.3; python_version >= '3.10'",
+    "urllib3>=1.26,<3",
     "eve>=1.1.2,<=2.1.0",
     "eve-elastic>=7.4.0,<7.5.0",
     "elasticsearch<7.14",  # we are using oss version on test server
@@ -22,8 +21,8 @@ install_requires = [
     "flask-mail>=0.9,<0.10",
     "flask-script>=2.0.5,<3.0",
     "flask-babel>=1.0,<4.1",
-    "pillow>=9.2,<9.3",
-    "arrow>=0.4,<=0.13",
+    "arrow>=0.4,<=1.3.0",
+    "pillow>=9.2,<10.4",
     "bcrypt>=3.1.1,<4.2",
     "blinker>=1.3,<1.8",
     "celery[redis]>=5.4.0,<5.5",
@@ -31,7 +30,7 @@ install_requires = [
     "redis>=4.5.2,<5.1",
     "kombu>=5.3.7,<5.5",
     "feedparser>=6.0.8,<6.1",
-    "hachoir<=3.0a3",
+    "hachoir<=3.3.0",
     "HermesCache>=0.10.0,<0.11.0",
     "python-magic>=0.4,<0.5",
     "ldap3>=2.2.4,<2.6",
