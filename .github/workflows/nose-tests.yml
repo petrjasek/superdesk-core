@@ -37,6 +37,7 @@ jobs:
 
     - run: pip install -U pip wheel setuptools pip-tools
     - run: pip-compile -U --resolver=backtracking setup.py
+    - run: pip install -Ur requirements.txt
 
   behave:
     runs-on: ubuntu-latest
