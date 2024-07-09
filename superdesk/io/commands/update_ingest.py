@@ -9,6 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 
+from typing import List, Set, Tuple
 import bson
 import logging
 from datetime import timedelta, timezone, datetime
@@ -501,12 +502,12 @@ def ingest_cancel(item, feeding_service):
         ingest_service.patch(relative["_id"], update)
 
 
-def ingest_items(items, provider, feeding_service, rule_set=None, routing_scheme=None):
+def ingest_items(items, provider, feeding_service, rule_set=None, routing_scheme=None) -> Set[str]:
     all_items = filter_expired_items(provider, items)
     items_dict = {doc[GUID_FIELD]: doc for doc in all_items}
     items_in_package = []
     failed_items = set()
-    created_ids = []
+    created_ids: List[str] = []
     for item in [doc for doc in all_items if doc.get(ITEM_TYPE) == CONTENT_TYPE.COMPOSITE]:
         items_in_package = [
             ref["residRef"] for group in item.get("groups", []) for ref in group.get("refs", []) if "residRef" in ref
@@ -552,12 +553,12 @@ def ingest_items(items, provider, feeding_service, rule_set=None, routing_scheme
     ingest_service = superdesk.get_resource_service(ingest_collection)
     updated_items = ingest_service.find({"_id": {"$in": created_ids}}, max_results=len(created_ids))
     app.data._search_backend(ingest_collection).bulk_insert(ingest_collection, list(updated_items))
-    if failed_items:
-        logger.error("Failed to ingest the following items: %s", failed_items)
     return failed_items
 
 
-def ingest_item(item, provider, feeding_service, rule_set=None, routing_scheme=None, expiry=None):
+def ingest_item(
+    item, provider, feeding_service, rule_set=None, routing_scheme=None, expiry=None
+) -> Tuple[bool, List[str]]:
     items_ids = []
     try:
         ingest_collection = get_ingest_collection(feeding_service, item)
