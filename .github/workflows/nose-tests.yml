@@ -17,7 +17,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - run: ./scripts/tests_setup
-    - run: pip install -U pip wheel setuptools
     - run: pip install -r dev-requirements.txt
 
     - run: pytest --log-level=ERROR --disable-warnings
@@ -35,7 +34,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - run: pip install -U pip wheel setuptools pip-tools
+    - run: pip install -U pip-tools
     - run: pip-compile -U --resolver=backtracking setup.py
 
   behave:
@@ -53,7 +52,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - run: ./scripts/tests_setup
-    - run: pip install -U pip wheel setuptools
     - run: pip install -r dev-requirements.txt
 
     - run: behave --tags=-sams --format progress2 --logging-level=ERROR
@@ -76,7 +74,6 @@ jobs:
     - run: ./scripts/tests_setup
     - run: ./scripts/install-start-sams
 
-    - run: pip install -U pip wheel setuptools
     - run: pip install -r dev-requirements.txt
 
     - run: behave --tags=sams --format progress2 --logging-level=ERROR
@@ -97,7 +94,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - run: ./scripts/tests_setup
-    - run: pip install -U pip wheel setuptools
     - run: pip install -r dev-requirements.txt
 
     - run: pytest prod_api
@@ -119,5 +115,4 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - run: pip install -U pip wheel setuptools
     - run: pip install -Ur dev-requirements.txt

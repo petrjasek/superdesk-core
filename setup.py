@@ -100,7 +100,6 @@ setup(
     packages=find_packages(exclude=["tests*", "features*"]),
     package_data=package_data,
     include_package_data=True,
-    # setup_requires=["setuptools_scm"],
     install_requires=install_requires,
     extras_require={
         "exiv2": ["pyexiv2>=2.12.0,<2.13"],
