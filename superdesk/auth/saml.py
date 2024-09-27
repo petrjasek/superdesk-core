@@ -31,16 +31,20 @@ Service provider config for superdesk in ``settings.json`` file example::
 
 """
 
+from typing import Dict
 import superdesk
 import logging
 
 from urllib.parse import urlparse
 
-from flask import current_app as app, request, redirect, make_response, session, jsonify, json
+from flask import current_app as app, request, redirect, make_response, session, jsonify
 from superdesk.auth import auth_user
+from superdesk.cache import cache
 
 try:
     from onelogin.saml2.auth import OneLogin_Saml2_Auth
+    from onelogin.saml2.settings import OneLogin_Saml2_Settings
+    from onelogin.saml2.idp_metadata_parser import OneLogin_Saml2_IdPMetadataParser
 
     imported = True
 except ImportError:
@@ -64,8 +68,24 @@ def init_app(app) -> None:
         superdesk.blueprint(bp, app)
 
 
+@cache(ttl=60 * 60 * 24)
+def fetch_idp_metadata(url: str) -> Dict:
+    return OneLogin_Saml2_IdPMetadataParser.parse_remote(url, validate_cert=True, timeout=10)
+
+
+def update_idp_metadata(settings: OneLogin_Saml2_Settings) -> None:
+    idp_data = settings.get_idp_data()
+    if idp_data.get("metadata"):
+        idp_data_updated = fetch_idp_metadata(idp_data["metadata"])
+        merged = OneLogin_Saml2_IdPMetadataParser.merge_settings(idp_data, idp_data_updated["idp"])
+        settings._idp = merged
+        settings.format_idp_cert_multi()
+
+
 def init_saml_auth(req):
-    auth = OneLogin_Saml2_Auth(req, custom_base_path=app.config["SAML_PATH"])
+    settings = OneLogin_Saml2_Settings(custom_base_path=app.config["SAML_PATH"], sp_validation_only=True)
+    update_idp_metadata(settings)
+    auth = OneLogin_Saml2_Auth(req, old_settings=settings)
     return auth
 
 
@@ -102,6 +122,8 @@ def get_userdata(saml_data):
             userdata[dest] = saml_data[src][0]
         except (KeyError, IndexError):
             continue
+    if userdata.get("username"):
+        userdata.setdefault("email", userdata["username"])
     return userdata
 
 

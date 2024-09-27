@@ -75,6 +75,7 @@ def auth_user(email, userdata=None):
     # create new user using userdata
     # and re-run auth
     try:
+        userdata.setdefault("email", email)
         user = superdesk.get_resource_service("users").create_external_user(userdata)
         return auth_user(user["email"])
     except ValidationError as err:  # can't create user, so let it fail on next iteration
