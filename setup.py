@@ -105,7 +105,7 @@ setup(
     extras_require={
         "exiv2": ["pyexiv2>=2.12.0,<2.16"],
     },
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
