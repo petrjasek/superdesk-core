@@ -1851,7 +1851,8 @@ class Editor3TestCase(unittest.TestCase):
 
     def test_client_compatibility(self):
         client = (
-            "<p>WestJet says it will operate its first Boeing 737 MAX flight on Jan. 21 since the aircraft was cleared to fly again in Canadian airspace.</p>\n"
+            "<p>WestJet says it will operate its first Boeing 737 MAX flight on Jan."
+            " 21 since the aircraft was cleared to fly again in Canadian airspace.</p>\n"
             "<p><br></p>\n"
             "<p><br></p>\n"
             "<p><br></p>\n"
@@ -1863,7 +1864,8 @@ class Editor3TestCase(unittest.TestCase):
         {
     "entityMap": {},
     "blocks": [{
-        "text": "WestJet says it will operate its first Boeing 737 MAX flight on Jan. 21 since the aircraft was cleared to fly again in Canadian airspace.",
+        "text": "WestJet says it will operate its first Boeing 737 MAX flight on Jan."
+                " 21 since the aircraft was cleared to fly again in Canadian airspace.",
         "data": {
             "MULTIPLE_HIGHLIGHTS": {}
         },
@@ -2075,7 +2077,13 @@ class Editor3TestCase(unittest.TestCase):
             "children": "",
         }
 
-        expected = "<table><tbody><tr><td><p>US dollar (USD)</p></td><td/><td><p>(9,6381)</p></td></tr><tr><td><p>Euro (EUR)</p></td><td/><td><p>(10,2704)</p></td></tr><tr><td><p>Sveitsiske franc (CHF)</p></td><td/><td><p>(1000,1363)</p></td></tr></tbody></table>"
+        expected = (
+            "<table><tbody>"
+            "<tr><td><p>US dollar (USD)</p></td><td/><td><p>(9,6381)</p></td></tr>"
+            "<tr><td><p>Euro (EUR)</p></td><td/><td><p>(10,2704)</p></td></tr>"
+            "<tr><td><p>Sveitsiske franc (CHF)</p></td><td/><td><p>(1000,1363)</p></td></tr>"
+            "</tbody></table>"
+        )
         item_editor3 = self.build_item(data)
         body_editor = Editor3Content(item_editor3)
         item = body_editor.html_exporter.render_table(data)

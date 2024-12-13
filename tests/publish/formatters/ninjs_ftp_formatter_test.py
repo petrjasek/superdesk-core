@@ -950,7 +950,7 @@ class FTPNinjsFormatterTest(TestCase):
             ],
             "abstract": "<p>Story abstract</p>",
             "annotations": [],
-            "body_html": '<p>For example, TCP port 631 pened by cupsd process and cupsd only listing on the loopback address (127.0.0.1). Similarly, TCP port 22 opened by sshd process and sshd listing on all IP address for ssh connections:</p>\n<!-- EMBED START Video {id: "editor_0"} -->\n<figure>\n    <video controls src="http://localhost:5000/api/upload-raw/647fdaebae4a8a99d5d4eab5.mp4" alt="Video Alt text" width="100%" height="100%" />\n    <figcaption>Test video decsription</figcaption>\n</figure>\n<!-- EMBED END Video {id: "editor_0"} -->\n<p>The ss command is used to dump socket statistics. It allows showing information similar to netstat. It can display more TCP and state information than other tools. The syntax is:</p>\n<!-- EMBED START Image {id: "editor_1"} -->\n<figure>\n    <img src="http://localhost:5000/api/upload-raw/63d84c03b3fae2e407e0decd.jpg" alt="Germany Daily Life" />\n    <figcaption>A Valais black-nosed sheep jumps into the air on a snow-covered meadow in Langenenslingen, Germany</figcaption>\n</figure>\n<!-- EMBED END Image {id: "editor_1"} -->\n<p>In addition, to above commands one can use the nmap command which is an open source tool for network exploration and security auditing. We are going to use nmap to find and list open ports in Linux:&nbsp;</p>',
+            "body_html": "<p>For example, TCP port 631 pened by cupsd process ...</p>",
             "fields_meta": {
                 "headline": {
                     "draftjsState": [
@@ -994,7 +994,7 @@ class FTPNinjsFormatterTest(TestCase):
                             "blocks": [
                                 {
                                     "key": "svbd",
-                                    "text": "For example, TCP port 631 pened by cupsd process and cupsd only listing on the loopback address (127.0.0.1). Similarly, TCP port 22 opened by sshd process and sshd listing on all IP address for ssh connections:",
+                                    "text": "For example, TCP port 631 pened by cupsd process",
                                     "type": "unstyled",
                                     "depth": 0,
                                     "inlineStyleRanges": [],
@@ -1012,7 +1012,7 @@ class FTPNinjsFormatterTest(TestCase):
                                 },
                                 {
                                     "key": "794l3",
-                                    "text": "The ss command is used to dump socket statistics. It allows showing information similar to netstat. It can display more TCP and state information than other tools. The syntax is:",
+                                    "text": "The ss command is used to dump socket statistics.",
                                     "type": "unstyled",
                                     "depth": 0,
                                     "inlineStyleRanges": [],
@@ -1030,7 +1030,7 @@ class FTPNinjsFormatterTest(TestCase):
                                 },
                                 {
                                     "key": "ellml",
-                                    "text": "In addition, to above commands one can use the nmap command which is an open source tool for network exploration and security auditing. We are going to use nmap to find and list open ports in Linux: ",
+                                    "text": "In addition, to above commands one can use the nmap",
                                     "type": "unstyled",
                                     "depth": 0,
                                     "inlineStyleRanges": [],
@@ -1044,17 +1044,17 @@ class FTPNinjsFormatterTest(TestCase):
                                     "mutability": "MUTABLE",
                                     "data": {
                                         "media": {
-                                            "_id": "urn:newsml:localhost:2023-06-07T11:18:32.082856:eacdccc3-37fd-4ec1-9aed-5b1e8fb61f99",
+                                            "_id": "urn:newsml:localhost:2023-06-07T11:18:32.082856:eacdccc3-37fd-4ec1-9aed-5b1e8fb61f99",  # noqa: B950
                                             "media": "647fdaebae4a8a99d5d4eab5",
                                             "type": "video",
                                             "pubstatus": "usable",
                                             "format": "HTML",
                                             "firstcreated": "2023-06-07T01:18:32+0000",
                                             "versioncreated": "2023-06-07T01:18:46+0000",
-                                            "guid": "urn:newsml:localhost:2023-06-07T11:18:32.082856:eacdccc3-37fd-4ec1-9aed-5b1e8fb61f99",
+                                            "guid": "urn:newsml:localhost:2023-06-07T11:18:32.082856:eacdccc3-37fd-4ec1-9aed-5b1e8fb61f99",  # noqa: B950
                                             "unique_id": 41881,
                                             "unique_name": "#41881",
-                                            "family_id": "urn:newsml:localhost:2023-06-07T11:18:32.082856:eacdccc3-37fd-4ec1-9aed-5b1e8fb61f99",
+                                            "family_id": "urn:newsml:localhost:2023-06-07T11:18:32.082856:eacdccc3-37fd-4ec1-9aed-5b1e8fb61f99",  # noqa: B950
                                             "state": "in_progress",
                                             "source": "AAP",
                                             "priority": 6,
@@ -1115,8 +1115,8 @@ class FTPNinjsFormatterTest(TestCase):
                                             "_id": "tag:localhost:2023:4f7e5665-84e3-4cef-9181-addf9bf8474c",
                                             "guid": "tag:localhost:2023:4f7e5665-84e3-4cef-9181-addf9bf8474c",
                                             "headline": "Germany Daily Life",
-                                            "description_text": "A Valais black-nosed sheep jumps into the air on a snow-covered meadow in Langenenslingen, Germany",
-                                            "archive_description": "A Valais black-nosed sheep jumps into the air on a snow-covered meadow in Langenenslingen, Germany, Saturday, Jan. 28, 2023. (Thomas Warnack/dpa via AP)",
+                                            "description_text": "A Valais black-nosed sheep jumps into the air",
+                                            "archive_description": "A Valais black-nosed sheep jumps into the air",
                                             "source": "AP",
                                             "original_source": "AP/DPA",
                                             "versioncreated": "2023-03-07T01:04:39+0000",
@@ -1132,21 +1132,21 @@ class FTPNinjsFormatterTest(TestCase):
                                                     "height": 2600,
                                                 },
                                                 "baseImage": {
-                                                    "href": "http://localhost:5000/api/upload-raw/63d84c08b3fae2e407e0dee9?_schema=http",
+                                                    "href": "http://localhost:5000/api/upload-raw/63d84c08b3fae2e407e0dee9?_schema=http",  # noqa: B950
                                                     "media": "63d84c08b3fae2e407e0dee9",
                                                     "mimetype": "image/jpeg",
                                                     "width": 1400,
                                                     "height": 847,
                                                 },
                                                 "thumbnail": {
-                                                    "href": "http://localhost:5000/api/upload-raw/63d84c08b3fae2e407e0deeb?_schema=http",
+                                                    "href": "http://localhost:5000/api/upload-raw/63d84c08b3fae2e407e0dee9?_schema=http",  # noqa: B950
                                                     "media": "63d84c08b3fae2e407e0deeb",
                                                     "mimetype": "image/jpeg",
                                                     "width": 198,
                                                     "height": 120,
                                                 },
                                                 "viewImage": {
-                                                    "href": "http://localhost:5000/api/upload-raw/63d84c08b3fae2e407e0deed?_schema=http",
+                                                    "href": "http://localhost:5000/api/upload-raw/63d84c08b3fae2e407e0deed?_schema=http",  # noqa: B950
                                                     "media": "63d84c08b3fae2e407e0deed",
                                                     "mimetype": "image/jpeg",
                                                     "width": 640,

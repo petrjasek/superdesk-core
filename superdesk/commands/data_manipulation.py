@@ -506,7 +506,7 @@ class StorageRestore(superdesk.Command):
 
 
 class StorageStartRecording(superdesk.Command):
-    """Record changes made in database until the command is stopped
+    """Record changes made in database until the command is stopped.
 
     This command is intended for developers to help producing specific state (e.g. for tests), or to create a specific
     Superdesk instance e.g. for a demo.

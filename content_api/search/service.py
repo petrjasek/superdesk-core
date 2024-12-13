@@ -101,7 +101,10 @@ class SearchService(ItemsService):
             item["place"] = [self._format_cv_item(item) for item in (item.get("place") or [])]
 
         if item.get("signal"):
-            item["flags"] = {"marked_for_legal": True for signal in item.get("signal") if signal.get("code") == "cwarn"}
+            for signal in item.get("signal"):
+                if signal.get("code") == "cwarn":
+                    item["flags"] = {"marked_for_legal": True}
+                    break
 
     def find_one(self, req, **lookup):
         self.check_get_access_privilege()

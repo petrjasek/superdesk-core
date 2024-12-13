@@ -201,7 +201,7 @@ def plain_text_to_html(text: str) -> str:
 
     EMAIL_REGEX = re.compile(r"([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)", re.MULTILINE | re.UNICODE | re.IGNORECASE)
     URL_REGEX = re.compile(
-        '((?:<a href[^>]+>)|(?:<a href="))?((https?://)?((?:[\w-]+\.)+[a-z]+(?:/\S*?)?)(?=[\.,)]?(?:\s|$)))',
+        r'((?:<a href[^>]+>)|(?:<a href="))?((https?://)?((?:[\w-]+\.)+[a-z]+(?:/\S*?)?)(?=[\.,)]?(?:\s|$)))',
         re.MULTILINE | re.UNICODE | re.IGNORECASE,
     )
 
