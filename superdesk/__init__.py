@@ -31,8 +31,9 @@ from .workflow import *  # noqa
 from .signals import *  # noqa
 from apps.common.models.base_model import BaseModel
 from apps.common.components.base_component import BaseComponent
+from importlib.metadata import version
 
-__version__ = "2.9.0.dev"
+__version__ = version("superdesk-core")
 
 API_NAME = "Superdesk API"
 SCHEMA_VERSION = 2
