@@ -1,6 +1,7 @@
-mypy
-mypy-extensions
-toml
+-r dev-requirements.txt
+
+mypy==1.14.1
+mypy-extensions==1.0.0
 types-chardet
 types-click
 types-croniter
@@ -15,5 +16,5 @@ types-requests<2.32.0.20241017  # https://github.com/python/typeshed/issues/1082
 types-tzlocal
 types-Werkzeug
 types-jwt
-typing-extensions
+typing-extensions==4.12.2
 boto3-stubs[s3,sqs]
