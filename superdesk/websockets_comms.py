@@ -10,16 +10,21 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 
+import os
 import arrow
 import logging
 import asyncio
 import signal
 import websockets
+import sentry_sdk
 
 from uuid import UUID
 from urllib.parse import urlparse, parse_qs
 from websockets.server import WebSocketServerProtocol
 from typing import Dict, Set, Optional, Union
+from sentry_sdk.integrations.asyncio import AsyncioIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
+
 from superdesk.types import WebsocketMessageData, WebsocketMessageFilterConditions
 
 from flask import json
@@ -38,6 +43,16 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logging.getLogger("websockets").setLevel(logging.WARNING)
 setup_logging(logging.WARNING)
+
+async def init_sentry():
+    if os.environ.get("SENTRY_DSN"):
+        sentry_sdk.init(
+            os.environ.get("SENTRY_DSN"),
+            integrations=[
+                AsyncioIntegration(),
+                CeleryIntegration(),
+            ],
+        )
 
 
 class SocketBrokerClient:
@@ -215,6 +230,7 @@ class SocketCommunication:
             if not websocket.open:
                 break
             pings += 1
+            x = 1 / 0
             yield from websocket.send(json.dumps({"ping": pings, "clients": len(websocket.ws_server.websockets)}))
 
     def get_message_recipients(self, message_data: WebsocketMessageData) -> Set[WebSocketServerProtocol]:
@@ -291,15 +307,15 @@ class SocketCommunication:
             except Exception:
                 yield
 
-    @asyncio.coroutine
-    def _server_loop(self, websocket):
+    async def _server_loop(self, websocket):
         """Server loop - wait for message and broadcast it.
 
         :param websocket: websocket protocol instance
         """
+        await init_sentry()
         while True:
-            message = yield from websocket.recv()
-            yield from self.broadcast(message)
+            message = await websocket.recv()
+            await self.broadcast(message)
 
     def _log(self, message, websocket):
         """Log message with some websocket data like address.
@@ -338,6 +354,7 @@ class SocketCommunication:
         """
         try:
             loop = asyncio.get_event_loop()
+            loop.run_until_complete(init_sentry())
             server = loop.run_until_complete(websockets.serve(self._connection_handler, self.host, self.port))
             loop.add_signal_handler(signal.SIGTERM, loop.stop)
             logger.info("listening on %s:%s" % (self.host, self.port))

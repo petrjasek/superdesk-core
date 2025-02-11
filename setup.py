@@ -36,7 +36,6 @@ install_requires = [
     "ldap3>=2.2.4,<2.10",
     "pytz>=2021.3",
     "tzlocal>=2.1,<3.0",
-    "raven[flask]>=5.10,<7.0",
     "requests>=2.7.0,<3.0",
     "boto3>=1.26,<2.0",
     "websockets>=10.3,<10.4",
@@ -67,6 +66,7 @@ install_requires = [
     "pymemcache>=4.0,<4.1",
     "xmlsec>=1.3.13,<1.3.15",
     "mongolock @ git+https://github.com/superdesk/mongolock.git@v1",
+    "sentry_sdk[flask,celery]>=2.20.0,<3.0",
 ]
 
 package_data = {
