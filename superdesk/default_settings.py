@@ -66,7 +66,7 @@ def celery_queue(name):
 DEFAULT_TIMEZONE = env("DEFAULT_TIMEZONE")
 
 if DEFAULT_TIMEZONE is None:
-    DEFAULT_TIMEZONE = tzlocal.get_localzone().zone
+    DEFAULT_TIMEZONE = tzlocal.get_localzone_name()
 
 if not DEFAULT_TIMEZONE:
     raise ValueError("DEFAULT_TIMEZONE is empty")
