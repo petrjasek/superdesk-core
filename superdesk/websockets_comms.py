@@ -349,7 +349,6 @@ class SocketCommunication:
                 self.sentry_dsn,
                 integrations=[AsyncioIntegration()],
                 traces_sample_rate=self.sentry_traces_sample_rate,
-                debug=self.debug,
             )
             print("CONFIGURED", self.sentry_traces_sample_rate)
         else:
