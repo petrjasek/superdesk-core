@@ -13,7 +13,7 @@ def test_service_get(prodapi_app_with_data):
         assert resp.status_code == 200
         items = resp.json["_items"]
 
-        assert len(items)
+        assert len(items) == 1
         assert items[0]["_id"]
         assert items[0]["username"] == "admin"
 

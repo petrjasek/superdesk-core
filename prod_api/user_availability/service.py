@@ -24,7 +24,7 @@ class UserAvailabilityService(ProdApiService):
 
     def get(self, req, lookup):
         start_date, end_date = self.get_start_end_dates(req)
-        users = get_resource_service("users").find(where={"is_active": True})
+        users = get_resource_service("users").find(where={"is_active": True, "user_availability_enabled": True})
         user_data = [self._get_user_availability(user, start_date, end_date) for user in users]
         return ListCursor(user_data)
 

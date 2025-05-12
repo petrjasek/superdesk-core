@@ -128,6 +128,7 @@ class UsersResource(Resource):
                 "allow_unknown": True,
             },
             "last_activity_at": {"type": "datetime", "nullable": True, "readonly": True},
+            "user_availability_enabled": {"type": "boolean"},
         }
 
         self.extra_response_fields = [

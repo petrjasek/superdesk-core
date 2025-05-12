@@ -225,7 +225,8 @@
             }
         },
         "first_name": "John",
-        "last_name": "Smith"
+        "last_name": "Smith",
+        "user_availability_enabled": true
     },
     {
         "_id": "5d6e86f0e3a44a95b9d48f23",
