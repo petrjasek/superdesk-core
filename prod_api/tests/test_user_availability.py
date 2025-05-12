@@ -3,11 +3,20 @@ from eve.utils import parse_request
 from superdesk import get_resource_service
 
 
-def test_service_get(prodapi_app_with_data):
+def test_service_get(prodapi_app_with_data, superdesk_app):
     """
     Test fetching items using `user_availability` service
     :param prodapi_app_with_data: prod api app with filled data
     """
+    with superdesk_app.app_context():
+        user = superdesk_app.data.find_one("users", req=None, username="admin")
+        assert user
+        superdesk_app.data.insert("default_user_availability", [
+            {
+                "_id": user["_id"],
+                "enabled": True,
+            }
+        ])
     with prodapi_app_with_data.test_client() as client:
         resp = client.get("/prodapi/v1/user_availability?month=2023-05")
         assert resp.status_code == 200
