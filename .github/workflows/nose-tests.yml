@@ -10,14 +10,19 @@ jobs:
         include:
           - os: ubuntu-22.04
             python-version: '3.10'
+            mongo: 4
           - os: ubuntu-24.04
             python-version: '3.12'
+            mongo: 6
+          - os: ubuntu-22.04
+            python-version: '3.10'
+            mongo: 6
 
     runs-on: ${{ matrix.os }}
 
     services:
       elastic:
-          image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
           ports:
               - "9200:9200"
 
@@ -27,7 +32,7 @@ jobs:
               - "6379:6379"
 
       mongo:
-          image: mongo:6
+          image: mongo:${{ matrix.mongo }}
           ports:
               - "27017:27017"
 
