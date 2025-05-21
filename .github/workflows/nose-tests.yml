@@ -44,6 +44,8 @@ jobs:
         cache: 'pip'
   
     - run: docker ps -a
+    - run: curl 127.0.0.1:9200
+    - run: curl localhost:9200
 
     - run: ./scripts/tests_setup
     - run: pip install -U pip wheel setuptools
