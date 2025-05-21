@@ -7,4 +7,4 @@ sudo apt-get -y install libxml2-dev libxmlsec1-dev libxmlsec1-openssl
 # wait for elastic to be up and running
 echo -n "Waiting for elasticsearch to be up and running..."
 while ! curl -sfo /dev/null 'http://localhost:9200/'; do echo -n '.' && sleep .5; done
-echo "done.
+echo "done."
