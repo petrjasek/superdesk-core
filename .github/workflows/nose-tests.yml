@@ -27,7 +27,7 @@ jobs:
           - "9200:9200"
 
       redis:
-        image: redis
+        image: redis:alpine
         ports:
           - "6379:6379"
 
@@ -85,7 +85,7 @@ jobs:
           - "9200:9200"
 
       redis:
-        image: redis
+        image: redis:alpine
         ports:
           - "6379:6379"
 
@@ -127,7 +127,7 @@ jobs:
           - "9200:9200"
 
       redis:
-        image: redis
+        image: redis:alpine
         ports:
           - "6379:6379"
 
@@ -171,7 +171,7 @@ jobs:
           - "9200:9200"
 
       redis:
-        image: redis
+        image: redis:alpine
         ports:
           - "6379:6379"
 
@@ -186,6 +186,7 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
 
     - run: ./scripts/tests_setup
     - run: pip install -U pip wheel setuptools
