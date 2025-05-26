@@ -84,15 +84,17 @@ class HTTPPushService(PublishService):
         item = json.loads(queue_item["formatted_item"])
         destination = queue_item.get("destination", {})
 
-        self._copy_published_media_files(json.loads(queue_item["formatted_item"]), destination)
+        s = requests.Session()
+
+        self._copy_published_media_files(json.loads(queue_item["formatted_item"]), destination, session=s)
 
         if not queue_item.get(PUBLISHED_IN_PACKAGE) or not destination.get("config", {}).get("packaged", False):
-            self._push_item(destination, json.dumps(item))
+            self._push_item(destination, json.dumps(item), session=s)
 
-    def _push_item(self, destination, data):
+    def _push_item(self, destination, data, session: requests.Session):
         resource_url = self._get_resource_url(destination)
         headers = self._get_headers(data, destination, self.headers)
-        response = requests.post(resource_url, data=data, headers=headers, timeout=self._get_timeout())
+        response = session.post(resource_url, data=data, headers=headers, timeout=self._get_timeout())
 
         # need to rethrow exception as a superdesk exception for now for notifiers.
         try:
@@ -102,7 +104,7 @@ class HTTPPushService(PublishService):
             message = "Error pushing item %s: %s" % (response.status_code, response.text)
             self._raise_publish_error(response.status_code, Exception(message), destination)
 
-    def _copy_published_media_files(self, item, destination):
+    def _copy_published_media_files(self, item, destination, session: requests.Session):
         """Copy the media files for the given item to the publish_items endpoint
 
         @param item: the item object
@@ -121,26 +123,25 @@ class HTTPPushService(PublishService):
             media.update(get_files(self.NAME, item))
 
         for media_id, rendition in media.items():
-            if not self._media_exists(media_id, destination):
+            if not self._media_exists(media_id, destination, session):
                 binary = app.media.get(media_id, resource=rendition.get("resource", "upload"))
-                self._transmit_media(binary, destination, exists=False)
+                self._transmit_media(binary, destination, session=session, exists=False)
 
-    def _transmit_media(self, media, destination, exists=None):
+    def _transmit_media(self, media, destination, session: requests.Session, exists=None):
         if exists is None:
-            exists = self._media_exists(media._id, destination)
+            exists = self._media_exists(media._id, destination, session)
         if exists:
             return
         mimetype = getattr(media, "content_type", "image/jpeg")
         data = {"media_id": str(media._id)}
         files = {"media": (str(media._id), media, mimetype)}
-        s = requests.Session()
         assets_url = self._get_assets_url(destination)
         request = requests.Request("POST", assets_url)
         prepped = request.prepare()
         prepped.prepare_body(data, files)
         headers = self._get_headers(prepped.body, destination, prepped.headers)
         prepped.prepare_headers(headers)
-        response = s.send(prepped, timeout=self._get_timeout())
+        response = session.send(prepped, timeout=self._get_timeout())
         if response.status_code not in (200, 201):
             self._raise_publish_error(
                 response.status_code,
@@ -148,7 +149,7 @@ class HTTPPushService(PublishService):
                 destination,
             )
 
-    def _media_exists(self, media_id, destination):
+    def _media_exists(self, media_id, destination, session: requests.Session):
         """Returns true if the media with the given id exists at the service identified by assets_url.
 
         Returns false otherwise. Raises Exception if the error code was not 200 or 404
@@ -160,7 +161,7 @@ class HTTPPushService(PublishService):
         @return: bool
         """
         assets_url = self._get_assets_url(destination, media_id)
-        response = requests.get(assets_url, timeout=self._get_timeout())
+        response = session.get(assets_url, timeout=self._get_timeout())
         if response.status_code not in (requests.codes.ok, requests.codes.not_found):  # @UndefinedVariable
             self._raise_publish_error(
                 response.status_code, Exception("Error querying the assets service %s" % assets_url), destination
