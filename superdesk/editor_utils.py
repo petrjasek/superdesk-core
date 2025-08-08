@@ -427,8 +427,10 @@ class DraftJSHTMLExporter:
                 attribs = {"data-attachment": link_data["attachment"]}
             elif link_data.get("target"):
                 attribs = {"href": link_data["href"], "target": link_data["target"]}
-            else:
+            elif link_data.get("href"):
                 attribs = {"href": link_data["href"]}
+            else:
+                return props["children"]
 
         return DOM.create_element("a", attribs, props["children"])
 

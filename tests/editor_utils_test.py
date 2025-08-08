@@ -377,7 +377,10 @@ class Editor3TestCase(unittest.TestCase):
                     "type": "unstyled",
                     "depth": 0,
                     "inlineStyleRanges": [],
-                    "entityRanges": [{"offset": 12, "length": 8, "key": 0}],
+                    "entityRanges": [
+                        {"offset": 12, "length": 8, "key": 0},
+                        {"offset": 0, "length": 8, "key": 1},
+                    ],
                     "data": {"MULTIPLE_HIGHLIGHTS": {}},
                 }
             ],
@@ -386,7 +389,12 @@ class Editor3TestCase(unittest.TestCase):
                     "type": "LINK",
                     "mutability": "MUTABLE",
                     "data": {"link": {"href": "https://en.wikipedia.org/wiki/Highlaws"}},
-                }
+                },
+                "1": {
+                    "type": "LINK",
+                    "mutability": "MUTABLE",
+                    "data": {"link": {}},
+                },
             },
         }
 
