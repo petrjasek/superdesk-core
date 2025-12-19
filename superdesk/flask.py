@@ -15,7 +15,6 @@
 # Import `signals` from flask before patching
 # and add it back in (as quart_flask_patch doesn't provide flask.signals)
 from flask import signals
-import quart_flask_patch  # noqa
 import flask
 
 from quart import (
