@@ -118,7 +118,7 @@ class CheckForUnknownParamsMethodTestCase(ItemsServiceTestCase):
         ex = context.exception
         self.assertEqual(
             ex.payload,
-            "Filtering by date range is not supported when retrieving a " 'single object (the "start_date" parameter)',
+            'Filtering by date range is not supported when retrieving a single object (the "start_date" parameter)',
         )
 
     async def test_raises_descriptive_error_on_disabled_end_date_filtering(self):
@@ -135,7 +135,7 @@ class CheckForUnknownParamsMethodTestCase(ItemsServiceTestCase):
         ex = context.exception
         self.assertEqual(
             ex.payload,
-            "Filtering by date range is not supported when retrieving a " 'single object (the "end_date" parameter)',
+            'Filtering by date range is not supported when retrieving a single object (the "end_date" parameter)',
         )
 
     async def test_raises_correct_error_on_duplicate_parameters(self):
@@ -256,7 +256,7 @@ class GetMethodTestCase(ItemsServiceTestCase):
 
         ex = context.exception
         self.assertEqual(
-            ex.payload, ("start_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) " "without the time part")
+            ex.payload, ("start_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) without the time part")
         )
 
     async def test_raises_correct_error_on_invalid_end_date_parameter(self):
@@ -273,7 +273,7 @@ class GetMethodTestCase(ItemsServiceTestCase):
 
         ex = context.exception
         self.assertEqual(
-            ex.payload, ("end_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) " "without the time part")
+            ex.payload, ("end_date parameter must be a valid ISO 8601 date (YYYY-MM-DD) without the time part")
         )
 
     async def test_raises_correct_error_if_start_date_greater_than_end_date(self):
@@ -411,7 +411,7 @@ class GetMethodTestCase(ItemsServiceTestCase):
         ex = context.exception
         self.assertEqual(
             ex.payload,
-            "Start date (2007-10-31) must not be set in the future " "(current server date (UTC): 2007-10-30)",
+            "Start date (2007-10-31) must not be set in the future (current server date (UTC): 2007-10-30)",
         )
 
     @mock.patch("content_api.items.service.utcnow")
@@ -431,7 +431,7 @@ class GetMethodTestCase(ItemsServiceTestCase):
 
         ex = context.exception
         self.assertEqual(
-            ex.payload, "End date (2007-10-31) must not be set in the future " "(current server date (UTC): 2007-10-30)"
+            ex.payload, "End date (2007-10-31) must not be set in the future (current server date (UTC): 2007-10-30)"
         )
 
     async def test_raises_error_for_invalid_parameter_for_service(self):
@@ -546,7 +546,7 @@ class SetFieldsFilterMethodTestCase(ItemsServiceTestCase):
             instance._set_fields_filter(request)
 
         ex = context.exception
-        self.assertEqual(ex.payload, "Cannot exclude a content field required by the NINJS format " "(uri).")
+        self.assertEqual(ex.payload, "Cannot exclude a content field required by the NINJS format (uri).")
 
     async def test_raises_error_if_field_whitelist_and_blacklist_both_given(self):
         request = MagicMock()
@@ -731,7 +731,8 @@ class OnFetchedItemMethodTestCase(ItemsServiceTestCase):
         instance.on_fetched_item(document)
 
         self.assertEqual(
-            document.get("uri"), "http://content_api.com/items_endpoint/item%3A123"  # %3A == urlquote(':')
+            document.get("uri"),
+            "http://content_api.com/items_endpoint/item%3A123",  # %3A == urlquote(':')
         )
 
     async def test_removes_non_ninjs_content_fields_from_fetched_document(self):
@@ -797,10 +798,12 @@ class OnFetchedMethodTestCase(ItemsServiceTestCase):
 
         documents = result["_items"]
         self.assertEqual(
-            documents[0].get("uri"), "http://content_api.com/items_endpoint/item%3A123"  # %3A == urlquote(':')
+            documents[0].get("uri"),
+            "http://content_api.com/items_endpoint/item%3A123",  # %3A == urlquote(':')
         )
         self.assertEqual(
-            documents[1].get("uri"), "http://content_api.com/items_endpoint/item%3A555"  # %3A == urlquote(':')
+            documents[1].get("uri"),
+            "http://content_api.com/items_endpoint/item%3A555",  # %3A == urlquote(':')
         )
 
     async def test_removes_non_ninjs_content_fields_from_all_fetched_documents(self):

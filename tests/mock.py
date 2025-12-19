@@ -1,4 +1,3 @@
-
 # TODO-ASYNC-PR: Find out what to do here
 # from superdesk.publish.subscribers import SubscribersService
 

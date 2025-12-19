@@ -112,8 +112,9 @@ class XMLFeedParser(FeedParser, metaclass=ABCMeta):
             if "default_attr" in value:
                 if "default" in value:
                     logger.error(
-                        "default and default_attr can't be used at the same time,"
-                        "only default will be used ({})".format(self.__class__)
+                        "default and default_attr can't be used at the same time,only default will be used ({})".format(
+                            self.__class__
+                        )
                     )
                 if "xpath":
                     if "/" not in "xpath":

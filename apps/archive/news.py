@@ -5,7 +5,6 @@ News resource
 It is an alias for archive without filtering out published items.
 """
 
-
 from superdesk.resource import build_custom_hateoas
 from .common import CUSTOM_HATEOAS
 from .resource import ArchiveResource

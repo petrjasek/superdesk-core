@@ -26,7 +26,7 @@ class CreateMethodTestCase(TestCase):
         try:
             from apps.highlights.service import MarkedForHighlightsService
         except ImportError:
-            self.fail("Could not import class under test " "(MarkedForHighlightsService).")
+            self.fail("Could not import class under test (MarkedForHighlightsService).")
         else:
             self.instance = MarkedForHighlightsService()
         db_item_1 = {

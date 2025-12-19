@@ -77,7 +77,7 @@ class ReutersOptaTestCase(BaseNewMLTwoTestCase):
 
     async def test_body(self):
         self.assertTrue(
-            self.item[0].get("body_html").startswith("<pre>Jan 3 (OPTA) - Results and fixtures for the " "Primeira")
+            self.item[0].get("body_html").startswith("<pre>Jan 3 (OPTA) - Results and fixtures for the Primeira")
         )
 
 

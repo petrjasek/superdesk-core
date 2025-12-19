@@ -8,9 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-"""Macro to auto publish the item using internal destination
-
-"""
+"""Macro to auto publish the item using internal destination"""
 
 import json
 from copy import deepcopy
@@ -44,7 +42,7 @@ async def internal_destination_auto_publish(item, **kwargs):
     """
     if item.get(ITEM_STATE) not in PUBLISH_STATES:
         raise InvalidStateTransitionError(
-            message="Internal Destination auto publish macro can " "only be called after publishing the item."
+            message="Internal Destination auto publish macro can only be called after publishing the item."
         )
     operation = item.get(ITEM_OPERATION)
     archive_action_service = get_resource_service(publish_services.get(operation))

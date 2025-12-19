@@ -12,8 +12,6 @@
 # codes extracted from IPTC IIM v4.2 specifications
 
 
-
-
 class TAG:
     RECORD_VERSION = "Record Version"
     OBJECT_TYPE_REFERENCE = "Object Type Reference"

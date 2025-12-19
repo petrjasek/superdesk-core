@@ -188,8 +188,7 @@ class RemoveExpiredContent:
             }
 
             log_msg_format = (
-                "{{'_id': {_id}, 'unique_name': {unique_name}, 'version': {_current_version}, "
-                "'expired_on': {expiry}}}."
+                "{{'_id': {_id}, 'unique_name': {unique_name}, 'version': {_current_version}, 'expired_on': {expiry}}}."
             )
 
             # Processing items to expire

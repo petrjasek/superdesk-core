@@ -37,7 +37,9 @@ async def get_media_streamed(media_id):
     if media_file:
         get_resource_service("api_audit").audit_item({"type": "asset", "uri": request.url}, media_id)
         return await generate_response_for_file(
-            media_file, cache_for=3600 * 24 * 7, content_disposition="inline"  # 7 days cache
+            media_file,
+            cache_for=3600 * 24 * 7,
+            content_disposition="inline",  # 7 days cache
         )
     raise FileNotFoundError("File not found on media storage.")
 

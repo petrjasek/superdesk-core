@@ -15,8 +15,8 @@ class RoutingRuleSchemeServiceTest(IsolatedAsyncioTestCase):
         self.instance = RoutingRuleSchemeService()
 
 
-@mock.patch("apps.rules.routing_rules" ".RoutingRuleSchemeService._validate_routing_scheme")
-@mock.patch("apps.rules.routing_rules" ".RoutingRuleSchemeService._check_if_rule_name_is_unique")
+@mock.patch("apps.rules.routing_rules.RoutingRuleSchemeService._validate_routing_scheme")
+@mock.patch("apps.rules.routing_rules.RoutingRuleSchemeService._check_if_rule_name_is_unique")
 class OnCreateMethodTestCase(RoutingRuleSchemeServiceTest):
     """Tests for the on_create() method."""
 
@@ -63,8 +63,8 @@ class OnCreateMethodTestCase(RoutingRuleSchemeServiceTest):
         self.assertEqual(routing_schemes[0], expected_scheme)
 
 
-@mock.patch("apps.rules.routing_rules" ".RoutingRuleSchemeService._validate_routing_scheme")
-@mock.patch("apps.rules.routing_rules" ".RoutingRuleSchemeService._check_if_rule_name_is_unique")
+@mock.patch("apps.rules.routing_rules.RoutingRuleSchemeService._validate_routing_scheme")
+@mock.patch("apps.rules.routing_rules.RoutingRuleSchemeService._check_if_rule_name_is_unique")
 class OnUpdateMethodTestCase(RoutingRuleSchemeServiceTest):
     """Tests for the on_update() method."""
 

@@ -139,8 +139,7 @@ class GenerateVocabularies:
             elif not skip:
                 if current_voc is None:
                     raise SystemExit(
-                        "Invalid source file! Your file must start with a vocabularies label (it must end with a "
-                        "colon)"
+                        "Invalid source file! Your file must start with a vocabularies label (it must end with a colon)"
                     )
                 item = {
                     "name": line,

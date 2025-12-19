@@ -78,7 +78,7 @@ class SuperdeskErrorTestCase(unittest.TestCase):
         instance.desc = "This is a detailed description"
 
         self.assertEqual(
-            str(instance), ("SuperdeskError Error 101 - Foobar error " "Details: This is a detailed description")
+            str(instance), ("SuperdeskError Error 101 - Foobar error Details: This is a detailed description")
         )
 
 
@@ -114,8 +114,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "IngestApiError Error 4000 - Unknown API ingest error: "
-            "Testing general API error on channel TestProvider",
+            "IngestApiError Error 4000 - Unknown API ingest error: Testing general API error on channel TestProvider",
         )
 
     def test_raise_apiRequestError(self):
@@ -133,8 +132,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "IngestApiError Error 4003 - API ingest has request error: "
-            "Testing apiRequestError on channel TestProvider",
+            "IngestApiError Error 4003 - API ingest has request error: Testing apiRequestError on channel TestProvider",
         )
 
     def test_raise_apiTimeoutError(self):
@@ -209,7 +207,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "IngestApiError Error 4005 - API ingest xml parse error: " "Testing apiParseError on channel TestProvider",
+            "IngestApiError Error 4005 - API ingest xml parse error: Testing apiParseError on channel TestProvider",
         )
 
     def test_raise_apiNotFoundError(self):
@@ -307,8 +305,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "ParserError Error 1001 - Message could not be parsed: "
-            "Testing parseMessageError on channel TestProvider",
+            "ParserError Error 1001 - Message could not be parsed: Testing parseMessageError on channel TestProvider",
         )
 
     def test_parse_message_error_save_data(self):
@@ -414,8 +411,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "ProviderError Error 2001 - Provider could not be saved: "
-            "Testing providerAddError on channel TestProvider",
+            "ProviderError Error 2001 - Provider could not be saved: Testing providerAddError on channel TestProvider",
         )
 
     async def test_raise_expiredContentError(self):
@@ -452,7 +448,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "ProviderError Error 2003 - Rule could not be applied: " "Testing ruleError on channel TestProvider",
+            "ProviderError Error 2003 - Rule could not be applied: Testing ruleError on channel TestProvider",
         )
 
     async def test_raise_ingestError(self):
@@ -471,7 +467,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "ProviderError Error 2004 - Ingest error: " "Testing ingestError on channel TestProvider",
+            "ProviderError Error 2004 - Ingest error: Testing ingestError on channel TestProvider",
         )
 
     async def test_raise_anpaError(self):
@@ -489,7 +485,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "ProviderError Error 2005 - Anpa category error: " "Testing anpaError on channel TestProvider",
+            "ProviderError Error 2005 - Anpa category error: Testing anpaError on channel TestProvider",
         )
 
     async def test_raise_providerFilterExpiredContentError(self):
@@ -526,7 +522,7 @@ class ErrorsTestCase(TestCase):
         self.assertEqual(len(self.mock_logger_handler.messages["error"]), 1)
         self.assertEqual(
             self.mock_logger_handler.messages["error"][0],
-            "IngestFtpError Error 5000 - FTP ingest error: " "Testing ftpError on channel TestProvider",
+            "IngestFtpError Error 5000 - FTP ingest error: Testing ftpError on channel TestProvider",
         )
 
     def test_raise_ftpUnknownParserError(self):

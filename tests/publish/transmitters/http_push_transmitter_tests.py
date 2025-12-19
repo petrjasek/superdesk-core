@@ -120,7 +120,9 @@ class HTTPPushServiceTestCase(TestCase):
         if response.status_code == requests.codes.not_found:  # @UndefinedVariable
             return False
         self.assertEqual(
-            response.status_code, requests.codes.ok, "Error retrieving item from the content API"  # @UndefinedVariable
+            response.status_code,
+            requests.codes.ok,
+            "Error retrieving item from the content API",  # @UndefinedVariable
         )
         return True
 

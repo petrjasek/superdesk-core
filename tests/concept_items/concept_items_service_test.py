@@ -29,7 +29,7 @@ class ConceptItemsServiceTestCase(TestCase):
             "cpnat_type": "cpnat:abstract",
             "labels": ["book", "tolkien"],
             "language": "en",
-            "definition_text": "Lord of the rings is a children's fantasy novel by English author J. R. R. " "Tolkien.",
+            "definition_text": "Lord of the rings is a children's fantasy novel by English author J. R. R. Tolkien.",
             "definition_html": "<b>Lord of the rings is a children's fantasy novel by English author J. R. R. "
             "Tolkien.</b>",
         },
@@ -175,12 +175,12 @@ class ConceptItemsServiceTestCase(TestCase):
             "Bootstrap: Responsive Web Development. Discover how easy it is to design killer "
             "interfaces and responsive websites with the Bootstrap framework. ",
             "Hobbit is a children's fantasy novel by English author J. R. R. Tolkien.",
-            "Lord of the rings is a children's fantasy novel by English author J. R. R. " "Tolkien.",
+            "Lord of the rings is a children's fantasy novel by English author J. R. R. Tolkien.",
             "the Elegance of the Hedgehog is a novel about parallels and the concealment of one’s "
             "true passions in life.",
             "The Little Prince is a novella, the most famous work of French aristocrat, writer, "
             "poet, and pioneering aviator Antoine de Saint-Exupéry.",
-            "Гайдамаки — історико-героїчна поема Шевченка, перший український історичний роман у " "віршах.",
+            "Гайдамаки — історико-героїчна поема Шевченка, перший український історичний роман у віршах.",
         ]
 
         req = ParsedRequest()
@@ -215,12 +215,12 @@ class ConceptItemsServiceTestCase(TestCase):
             "Bootstrap: Responsive Web Development. Discover how easy it is to design killer "
             "interfaces and responsive websites with the Bootstrap framework. ",
             "Hobbit is a children's fantasy novel by English author J. R. R. Tolkien.",
-            "Lord of the rings is a children's fantasy novel by English author J. R. R. " "Tolkien.",
+            "Lord of the rings is a children's fantasy novel by English author J. R. R. Tolkien.",
             "the Elegance of the Hedgehog is a novel about parallels and the concealment of one’s "
             "true passions in life.",
             "The Little Prince is a novella, the most famous work of French aristocrat, writer, "
             "poet, and pioneering aviator Antoine de Saint-Exupéry.",
-            "Гайдамаки — історико-героїчна поема Шевченка, перший український історичний роман у " "віршах.",
+            "Гайдамаки — історико-героїчна поема Шевченка, перший український історичний роман у віршах.",
         ]
 
         req = ParsedRequest()

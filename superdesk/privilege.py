@@ -9,6 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 """Privileges registry."""
+
 from .errors import PrivilegeNameError
 from quart_babel.speaklater import LazyString
 

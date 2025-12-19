@@ -493,7 +493,7 @@ class UsersService(AsyncBaseService):
             user["invisible_stages"] = stages
             logger.info("Updated Stage Visibility for user {}.".format(user.get(ID_FIELD)))
         except Exception:
-            logger.exception("Failed to update the stage visibility " "for user: {}".format(user.get(ID_FIELD)))
+            logger.exception("Failed to update the stage visibility for user: {}".format(user.get(ID_FIELD)))
 
     async def update_stage_visibility_for_user_async(self, user):
         if not self._updating_stage_visibility:
@@ -505,7 +505,7 @@ class UsersService(AsyncBaseService):
             user["invisible_stages"] = stages
             logger.info("Updated Stage Visibility for user {}.".format(user.get(ID_FIELD)))
         except Exception:
-            logger.exception("Failed to update the stage visibility " "for user: {}".format(user.get(ID_FIELD)))
+            logger.exception("Failed to update the stage visibility for user: {}".format(user.get(ID_FIELD)))
 
     def stop_updating_stage_visibility(self):
         if not get_app_config("SUPERDESK_TESTING"):

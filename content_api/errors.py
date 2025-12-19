@@ -12,7 +12,6 @@
 A module that contains exception types for the Superdesk public API.
 """
 
-
 from superdesk.errors import SuperdeskApiError
 
 

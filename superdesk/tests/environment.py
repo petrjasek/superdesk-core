@@ -123,13 +123,15 @@ async def before_feature_async(context, feature):
     config = deepcopy(config or {})
     app_factory = app_factory or get_app
 
-    config.update({
-        # set the MAX_TRANSMIT_RETRY_ATTEMPT to zero so that transmit does not retry
-        "MAX_TRANSMIT_RETRY_ATTEMPT": 0,
-        # Use mock publish consumer (so we don't push anything outside this environment)
-        "PUBLISH_MODULES": PUBLISH_MODULES + ["superdesk.tests.publish.mock_consumer"],
-        "PUBLISH_EXCHANGE_FACTORY": "superdesk.tests.publish.exchange_factory:MockPublishExchangeFactory"
-    })
+    config.update(
+        {
+            # set the MAX_TRANSMIT_RETRY_ATTEMPT to zero so that transmit does not retry
+            "MAX_TRANSMIT_RETRY_ATTEMPT": 0,
+            # Use mock publish consumer (so we don't push anything outside this environment)
+            "PUBLISH_MODULES": PUBLISH_MODULES + ["superdesk.tests.publish.mock_consumer"],
+            "PUBLISH_EXCHANGE_FACTORY": "superdesk.tests.publish.exchange_factory:MockPublishExchangeFactory",
+        }
+    )
     config["MAX_TRANSMIT_RETRY_ATTEMPT"] = 0
     os.environ["BEHAVE_TESTING"] = "1"
     await tests.setup(context, config, app_factory=app_factory)

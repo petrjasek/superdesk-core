@@ -196,7 +196,7 @@ class ArchiveRewriteService(AsyncBaseService):
 
             if original.get("profile") and update.get("profile") and original.get("profile") != update.get("profile"):
                 raise SuperdeskApiError.badRequestError(
-                    _("Rewrite item content profile does " "not match with Original item.")
+                    _("Rewrite item content profile does not match with Original item.")
                 )
 
     async def _create_rewrite_article(self, original, existing_item=None, desk_id=None):

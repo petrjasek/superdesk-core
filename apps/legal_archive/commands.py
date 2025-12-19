@@ -86,7 +86,7 @@ def is_legal_archive_enabled():
 
 class LegalArchiveImport:
     log_msg_format = (
-        "{{'_id': {_id}, 'unique_name': {unique_name}, 'version': {_current_version}, " "'expired_on': {expiry}}}."
+        "{{'_id': {_id}, 'unique_name': {unique_name}, 'version': {_current_version}, 'expired_on': {expiry}}}."
     )
 
     async def upsert_into_legal_archive(self, item_id):
@@ -466,17 +466,16 @@ class LegalArchiveImport:
         logger.info("Number of items to move to legal archive publish queue: {}, pages={}".format(count, no_of_pages))
 
         for page in range(0, no_of_pages):
-            logger.info(
-                "Fetching publish queue items " "for page number: {}. queue_id: {}".format((page + 1), queue_id)
-            )
+            logger.info("Fetching publish queue items for page number: {}. queue_id: {}".format((page + 1), queue_id))
             query["_id"] = {"$gte": str(queue_id)}
             cursor = await service.find(query, sort=[("_id", 1)], max_results=page_size)
             items = [item.to_dict(context={"use_objectid": True}) async for item in cursor]
             if len(items) > 0:
                 queue_id = items[len(items) - 1][ID_FIELD]
             logger.info(
-                "Fetched No. of Items: {} for page: {} "
-                "For import in to legal archive publish_queue.".format(len(items), (page + 1))
+                "Fetched No. of Items: {} for page: {} For import in to legal archive publish_queue.".format(
+                    len(items), (page + 1)
+                )
             )
             yield items
 
@@ -610,9 +609,7 @@ class ImportLegalArchiveCommand:
         logger.info("Number of items to move to legal archive: {}, pages={}".format(count, no_of_pages))
 
         for page in range(0, no_of_pages):
-            logger.info(
-                "Fetching published items " "for page number: {} sequence no: {}".format((page + 1), sequence_no)
-            )
+            logger.info("Fetching published items for page number: {} sequence no: {}".format((page + 1), sequence_no))
             req = ParsedRequest()
             page_query = deepcopy(query)
             sequence_filter = {"range": {"publish_sequence_no": {"gte": sequence_no}}}
@@ -632,6 +629,6 @@ class ImportLegalArchiveCommand:
                 sequence_no = items[len(items) - 1]["publish_sequence_no"]
 
             logger.info(
-                "Fetched No. of Items: {} for page: {} " "For import into legal archive.".format(len(items), (page + 1))
+                "Fetched No. of Items: {} for page: {} For import into legal archive.".format(len(items), (page + 1))
             )
             yield items

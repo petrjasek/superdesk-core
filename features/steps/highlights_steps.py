@@ -41,9 +41,8 @@ async def given_highlights(context):
 @when("we create highlights package")
 @async_run_until_complete
 async def when_we_create_highglights_package(context):
-    data_text = (
-        '{"highlight": "%s", "type": "composite", '
-        '"task": {"user": "#user._id#", "desk": "#desks._id#"}}' % str(context.highlights["_id"])
+    data_text = '{"highlight": "%s", "type": "composite", "task": {"user": "#user._id#", "desk": "#desks._id#"}}' % str(
+        context.highlights["_id"]
     )
     data_text = apply_placeholders(context, data_text)
     url = get_prefixed_url(context.app, "/archive")

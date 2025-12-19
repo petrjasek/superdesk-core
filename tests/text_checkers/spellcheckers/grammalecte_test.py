@@ -120,7 +120,7 @@ class GrammalecteTestCase(AsyncTestCase):
                 "startOffset": 14,
                 "suggestions": [{"text": "a"}],
                 "text": "à",
-                "message": "Confusion probable : “à” est une préposition. " "Pour le verbe “avoir”, écrivez “a”.",
+                "message": "Confusion probable : “à” est une préposition. Pour le verbe “avoir”, écrivez “a”.",
                 "type": "grammar",
             },
             {
@@ -177,7 +177,7 @@ class GrammalecteTestCase(AsyncTestCase):
                                 "nEnd": 23,
                                 "nStart": 16,
                                 "sLineId": "#5643",
-                                "sMessage": "Le verbe devrait être à " "l’infinitif.",
+                                "sMessage": "Le verbe devrait être à l’infinitif.",
                                 "sRuleId": "conf_a_à_verbe__b13_a3_0",
                                 "sType": "conf",
                             },
@@ -207,7 +207,7 @@ class GrammalecteTestCase(AsyncTestCase):
                                 "nEnd": 23,
                                 "nStart": 16,
                                 "sLineId": "#5643",
-                                "sMessage": "Le verbe devrait être à " "l’infinitif.",
+                                "sMessage": "Le verbe devrait être à l’infinitif.",
                                 "sRuleId": "conf_a_à_verbe__b13_a3_0",
                                 "sType": "conf",
                             },
@@ -221,7 +221,7 @@ class GrammalecteTestCase(AsyncTestCase):
 
         expected = [
             {
-                "message": "Confusion probable : “à” est une préposition. Pour le " "verbe “avoir”, écrivez “a”.",
+                "message": "Confusion probable : “à” est une préposition. Pour le verbe “avoir”, écrivez “a”.",
                 "startOffset": 14,
                 "suggestions": [{"text": "a"}],
                 "text": "à",
@@ -235,7 +235,7 @@ class GrammalecteTestCase(AsyncTestCase):
                 "type": "grammar",
             },
             {
-                "message": "Confusion probable : “à” est une préposition. Pour le " "verbe “avoir”, écrivez “a”.",
+                "message": "Confusion probable : “à” est une préposition. Pour le verbe “avoir”, écrivez “a”.",
                 "startOffset": 55,
                 "suggestions": [{"text": "a"}],
                 "text": "à",

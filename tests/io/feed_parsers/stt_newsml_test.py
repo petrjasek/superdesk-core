@@ -37,7 +37,7 @@ class STTTestCase(BaseSTTNewsMLTestCase):
         item = self.item[0]
         self.assertEqual(
             item["headline"],
-            "Parliament passed the Alcohol Act and the government gained confidence" "*** TRANSLATED ***",
+            "Parliament passed the Alcohol Act and the government gained confidence*** TRANSLATED ***",
         )
         self.assertEqual(item["guid"], "urn:newsml:stt.fi:20171219:101801633:4")
         self.assertEqual(item["uri"], "urn:newsml:stt.fi:20171219:101801633")
@@ -216,7 +216,7 @@ class STTNoHLTestCase(BaseSTTNewsMLTestCase):
         item = self.item[0]
         self.assertEqual(
             item["headline"],
-            "*** DISCLAIMER: THIS IS AN AUTOMATED TRANSLATION FROM FINNISH ***" "\n\nAlso the unemployment law went th",
+            "*** DISCLAIMER: THIS IS AN AUTOMATED TRANSLATION FROM FINNISH ***\n\nAlso the unemployment law went th",
         )
 
 

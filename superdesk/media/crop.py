@@ -402,6 +402,5 @@ class CropService:
                 )
             except Exception:
                 logger.exception(
-                    "Failed to update media "
-                    "reference item {} media {}".format(ref.get("item_id"), ref.get("media_id"))
+                    "Failed to update media reference item {} media {}".format(ref.get("item_id"), ref.get("media_id"))
                 )

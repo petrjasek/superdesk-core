@@ -15,22 +15,26 @@ from superdesk import get_resource_service
 from superdesk.commands.rebuild_elastic_index import RebuildElasticIndex
 
 
-RESOURCE = 'ingest'
+RESOURCE = "ingest"
 
 
 class RebuildIndexTestCase(TestCase):
     @property
     def data(self):
         return [
-            {'headline': 'test {}'.format(i), 'slugline': 'rebuild {}'.format(i),
-             'type': 'text' if (i % 2 == 0) else 'picture'} for i in range(11, 21)
+            {
+                "headline": "test {}".format(i),
+                "slugline": "rebuild {}".format(i),
+                "type": "text" if (i % 2 == 0) else "picture",
+            }
+            for i in range(11, 21)
         ]
 
     def query_items(self):
         req = ParsedRequest()
         req.args = {}
         req.max_results = 25
-        return get_resource_service('ingest').get(req, {})
+        return get_resource_service("ingest").get(req, {})
 
     async def test_retrieve_items_after_index_rebuilt(self):
         elastic = self.app.data.elastic

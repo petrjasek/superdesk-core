@@ -73,7 +73,7 @@ class PACharsetConversionTest(PANITFFileTestCase):
     def test_charset(self):
         self.assertTrue(
             self.item["body_html"].startswith(
-                "<p>Treasury coffers will take a £66 billion annual hit " "if Britain goes for a so-called hard Brexit"
+                "<p>Treasury coffers will take a £66 billion annual hit if Britain goes for a so-called hard Brexit"
             )
         )
         self.assertEqual(self.item["headline"], "HARD BREXIT TO COST UK UP TO £66BN A YEAR, SAYS TREASURY")

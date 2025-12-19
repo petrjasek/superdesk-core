@@ -146,7 +146,7 @@ class RenderTemplateTestCase(TestCase):
         self.assertEqual(updates["priority"], 3)
         self.assertEqual(
             updates["body_html"],
-            "This article has slugline: Testing and dateline: " "hello world at 02 Jun 2015 08:53 AEST",
+            "This article has slugline: Testing and dateline: hello world at 02 Jun 2015 08:53 AEST",
         )
         self.assertListEqual(updates["place"], ["Australia"])
 

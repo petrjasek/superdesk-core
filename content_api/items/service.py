@@ -179,7 +179,8 @@ class ItemsService(BaseService):
         if "_links" in result:  # might not be present if HATEOAS disabled
             url_parts = urlparse(request.url)
             result["_links"]["self"]["href"] = "{}?{}".format(
-                url_parts.path[1:], url_parts.query  # relative path, remove opening slash
+                url_parts.path[1:],
+                url_parts.query,  # relative path, remove opening slash
             )
 
     def on_deleted(self, document):
@@ -294,7 +295,7 @@ class ItemsService(BaseService):
         request_params = request.args or MultiDict()
 
         if not allow_filtering:
-            err_msg = "Filtering{} is not supported when retrieving a " 'single object (the "{param}" parameter)'
+            err_msg = 'Filtering{} is not supported when retrieving a single object (the "{param}" parameter)'
 
             if "start_date" in request_params.keys():
                 desc = err_msg.format(" by date range", param="start_date")
@@ -389,7 +390,7 @@ class ItemsService(BaseService):
             * if the start date is bigger than the end date
         """
         # check date limits' format...
-        err_msg = "{} parameter must be a valid ISO 8601 date (YYYY-MM-DD) " "without the time part"
+        err_msg = "{} parameter must be a valid ISO 8601 date (YYYY-MM-DD) without the time part"
 
         try:
             start_date = self._parse_iso_date(request_params.get("start_date"))
@@ -402,7 +403,7 @@ class ItemsService(BaseService):
             raise BadParameterValueError(desc=err_msg.format("end_date")) from None
 
         # disallow dates in the future...
-        err_msg = "{} date ({}) must not be set in the future " "(current server date (UTC): {})"
+        err_msg = "{} date ({}) must not be set in the future (current server date (UTC): {})"
         today = utcnow().date()
 
         if (start_date is not None) and (start_date > today):
@@ -536,7 +537,7 @@ class ItemsService(BaseService):
 
         # check for semantically incorrect field filter values...
         if (include_fields is not None) and (exclude_fields is not None):
-            err_msg = "Cannot both include and exclude content fields " "at the same time."
+            err_msg = "Cannot both include and exclude content fields at the same time."
             raise UnexpectedParameterError(desc=err_msg)
 
         if include_fields is not None:
@@ -547,7 +548,7 @@ class ItemsService(BaseService):
 
         if exclude_fields is not None:
             if "uri" in exclude_fields:
-                err_msg = "Cannot exclude a content field required by the " "NINJS format (uri)."
+                err_msg = "Cannot exclude a content field required by the NINJS format (uri)."
                 raise BadParameterValueError(desc=err_msg)
 
             err_msg = "Unknown content field to exclude ({})."

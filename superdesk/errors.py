@@ -564,7 +564,7 @@ class SuperdeskPublishError(SuperdeskErrorWithNotifications):
                 self._set_notification_args(
                     [
                         "error",
-                        "Error [%s] on a Subscriber" "s destination {{name}}: %s" % (code, exception_msg),
+                        "Error [%s] on a Subscribers destination {{name}}: %s" % (code, exception_msg),
                     ],
                     dict(
                         resource="subscribers" if destination else None,

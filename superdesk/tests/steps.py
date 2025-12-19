@@ -98,7 +98,7 @@ async def expect_status_in(response, codes):
 
 
 def format_message_text_and_body(text, message):
-    return "{message}\n" "Response body:" '"""' "{text}" '"""'.format(message=message, text=text)
+    return '{message}\nResponse body:"""{text}"""'.format(message=message, text=text)
 
 
 async def get_body_text_async(response):

@@ -931,7 +931,7 @@ class NewsMLG2FormatterTest(TestCase):
             "Oceania",
         )
         self.assertIsNone(
-            content_meta.find("{http://iptc.org/std/nar/2006-10-01/}" 'subject[@qcode="loctyp:CountryArea"]')
+            content_meta.find('{http://iptc.org/std/nar/2006-10-01/}subject[@qcode="loctyp:CountryArea"]')
         )
         article["place"] = [
             {
@@ -979,9 +979,9 @@ class NewsMLG2FormatterTest(TestCase):
         subject = content_meta.find('{http://iptc.org/std/nar/2006-10-01/}subject[@qcode="loctyp:WorldArea"]')
         self.assertEqual(subject.find("{http://iptc.org/std/nar/2006-10-01/}name").text, "Europe")
         self.assertIsNone(
-            content_meta.find("{http://iptc.org/std/nar/2006-10-01/}" 'subject[@qcode="loctyp:CountryArea"]')
+            content_meta.find('{http://iptc.org/std/nar/2006-10-01/}subject[@qcode="loctyp:CountryArea"]')
         )
-        self.assertIsNone(content_meta.find("{http://iptc.org/std/nar/2006-10-01/}" 'subject[@qcode="loctyp:Country"]'))
+        self.assertIsNone(content_meta.find('{http://iptc.org/std/nar/2006-10-01/}subject[@qcode="loctyp:Country"]'))
 
     async def testPlaceGeonames(self):
         article = self.article.copy()
