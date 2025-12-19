@@ -10,6 +10,7 @@ from tests.mock import resources
 
 from superdesk.core import json
 from superdesk.flask import Flask
+from superdesk.json_utils import SuperdeskJSONEncoder
 from superdesk.publish.formatters.imatrics import IMatricsFormatter
 from superdesk.publish.transmitters.imatrics import IMatricsTransmitter
 

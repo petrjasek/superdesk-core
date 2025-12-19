@@ -13,7 +13,7 @@ from typing import Optional
 import arrow
 import datetime
 import pytz
-from pytz import utc  # flake8: noqa
+from pytz import utc, timezone  # flake8: noqa
 
 tzinfo = getattr(datetime, "tzinfo", object)
 

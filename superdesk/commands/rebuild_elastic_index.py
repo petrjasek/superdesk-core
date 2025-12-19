@@ -63,4 +63,4 @@ class RebuildElasticIndex:
                 # No need to rebuilt its index
                 continue
             app.data.elastic.reindex(resource, requests_per_second=requests_per_second)
-            print("Index {} rebuilt successfully.".format(resource))
+            print('Index {} rebuilt successfully.'.format(resource))

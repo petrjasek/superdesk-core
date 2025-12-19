@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from typing import Any, Awaitable
+from typing import Any, Awaitable, get_origin, get_args
 from inspect import signature, isawaitable
 import logging
 

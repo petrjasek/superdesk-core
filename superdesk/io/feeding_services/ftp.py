@@ -164,9 +164,8 @@ class FTPFeedingService(FeedingService):
         """
         if failed and not self.is_old_content(file_modify):
             logger.warning(
-                "{src!r} ingestion failed, but we are in the backstop delay, it will be tried again next time".format(
-                    src=src
-                )
+                "{src!r} ingestion failed, but we are in the backstop delay, it will be "
+                "tried again next time".format(src=src)
             )
             return
         try:
@@ -263,7 +262,7 @@ class FTPFeedingService(FeedingService):
                         self._timer.split("retrieve_parse"), os.path.getsize(local_file_path), filename
                     )
                 )
-            except ftplib.all_errors:
+            except ftplib.all_errors as err:
                 self._log_msg(
                     "Download failed. Exec time: {:.4f} secs. File: {}.".format(
                         self._timer.stop("retrieve_parse"), filename

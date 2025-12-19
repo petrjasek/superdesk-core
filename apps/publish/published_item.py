@@ -19,7 +19,7 @@ from superdesk.resource_fields import ID_FIELD, ITEMS, DATE_CREATED, LAST_UPDATE
 from superdesk.flask import request
 from superdesk import get_resource_service
 from superdesk.errors import SuperdeskApiError
-from superdesk.metadata.item import not_analyzed, ITEM_STATE, PUBLISH_STATES
+from superdesk.metadata.item import not_analyzed, ITEM_STATE, PUBLISH_STATES, CONTENT_STATE
 from superdesk.metadata.utils import aggregations, get_elastic_highlight_query
 from superdesk.resource import Resource
 from superdesk.eve_async import AsyncBaseService, AsyncListCursor
@@ -389,7 +389,7 @@ class PublishedItemService(AsyncBaseService, HighlightsSearchMixin):
                     await super().system_update_async(ObjectId(item.get(ID_FIELD)), {"moved_to_legal": status}, item)
             except Exception:
                 logger.exception(
-                    "Failed to set the moved_to_legal flag for item {} and version {}".format(item_id, version)
+                    "Failed to set the moved_to_legal flag " "for item {} and version {}".format(item_id, version)
                 )
 
     async def get_published_items_by_moved_to_legal(self, item_ids, move_to_legal):
@@ -416,7 +416,7 @@ class PublishedItemService(AsyncBaseService, HighlightsSearchMixin):
                 return await (await super().get_async(req=request, lookup=None)).to_list()
             except Exception:
                 logger.exception(
-                    "Failed to get published items by moved to legal: {} -- ids: {}.".format(move_to_legal, item_ids)
+                    "Failed to get published items " "by moved to legal: {} -- ids: {}.".format(move_to_legal, item_ids)
                 )
 
         return []

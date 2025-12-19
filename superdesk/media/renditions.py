@@ -77,9 +77,8 @@ def generate_renditions(
         if not can_generate_custom_crop_from_original(width, height, crop):
             if rendition in get_app_config("RENDITIONS", {})["picture"]:
                 logger.info(
-                    'image is too small for rendition "{rendition}", but it is an internal one, so we keep it'.format(
-                        rendition=rendition
-                    )
+                    'image is too small for rendition "{rendition}", but it is an internal one, '
+                    "so we keep it".format(rendition=rendition)
                 )
             else:
                 del rendition_config[rendition]

@@ -400,7 +400,7 @@ class UsersAsyncService(AsyncResourceService[UsersResourceModel]):
             user.invisible_stages = stages
             logger.info("Updated Stage Visibility for user {}.".format(user_id))
         except Exception:
-            logger.exception("Failed to update the stage visibility for user: {}".format(user_id))
+            logger.exception("Failed to update the stage visibility " "for user: {}".format(user_id))
 
     def stop_updating_stage_visibility(self):
         if not get_app_config("SUPERDESK_TESTING"):

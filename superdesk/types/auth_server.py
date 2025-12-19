@@ -1,5 +1,6 @@
 from typing import Annotated
 from enum import Enum, unique
+import bcrypt
 
 from bson import ObjectId
 from pydantic import Field, StringConstraints, field_validator

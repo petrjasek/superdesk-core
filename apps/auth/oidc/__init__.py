@@ -33,7 +33,6 @@ are your keycloak realm, server client, and web client respectively, set followi
     OIDC_SERVER_CLIENT_SECRET=server-client-secret
     OIDC_WEB_CLIENT=web-client
 """
-
 import logging
 
 import superdesk

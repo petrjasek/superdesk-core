@@ -24,12 +24,13 @@ from apps.packages.package_service import PackageService
 from apps.publish.content.common import ITEM_KILL
 from apps.publish.content.kill import KillPublishService
 from apps.publish.content.take_down import TakeDownPublishService
+from apps.publish.published_item import QUEUE_STATE
 from superdesk.archive_async.service import AsyncArchiveService
 from superdesk.core.app import get_current_app
 from superdesk.core.resources.service import AsyncResourceService
 from superdesk.core.types.search import ProjectedFieldArg, SearchRequest
 from superdesk.errors import SuperdeskApiError
-from superdesk.metadata.item import CONTENT_TYPE
+from superdesk.metadata.item import CONTENT_TYPE, PUBLISH_STATES
 from superdesk.metadata.packages import MAIN_GROUP, RESIDREF
 from superdesk.notification import push_notification
 from superdesk.resource_fields import VERSION

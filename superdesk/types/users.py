@@ -10,6 +10,7 @@
 
 """Superdesk Users"""
 
+
 from datetime import datetime
 from typing import Annotated, Any
 

@@ -13,7 +13,6 @@
 
 Environment variables names match config name, with some expections documented below.
 """
-
 from typing import Callable
 from typing_extensions import TypedDict
 import json

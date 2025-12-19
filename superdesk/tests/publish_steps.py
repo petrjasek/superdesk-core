@@ -23,6 +23,7 @@ from superdesk.tests.steps import (
     fail_and_print_body_async,
 )
 from wooper.assertions import assert_equal
+from superdesk.publish_async.commands import transmit
 
 
 @when("we enqueue published")

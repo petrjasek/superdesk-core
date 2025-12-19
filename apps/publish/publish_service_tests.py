@@ -11,6 +11,7 @@
 from bson import ObjectId
 
 from superdesk.core.resources import AsyncResourceService
+from apps.publish import init_app
 from superdesk.errors import PublishQueueError
 from superdesk.types import SubscribersResource, PublishQueueResource
 from superdesk.publish import SUBSCRIBER_TYPES

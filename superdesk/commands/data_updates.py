@@ -233,9 +233,8 @@ async def downgrade_command_handler(data_update_id=None, fake=False, dry=False):
 
     if data_update_id and data_update_id not in data_updates_files:
         print(
-            "Error argument --id/-i: invalid choice: '{}' (choose from  {})".format(
-                data_update_id, get_data_updates_files(strip_file_extension=True)
-            )
+            "Error argument --id/-i: invalid choice: '{}'"
+            " (choose from  {})".format(data_update_id, get_data_updates_files(strip_file_extension=True))
         )
         return
 

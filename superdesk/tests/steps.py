@@ -42,6 +42,7 @@ from wooper.general import fail, apply_path, WooperAssertionError, parse_json_in
 from wooper.expect import expect_headers_contain
 
 from superdesk.types import AuthServerClientResource
+from superdesk.core import get_current_async_app
 from superdesk.resource_fields import ID_FIELD, LAST_UPDATED, DATE_CREATED, VERSION, ETAG
 import superdesk
 from superdesk.core import json
@@ -98,7 +99,7 @@ async def expect_status_in(response, codes):
 
 
 def format_message_text_and_body(text, message):
-    return '{message}\nResponse body:"""{text}"""'.format(message=message, text=text)
+    return "{message}\n" "Response body:" '"""' "{text}" '"""'.format(message=message, text=text)
 
 
 async def get_body_text_async(response):

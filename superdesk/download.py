@@ -9,7 +9,6 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 """Download module"""
-
 import logging
 import superdesk
 from superdesk.errors import SuperdeskApiError

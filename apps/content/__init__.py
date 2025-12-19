@@ -1,4 +1,5 @@
-"""Content related helpers and utils."""
+"""Content related helpers and utils.
+"""
 
 from superdesk.resource_fields import ID_FIELD, VERSION
 from superdesk.notification import push_notification

@@ -1,3 +1,5 @@
+from unittest.mock import create_autospec
+
 # TODO-ASYNC-PR: Find out what to do here
 # from superdesk.publish.subscribers import SubscribersService
 

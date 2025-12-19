@@ -9,7 +9,6 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 """Upload module"""
-
 import logging
 
 import superdesk

@@ -9,6 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import logging
+import superdesk
 
 from superdesk.core import get_current_app
 from superdesk.activity import add_activity, ACTIVITY_UPDATE

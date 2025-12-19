@@ -1,5 +1,5 @@
 import json
-from typing import List, Union
+from typing import Any, List, Union
 
 import apps.archive  # NOQA
 

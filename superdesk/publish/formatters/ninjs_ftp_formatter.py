@@ -15,6 +15,7 @@ from draftjs_exporter.dom import DOM
 
 from superdesk.core import get_app_config
 from superdesk.media.renditions import get_rendition_file_name
+from superdesk import get_resource_service
 from superdesk.editor_utils import get_content_state_fields, Editor3Content, DraftJSHTMLExporter
 from superdesk.media.renditions import get_renditions_spec
 from superdesk.publish_async.publish_cache import PublishCache

@@ -98,13 +98,13 @@ class SubscribersService(AsyncResourceService[SubscribersResource]):
         if min <= 0:
             raise SuperdeskApiError.badRequestError(
                 payload={"sequence_num_settings.min": 1},
-                message="Value of Minimum in Sequence Number Settings should be greater than 0",
+                message="Value of Minimum in Sequence Number Settings should " "be greater than 0",
             )
 
         if min >= max:
             raise SuperdeskApiError.badRequestError(
                 payload={"sequence_num_settings.min": 1},
-                message="Value of Minimum in Sequence Number Settings should be less than the value of Maximum",
+                message="Value of Minimum in Sequence Number Settings should " "be less than the value of Maximum",
             )
 
         subscriber.sequence_num_settings = SubscriberSequenceSettings(min=min, max=max)
@@ -122,7 +122,7 @@ class SubscribersService(AsyncResourceService[SubscribersResource]):
         if not subscriber.destinations and not subscriber.api_products:
             raise SuperdeskApiError.badRequestError(
                 payload={"destinations": {"required": 1}, "api_products": {"required": 1}},
-                message="At least one destination or one API Product should be specified",
+                message="At least one destination or one API Product should " "be specified",
             )
 
         if len(subscriber.products or []) and not subscriber.destinations:
@@ -135,7 +135,7 @@ class SubscribersService(AsyncResourceService[SubscribersResource]):
             products = await ProductsResource.get_names(lookup)
             if products:
                 raise SuperdeskApiError.badRequestError(
-                    payload={"products": 1}, message="Invalid Product Type. Products {}.".format(", ".join(products))
+                    payload={"products": 1}, message="Invalid Product Type. " "Products {}.".format(", ".join(products))
                 )
         if subscriber.api_products:
             lookup = {
@@ -146,7 +146,7 @@ class SubscribersService(AsyncResourceService[SubscribersResource]):
             if products:
                 raise SuperdeskApiError.badRequestError(
                     payload={"products": 1},
-                    message="Invalid Product Type. API Products {}.".format(", ".join(products)),
+                    message="Invalid Product Type. " "API Products {}.".format(", ".join(products)),
                 )
 
     def _apply_schedule_status(self, subscriber: SubscribersResource) -> None:

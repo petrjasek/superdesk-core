@@ -23,6 +23,7 @@ from superdesk.metadata import utils
 from superdesk.upload import url_for_media
 from superdesk import filemeta
 from PIL import Image
+import json
 
 
 class BaseMediaEditorTestCase(TestCase):

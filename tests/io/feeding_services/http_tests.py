@@ -13,6 +13,7 @@ import requests
 from datetime import timedelta
 from unittest.mock import patch, MagicMock
 
+import superdesk
 from superdesk.utc import utcnow
 from superdesk.io.registry import register_feeding_service
 from superdesk.io.feeding_services.http_service import HTTPFeedingService

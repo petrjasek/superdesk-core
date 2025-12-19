@@ -13,15 +13,18 @@ from copy import copy, deepcopy
 import superdesk
 from superdesk import editor_utils
 import superdesk.signals as signals
-from superdesk.core import get_current_app, get_app_config
+from superdesk.core import json, get_current_app, get_app_config
 from superdesk.resource_fields import ID_FIELD, ITEMS, VERSION, LAST_UPDATED, DATE_CREATED, ETAG
 from superdesk.flask import request, abort
 from superdesk.resource import Resource
 from superdesk.types import UsersResourceModel
 from superdesk.eve_async.service import AsyncBaseService
 from superdesk.metadata.utils import (
+    extra_response_fields,
     item_url,
+    aggregations,
     is_normal_package,
+    get_elastic_highlight_query,
 )
 from apps.auth import get_user, get_user_id
 from .common import (
@@ -66,7 +69,7 @@ from superdesk.activity import (
     ACTIVITY_UPDATE,
     ACTIVITY_DELETE,
 )
-from eve.utils import parse_request
+from eve.utils import parse_request, ParsedRequest
 from superdesk.users.services import current_user_has_privilege, is_admin
 from superdesk.metadata.item import (
     ITEM_STATE,
@@ -93,9 +96,10 @@ from apps.content import push_content_notification, push_expired_notification, p
 from apps.common.models.utils import get_model
 from apps.item_lock.models.item import ItemModel
 from apps.packages import PackageService
+from superdesk.privilege import GLOBAL_SEARCH_PRIVILEGE
 from .archive_media import ArchiveMediaService
 from .usage import track_usage, update_refs
-from .utils import flush_renditions
+from .utils import flush_renditions, private_content_filter, remove_is_queued
 from superdesk.utc import utcnow
 from superdesk.vocabularies import is_related_content
 from quart_babel import gettext as _

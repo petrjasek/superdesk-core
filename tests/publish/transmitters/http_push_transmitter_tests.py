@@ -13,8 +13,10 @@ import io
 import os
 import hmac
 import json
+import unittest
 import requests
 
+from superdesk.flask import Flask
 from superdesk.publish import SUBSCRIBER_TYPES
 from superdesk.publish.transmitters.http_push import HTTPPushService
 
@@ -120,9 +122,7 @@ class HTTPPushServiceTestCase(TestCase):
         if response.status_code == requests.codes.not_found:  # @UndefinedVariable
             return False
         self.assertEqual(
-            response.status_code,
-            requests.codes.ok,
-            "Error retrieving item from the content API",  # @UndefinedVariable
+            response.status_code, requests.codes.ok, "Error retrieving item from the content API"  # @UndefinedVariable
         )
         return True
 

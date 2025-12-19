@@ -11,7 +11,7 @@
 import bson
 
 from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 
 from superdesk.resource_fields import DATE_CREATED, LAST_UPDATED, ETAG
 from superdesk.tests import TestCase

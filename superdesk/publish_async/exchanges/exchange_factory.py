@@ -7,7 +7,7 @@ from eve.utils import ParsedRequest
 from superdesk import get_resource_service
 from superdesk.core import get_config
 from superdesk.core.app import SuperdeskAsyncApp
-from superdesk.core.utils import SingletonInstance
+from superdesk.core.utils import SingletonInstance, date_to_str
 from superdesk.types import (
     PublishQueueResource,
     PublishQueueState,
@@ -36,7 +36,7 @@ from superdesk.publish_async import get_exchange_factory
 from superdesk.resource_fields import ITEM_TYPE, ITEM_STATE
 
 from superdesk.metadata.item import PUBLISH_SCHEDULE, SCHEDULE_SETTINGS
-from superdesk.resource_fields import ITEM_OPERATION
+from superdesk.resource_fields import ID_FIELD, ITEM_OPERATION
 
 from ..utils import (
     get_high_priority_celery_queue,

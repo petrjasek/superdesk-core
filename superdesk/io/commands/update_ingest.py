@@ -543,7 +543,7 @@ async def ingest_items(items, provider, feeding_service, rule_set=None, routing_
             provider,
             feeding_service,
             rule_set,
-            routing_scheme=routing_scheme if item[GUID_FIELD] not in items_in_package else None,
+            routing_scheme=routing_scheme if not item[GUID_FIELD] in items_in_package else None,
         )
         if ingested:
             created_ids = created_ids + ids
@@ -613,7 +613,7 @@ async def ingest_item(item, provider, feeding_service, rule_set=None, routing_sc
             )
             return False, []
         elif old_item and not ingest_service.should_update(old_item, item, provider):
-            logger.info(f"Resource '{ingest_collection}' item '{item[GUID_FIELD]}' should not be updated")
+            logger.info(f"Resource '{ingest_collection}' " f"item '{item[GUID_FIELD]}' should not be updated")
             return False, []
 
         item["ingest_provider"] = str(provider[ID_FIELD])

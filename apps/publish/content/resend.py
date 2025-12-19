@@ -27,6 +27,7 @@ from superdesk.errors import SuperdeskApiError
 from superdesk.metadata.item import CONTENT_TYPE, ITEM_TYPE, ITEM_STATE, CONTENT_STATE
 from apps.archive.common import is_genre, BROADCAST_GENRE, ITEM_RESEND
 from superdesk.publish_async.commands import publish_item
+from apps.archive.common import ITEM_OPERATION
 from quart_babel import gettext as _
 
 logger = logging.getLogger(__name__)

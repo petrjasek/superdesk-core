@@ -1,3 +1,4 @@
+import io
 import logging
 
 from .utils import get_mimetype

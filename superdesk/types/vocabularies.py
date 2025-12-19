@@ -13,7 +13,8 @@ import logging
 from enum import Enum, unique
 from typing import Annotated, Any
 
-from pydantic import Field
+from pydantic import BaseModel, Field
+from quart_babel import gettext as _
 
 from superdesk.core.resources import ResourceModel
 from superdesk.core.resources.model import Dataclass, ResourceModel

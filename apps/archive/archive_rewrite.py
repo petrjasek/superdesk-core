@@ -17,7 +17,7 @@ from superdesk.eve_async.service import AsyncBaseService
 from superdesk.resource_fields import ID_FIELD
 from superdesk.flask import request
 from apps.archive import ArchiveSpikeService
-from superdesk import get_resource_service
+from superdesk import get_resource_service, Service
 from superdesk.metadata.item import (
     ITEM_STATE,
     EMBARGO,
@@ -164,7 +164,7 @@ class ArchiveRewriteService(AsyncBaseService):
 
         if (
             original.get("rewrite_of")
-            and original.get(ITEM_STATE) not in PUBLISH_STATES
+            and not (original.get(ITEM_STATE) in PUBLISH_STATES)
             and not get_app_config("WORKFLOW_ALLOW_MULTIPLE_UPDATES")
         ):
             raise SuperdeskApiError.badRequestError(
@@ -196,7 +196,7 @@ class ArchiveRewriteService(AsyncBaseService):
 
             if original.get("profile") and update.get("profile") and original.get("profile") != update.get("profile"):
                 raise SuperdeskApiError.badRequestError(
-                    _("Rewrite item content profile does not match with Original item.")
+                    _("Rewrite item content profile does " "not match with Original item.")
                 )
 
     async def _create_rewrite_article(self, original, existing_item=None, desk_id=None):

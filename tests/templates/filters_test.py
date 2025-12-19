@@ -28,7 +28,7 @@ class ConvertDatetimeFiltersTest(TestCase):
 
     async def test_convert_datetime_utc_format(self):
         template_string = (
-            '{{ item.versioncreated | format_datetime(timezone_string="Australia/Sydney", date_format="%Y-%m-%d")}}'
+            '{{ item.versioncreated | format_datetime(timezone_string="Australia/Sydney", ' 'date_format="%Y-%m-%d")}}'
         )
         item = {"versioncreated": "2015-01-01T22:54:53+0000"}
         result = await render_template_string(template_string, item=item)

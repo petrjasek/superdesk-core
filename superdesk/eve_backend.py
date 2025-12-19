@@ -10,6 +10,7 @@
 
 
 from typing import Dict, Any, Literal
+from inspect import isawaitable
 import eve.io.base
 import json as std_json
 import pymongo.collection

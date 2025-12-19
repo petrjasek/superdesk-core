@@ -12,12 +12,15 @@ from bson import ObjectId
 from unittest import mock
 from unittest.mock import MagicMock
 from datetime import timedelta
+from collections import UserList
 
 from superdesk.types import PublishQueueResource, SubscribersResource, SubscriberType
 from superdesk.tests import TestCase
 from superdesk.utc import utcnow
+from superdesk.publish import PUBLISHED_IN_PACKAGE
 
 from superdesk.publish_async.utils import get_queue_items
+from superdesk.metadata.item import CONTENT_TYPE, ITEM_TYPE
 
 # TODO-ASYNC[publish]: Fix this, it imports the superdesk.publish.publish_queue file directly, and uses code from it
 publish_queue = {}

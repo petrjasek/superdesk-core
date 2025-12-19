@@ -11,6 +11,7 @@
 
 from typing import Dict, Any
 import json
+import requests
 import logging
 from datetime import timedelta, datetime
 
@@ -65,7 +66,7 @@ class APMediaFeedingService(HTTPFeedingServiceBase):
             "id": "productList",
             "type": "text",
             "label": "Product List",
-            "placeholder": "Use coma separated product ids for multiple products, empty for all ",
+            "placeholder": "Use coma separated product id" "s for multiple products, empty for all ",
             "required": False,
         },
         {"id": "availableProducts", "type": "text", "label": "All Available Products", "readonly": True},

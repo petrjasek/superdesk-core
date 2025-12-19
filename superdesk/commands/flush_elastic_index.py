@@ -38,7 +38,7 @@ class FlushElasticIndex:
 
     async def run(self, sd_index: bool, capi_index: bool):
         if not (sd_index or capi_index):
-            raise SystemExit("You must specify at least one elastic index to flush. Options: `--sd`, `--capi`")
+            raise SystemExit("You must specify at least one elastic index to flush. " "Options: `--sd`, `--capi`")
 
         self._es = get_es(get_app_config("ELASTICSEARCH_URL"))
 

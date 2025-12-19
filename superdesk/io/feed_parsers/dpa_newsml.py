@@ -12,6 +12,7 @@ from superdesk.io.feed_parsers.newsml_2_0 import NewsMLTwoFeedParser
 from superdesk.io.registry import register_feed_parser
 from superdesk.etree import etree
 from pytz import utc
+import re
 
 
 class DPAFeedParser(NewsMLTwoFeedParser):

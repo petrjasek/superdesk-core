@@ -11,6 +11,7 @@
 from apps.archive.resource import ArchiveResource, ArchiveVersionsResource
 from apps.archive_history import ArchiveHistoryResource
 
+from typing import Any
 
 from superdesk.types import PublishQueueState
 from superdesk.resource import Resource

@@ -10,8 +10,9 @@
 import logging
 import datetime
 from copy import copy, deepcopy
-from typing import Dict, Any
+from typing import Dict, List, Any, Optional, Sequence, Union, Tuple
 
+from bson import ObjectId
 
 import superdesk
 import superdesk.signals as signals
@@ -32,6 +33,7 @@ from apps.archive.common import (
     update_schedule_settings,
     ITEM_OPERATION,
     ITEM_RESTORE,
+    ITEM_CREATE,
     ITEM_UPDATE,
     ITEM_DUPLICATE,
     ITEM_DUPLICATED_FROM,
@@ -39,6 +41,7 @@ from apps.archive.common import (
     ARCHIVE as SOURCE,
     LAST_PRODUCTION_DESK,
     LAST_AUTHORING_DESK,
+    ITEM_FETCH,
     convert_task_attributes_to_objectId,
     BROADCAST_GENRE,
     set_dateline,
@@ -49,6 +52,7 @@ from apps.archive.highlights_search_mixin import HighlightsSearchMixin
 from apps.common.components.utils import get_component
 from apps.archive.usage import update_refs, track_usage
 from apps.common.models.utils import get_model
+from apps.common.models.base_model import InvalidEtag
 from apps.content import push_content_notification, push_expired_notification, push_notification
 from apps.item_autosave.components.item_autosave import ItemAutosave
 from apps.item_lock.models.item import ItemModel
@@ -76,12 +80,17 @@ from superdesk.metadata.item import (
     INGEST_ID,
     PROCESSED_FROM,
     PUBLISH_STATES,
+    get_schema,
 )
 from superdesk.metadata.packages import LINKED_IN_PACKAGES, RESIDREF
 from superdesk.metadata.utils import (
+    is_normal_package,
     is_normal_package_async,
+    aggregations,
+    get_elastic_highlight_query,
 )
-from superdesk.resource_fields import ID_FIELD, VERSION, LAST_UPDATED, DATE_CREATED, ETAG
+from superdesk.privilege import GLOBAL_SEARCH_PRIVILEGE
+from superdesk.resource_fields import ITEMS, ID_FIELD, VERSION, LAST_UPDATED, DATE_CREATED, ETAG
 from superdesk.text_utils import update_word_count
 from superdesk.types import ArchiveResourceModel, ContentTypes, ItemOperation
 from superdesk.users.services import current_user_has_privilege, is_admin

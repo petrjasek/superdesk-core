@@ -115,7 +115,7 @@ class TextParserTest(ItemTest):
         self.assertEqual(3, self.item.get("urgency"))
         self.assertEqual("SOCCER-ENGLAND/CHELSEA-BENITEZ", self.item["slugline"])
         self.assertEqual(
-            "Soccer-Smiling Benitez pleads for support after midweek outburst against opponent",
+            "Soccer-Smiling Benitez pleads for support " "after midweek outburst against opponent",
             self.item["headline"],
         )
         self.assertNotIn("description_text", self.item)

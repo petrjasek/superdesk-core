@@ -57,6 +57,7 @@ from superdesk.utc import utcnow
 
 from apps.publish.content import KillPublishService, TakeDownPublishService
 from quart_babel import gettext as _, lazy_gettext
+import content_api
 
 
 logger = logging.getLogger(__name__)

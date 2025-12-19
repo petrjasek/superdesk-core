@@ -743,9 +743,9 @@ class Newsml12FormatterTest(TestCase):
             xml.find("NewsItem/NewsComponent/NewsComponent/NewsLines/KeywordLine").text, "NUS CHRISTOPHER PYNE PROTEST"
         )
         self.assertEqual(
-            xml.find(('NewsItem/NewsComponent/NewsComponent/DescriptiveMetadata/Property[@FormalName="Category"]')).get(
-                "Value"
-            ),
+            xml.find(
+                ("NewsItem/NewsComponent/NewsComponent/DescriptiveMetadata/" 'Property[@FormalName="Category"]')
+            ).get("Value"),
             "a",
         )
 

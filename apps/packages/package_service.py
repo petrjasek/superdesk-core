@@ -35,6 +35,7 @@ from superdesk.metadata.packages import (
 )
 from apps.archive.common import ITEM_UNLINK, insert_into_versions_async
 from superdesk.utc import utcnow
+from superdesk.default_settings import VERSION
 from quart_babel import gettext as _
 from superdesk.validation import ValidationError
 from superdesk.publish_async.utils import get_residrefs
