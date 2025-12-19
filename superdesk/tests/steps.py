@@ -42,7 +42,6 @@ from wooper.general import fail, apply_path, WooperAssertionError, parse_json_in
 from wooper.expect import expect_headers_contain
 
 from superdesk.types import AuthServerClientResource
-from superdesk.core import get_current_async_app
 from superdesk.resource_fields import ID_FIELD, LAST_UPDATED, DATE_CREATED, VERSION, ETAG
 import superdesk
 from superdesk.core import json

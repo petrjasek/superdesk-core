@@ -19,7 +19,7 @@ from superdesk.resource_fields import ID_FIELD, ITEMS, DATE_CREATED, LAST_UPDATE
 from superdesk.flask import request
 from superdesk import get_resource_service
 from superdesk.errors import SuperdeskApiError
-from superdesk.metadata.item import not_analyzed, ITEM_STATE, PUBLISH_STATES, CONTENT_STATE
+from superdesk.metadata.item import not_analyzed, ITEM_STATE, PUBLISH_STATES
 from superdesk.metadata.utils import aggregations, get_elastic_highlight_query
 from superdesk.resource import Resource
 from superdesk.eve_async import AsyncBaseService, AsyncListCursor

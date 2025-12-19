@@ -1,4 +1,3 @@
-from typing import Any, cast
 
 from quart_babel import gettext
 from superdesk.errors import SuperdeskApiError

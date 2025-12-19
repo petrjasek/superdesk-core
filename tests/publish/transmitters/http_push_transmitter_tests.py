@@ -13,10 +13,8 @@ import io
 import os
 import hmac
 import json
-import unittest
 import requests
 
-from superdesk.flask import Flask
 from superdesk.publish import SUBSCRIBER_TYPES
 from superdesk.publish.transmitters.http_push import HTTPPushService
 

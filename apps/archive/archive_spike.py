@@ -23,7 +23,6 @@ from superdesk.metadata.item import (
     GUID_FIELD,
     GUID_TAG,
     PUBLISH_STATES,
-    CONTENT_STATE,
 )
 from superdesk.notification import push_notification
 from superdesk.eve_async import AsyncBaseService

@@ -10,7 +10,7 @@
 
 from superdesk import get_resource_service
 from os.path import dirname, join
-from superdesk.tests import TestCase, markers
+from superdesk.tests import TestCase
 from superdesk.utc import utcnow
 from apps.auth.db.commands import create_user_command_handler, ImportUsersCommand
 

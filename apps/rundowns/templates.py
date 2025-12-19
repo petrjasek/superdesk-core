@@ -2,7 +2,7 @@ import copy
 import logging
 import superdesk
 
-from typing import Dict, Optional
+from typing import Optional
 
 from apps.auth import get_user_id
 

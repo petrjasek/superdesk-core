@@ -48,7 +48,7 @@ from superdesk.resource_fields import ID_FIELD, VERSION_ID_FIELD, CURRENT_VERSIO
 
 from ..app import SuperdeskAsyncApp, get_current_async_app, get_config
 from .cursor import ElasticsearchResourceCursorAsync, MongoResourceCursorAsync, ResourceCursorAsync
-from .utils import get_projection_from_request, combine_projection_args
+from .utils import get_projection_from_request
 from .types import ResourceModelType
 
 logger = logging.getLogger(__name__)

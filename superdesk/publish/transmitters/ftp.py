@@ -56,7 +56,7 @@ class FTPPublishService(PublishService):
     async def _get_published_item(self, queue_item):
         try:
             return json.loads(queue_item["formatted_item"])
-        except json.JSONDecodeError as ex:
+        except json.JSONDecodeError:
             return await superdesk.get_resource_service("published").find_one_async(
                 req=None,
                 item_id=queue_item["item_id"],

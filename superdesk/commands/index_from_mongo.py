@@ -13,7 +13,6 @@ import time
 import click
 import pymongo
 from bson.objectid import ObjectId
-from flask import current_app as app
 from datetime import datetime
 
 from superdesk.errors import BulkIndexError
