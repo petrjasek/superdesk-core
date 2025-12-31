@@ -162,12 +162,10 @@ class ElasticResourceAsyncClient(BaseElasticResourceClient):
         return None
 
     @overload
-    async def find_one(self, req: SearchRequest) -> dict[str, Any] | None:
-        ...
+    async def find_one(self, req: SearchRequest) -> dict[str, Any] | None: ...
 
     @overload
-    async def find_one(self, req: dict) -> dict[str, Any] | None:
-        ...
+    async def find_one(self, req: dict) -> dict[str, Any] | None: ...
 
     async def find_one(self, req: SearchRequest | dict) -> Optional[Dict[str, Any]]:
         """Find a single document in Elasticsearch based on the provided search query

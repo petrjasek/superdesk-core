@@ -157,12 +157,10 @@ class ElasticResourceClient(BaseElasticResourceClient):
         return None
 
     @overload
-    def find_one(self, req: SearchRequest) -> dict[str, Any] | None:
-        ...
+    def find_one(self, req: SearchRequest) -> dict[str, Any] | None: ...
 
     @overload
-    def find_one(self, req: dict) -> dict[str, Any] | None:
-        ...
+    def find_one(self, req: dict) -> dict[str, Any] | None: ...
 
     def find_one(self, req: SearchRequest | dict) -> dict[str, Any] | None:
         """Find a single document in Elasticsearch based on the provided search query

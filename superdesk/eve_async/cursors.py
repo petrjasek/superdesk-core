@@ -9,12 +9,12 @@ if TYPE_CHECKING:
 
     class MongoAsyncEveCursor(AsyncIOMotorCursor):
         # Adding the ``count`` method to the cursor, as our ``EveBackend`` adds it
-        async def count(self) -> int:
-            ...  # type: ignore[empty-body]
+        async def count(self) -> int: ...  # type: ignore[empty-body]
 
         # Make sure ``sort`` function returns our cursor class
-        def sort(self, key_or_list: MongoCursorHint, direction: int | str | None = None) -> "MongoAsyncEveCursor":
-            ...  # type: ignore[empty-body]
+        def sort(
+            self, key_or_list: MongoCursorHint, direction: int | str | None = None
+        ) -> "MongoAsyncEveCursor": ...  # type: ignore[empty-body]
 
         # Seems like ``motor-types`` incorrectly assumes length is not optional
         # compared to the ``motor`` library where it's optional

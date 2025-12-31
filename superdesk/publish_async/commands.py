@@ -118,8 +118,7 @@ async def transmit():
 
 
 @overload
-async def publish_item(request: PublishRequest) -> PublishRequestResponse:
-    ...
+async def publish_item(request: PublishRequest) -> PublishRequestResponse: ...
 
 
 @overload
@@ -133,8 +132,7 @@ async def publish_item(
     sender_type: PublishSenderType = PublishSenderType.INTERNAL,
     publish_to_content_api: bool = False,
     subscribers: list[SubscribersResource] | None = None,
-) -> PublishRequestResponse:
-    ...
+) -> PublishRequestResponse: ...
 
 
 async def publish_item(

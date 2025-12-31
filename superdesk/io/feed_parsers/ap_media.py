@@ -216,9 +216,11 @@ class APMediaFeedParser(FeedParser):
         if len(in_item.get("bylines", [])):
             item["byline"] = ",".join(
                 [
-                    n.get("name")
-                    if n.get("name")
-                    else n.get("by", "") + (" ({})".format(n.get("title")) if n.get("title") else "")
+                    (
+                        n.get("name")
+                        if n.get("name")
+                        else n.get("by", "") + (" ({})".format(n.get("title")) if n.get("title") else "")
+                    )
                     for n in in_item.get("bylines", [])
                 ]
             )

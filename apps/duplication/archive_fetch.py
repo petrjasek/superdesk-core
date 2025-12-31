@@ -93,9 +93,11 @@ class FetchService(AsyncBaseService):
                 desk_id,
                 stage_id,
                 # we might want to change state or target from the macro
-                state=ingest_doc[ITEM_STATE]
-                if ingest_doc.get(ITEM_STATE) and ingest_doc[ITEM_STATE] != CONTENT_STATE.INGESTED
-                else doc.get(ITEM_STATE),
+                state=(
+                    ingest_doc[ITEM_STATE]
+                    if ingest_doc.get(ITEM_STATE) and ingest_doc[ITEM_STATE] != CONTENT_STATE.INGESTED
+                    else doc.get(ITEM_STATE)
+                ),
                 target=ingest_doc.get("target", doc.get("target")),
             )
 

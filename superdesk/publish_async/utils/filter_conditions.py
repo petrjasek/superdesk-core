@@ -335,21 +335,23 @@ async def _get_vocabulary_fields(values: dict[str, list[str] | list[dict]]) -> l
         field = FilterConditionFieldParam(
             field=vocabulary["_id"],
             label=vocabulary.get("display_name"),
-            operators=[
-                FilterConditionOperator.IN,
-                FilterConditionOperator.NOT_IN,
-                FilterConditionOperator.EQUALS,
-                FilterConditionOperator.NOT_EQUALS,
-                FilterConditionOperator.LIKE,
-                FilterConditionOperator.NOT_LIKE,
-                FilterConditionOperator.STARTS_WITH,
-                FilterConditionOperator.ENDS_WITH,
-            ]
-            if field_type == "text"
-            else [
-                FilterConditionOperator.IN,
-                FilterConditionOperator.NOT_IN,
-            ],
+            operators=(
+                [
+                    FilterConditionOperator.IN,
+                    FilterConditionOperator.NOT_IN,
+                    FilterConditionOperator.EQUALS,
+                    FilterConditionOperator.NOT_EQUALS,
+                    FilterConditionOperator.LIKE,
+                    FilterConditionOperator.NOT_LIKE,
+                    FilterConditionOperator.STARTS_WITH,
+                    FilterConditionOperator.ENDS_WITH,
+                ]
+                if field_type == "text"
+                else [
+                    FilterConditionOperator.IN,
+                    FilterConditionOperator.NOT_IN,
+                ]
+            ),
         )
 
         if field_type != "text":

@@ -160,9 +160,11 @@ class DefaultAvailabilityService(superdesk.Service):
                             "date": d.date().isoformat(),
                             "status": default_availability["status"],
                             "language": doc.get("language") or [],
-                            "working_hours": default_availability["working_hours"]
-                            if default_availability.get("working_hours")
-                            else [],
+                            "working_hours": (
+                                default_availability["working_hours"]
+                                if default_availability.get("working_hours")
+                                else []
+                            ),
                             "_generated": True,
                         }
                     )

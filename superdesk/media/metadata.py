@@ -41,13 +41,11 @@ def _get_item_value(item, src: str) -> str | None:
 
 
 @overload
-def write_metadata(bin: bytes, metadata: MediaMetadata, content_type: Literal["video"]) -> bytes:
-    ...  # noqa
+def write_metadata(bin: bytes, metadata: MediaMetadata, content_type: Literal["video"]) -> bytes: ...  # noqa
 
 
 @overload
-def write_metadata(bin: bytes, metadata: MediaMetadata, content_type: Literal["picture"]) -> bytes:
-    ...  # noqa
+def write_metadata(bin: bytes, metadata: MediaMetadata, content_type: Literal["picture"]) -> bytes: ...  # noqa
 
 
 def write_metadata(bin: bytes, metadata, content_type: CONTENT_TYPE_LITERAL):

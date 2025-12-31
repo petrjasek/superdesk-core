@@ -47,7 +47,9 @@ class VocabulariesUpdateArchiveTestCase(TestCase):
                     "parent": None,
                     "is_active": True,
                     "qcode": "subject:03000000",
-                    "translations": {"name": {"de": "Marktumfeld", "it": "Contesto di mercato", "ja": "マーケット・コンテクスト"}},
+                    "translations": {
+                        "name": {"de": "Marktumfeld", "it": "Contesto di mercato", "ja": "マーケット・コンテクスト"}
+                    },
                 },
             ],
         },
@@ -82,7 +84,9 @@ class VocabulariesUpdateArchiveTestCase(TestCase):
             "name": "Market context",
             "parent": None,
             "qcode": "subject:03000000",
-            "translations": {"name": {"de": "Marktumfeld", "it": "Contesto di mercato", "ja": "マーケット・コンテクスト"}},
+            "translations": {
+                "name": {"de": "Marktumfeld", "it": "Contesto di mercato", "ja": "マーケット・コンテクスト"}
+            },
         }
 
         new = {

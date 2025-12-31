@@ -257,9 +257,11 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
 
                 publish_queue_item = PublishQueueResource(
                     id=ObjectId(),
-                    state=PublishQueueState.SUCCESS
-                    if destination.delivery_type == "content_api"
-                    else PublishQueueState.ROUTING,
+                    state=(
+                        PublishQueueState.SUCCESS
+                        if destination.delivery_type == "content_api"
+                        else PublishQueueState.ROUTING
+                    ),
                     is_content_api=destination.delivery_type == "content_api",
                     item_id=request.item_id,
                     publishing_action=request.published_state,

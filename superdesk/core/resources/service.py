@@ -126,8 +126,7 @@ class AsyncResourceService(Generic[ResourceModelType]):
         return cast(ResourceModelType, self.config.data_class.from_dict(data))
 
     @overload
-    async def find_one_raw(self, req: SearchRequest) -> dict | None:
-        ...
+    async def find_one_raw(self, req: SearchRequest) -> dict | None: ...
 
     @overload
     async def find_one_raw(
@@ -138,8 +137,7 @@ class AsyncResourceService(Generic[ResourceModelType]):
         use_mongo: bool = False,
         version: int | None = None,
         **lookup,
-    ) -> dict | None:
-        ...
+    ) -> dict | None: ...
 
     async def find_one_raw(
         self,
@@ -175,9 +173,11 @@ class AsyncResourceService(Generic[ResourceModelType]):
 
         if search_request.use_mongo or item is None:
             kwargs = dict(
-                filter=json.loads(search_request.where or "{}")
-                if isinstance(search_request.where, str)
-                else search_request.where or {}
+                filter=(
+                    json.loads(search_request.where or "{}")
+                    if isinstance(search_request.where, str)
+                    else search_request.where or {}
+                )
             )
             projection_arg = self._get_mongo_projection_argument(search_request)
             if projection_arg:
@@ -196,8 +196,7 @@ class AsyncResourceService(Generic[ResourceModelType]):
         return item
 
     @overload
-    async def find_one(self, req: SearchRequest) -> ResourceModelType | None:
-        ...
+    async def find_one(self, req: SearchRequest) -> ResourceModelType | None: ...
 
     @overload
     async def find_one(
@@ -207,8 +206,7 @@ class AsyncResourceService(Generic[ResourceModelType]):
         use_mongo: bool = False,
         version: int | None = None,
         **lookup,
-    ) -> ResourceModelType | None:
-        ...
+    ) -> ResourceModelType | None: ...
 
     async def find_one(
         self,
@@ -698,8 +696,7 @@ class AsyncResourceService(Generic[ResourceModelType]):
     @overload
     async def find(
         self, req: SearchRequest
-    ) -> ElasticsearchResourceCursorAsync[ResourceModelType] | MongoResourceCursorAsync[ResourceModelType]:
-        ...
+    ) -> ElasticsearchResourceCursorAsync[ResourceModelType] | MongoResourceCursorAsync[ResourceModelType]: ...
 
     @overload
     async def find(
@@ -710,8 +707,7 @@ class AsyncResourceService(Generic[ResourceModelType]):
         sort: SortParam | None = None,
         projection: ProjectedFieldArg | None = None,
         use_mongo: bool = False,
-    ) -> ElasticsearchResourceCursorAsync[ResourceModelType] | MongoResourceCursorAsync[ResourceModelType]:
-        ...
+    ) -> ElasticsearchResourceCursorAsync[ResourceModelType] | MongoResourceCursorAsync[ResourceModelType]: ...
 
     async def find(
         self,

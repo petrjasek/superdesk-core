@@ -170,9 +170,11 @@ def validate_data_relation_async(
                 if not await collection.find_one({external_field: item_id}):
                     raise PydanticCustomError(
                         "data_relation",
-                        str(error_string)
-                        if error_string
-                        else gettext("Resource '{resource_name}' with ID '{item_id}' does not exist"),
+                        (
+                            str(error_string)
+                            if error_string
+                            else gettext("Resource '{resource_name}' with ID '{item_id}' does not exist")
+                        ),
                         dict(
                             resource_name=resource_name,
                             item_id=item_id,

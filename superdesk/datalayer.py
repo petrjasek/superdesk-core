@@ -197,16 +197,13 @@ class SuperdeskDataLayer(DataLayer):
         return self._backend(resource, use_async=True).is_empty(resource)
 
     @overload
-    def _search_backend(self, resource) -> Elastic | None:
-        ...
+    def _search_backend(self, resource) -> Elastic | None: ...
 
     @overload
-    def _search_backend(self, resource, use_async: Literal[False] = False) -> Elastic | None:
-        ...
+    def _search_backend(self, resource, use_async: Literal[False] = False) -> Elastic | None: ...
 
     @overload
-    def _search_backend(self, resource, use_async: Literal[True]) -> ElasticAsync | None:
-        ...
+    def _search_backend(self, resource, use_async: Literal[True]) -> ElasticAsync | None: ...
 
     def _search_backend(self, resource, use_async: bool = False) -> Elastic | ElasticAsync | None:
         if resource.endswith(get_config(str, "VERSIONS")):
@@ -222,16 +219,13 @@ class SuperdeskDataLayer(DataLayer):
         return getattr(self, backend) if backend is not None else None
 
     @overload
-    def _backend(self, resource: str) -> Mongo | None:
-        ...
+    def _backend(self, resource: str) -> Mongo | None: ...
 
     @overload
-    def _backend(self, resource: str, use_async: Literal[False]) -> Mongo | None:
-        ...
+    def _backend(self, resource: str, use_async: Literal[False]) -> Mongo | None: ...
 
     @overload
-    def _backend(self, resource: str, use_async: Literal[True]) -> MongoAsync | None:
-        ...
+    def _backend(self, resource: str, use_async: Literal[True]) -> MongoAsync | None: ...
 
     def _backend(self, resource: str, use_async: bool = False) -> Mongo | MongoAsync | None:
         datasource = self.datasource(resource)

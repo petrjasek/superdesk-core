@@ -227,9 +227,11 @@ class IngestProviderService(AsyncBaseService):
             "updated Ingest Channel {{name}}",
             self.datasource,
             item=None,
-            user_list=[user.to_dict() for user in await UsersResourceModel.get_by_user_type(UserTypeEnum.ADMINISTRATOR)]
-            if do_notification
-            else None,
+            user_list=(
+                [user.to_dict() for user in await UsersResourceModel.get_by_user_type(UserTypeEnum.ADMINISTRATOR)]
+                if do_notification
+                else None
+            ),
             name=updates.get("name", original.get("name")),
             provider_id=original.get("_id"),
         )
@@ -254,11 +256,11 @@ class IngestProviderService(AsyncBaseService):
                 "{{status}} Ingest Channel {{name}}",
                 self.datasource,
                 item=None,
-                user_list=[
-                    user.to_dict() for user in await UsersResourceModel.get_by_user_type(UserTypeEnum.ADMINISTRATOR)
-                ]
-                if do_notification
-                else None,
+                user_list=(
+                    [user.to_dict() for user in await UsersResourceModel.get_by_user_type(UserTypeEnum.ADMINISTRATOR)]
+                    if do_notification
+                    else None
+                ),
                 name=updates.get("name", original.get("name")),
                 status=status,
                 provider_id=original.get("_id"),
