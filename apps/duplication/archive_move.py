@@ -33,7 +33,6 @@ from superdesk.metadata.item import (
 )
 from superdesk.metadata.packages import REFS, GROUPS, RESIDREF
 from superdesk.resource import Resource
-from superdesk.services import BaseService
 from superdesk.metadata.utils import item_url
 from apps.archive.common import (
     insert_into_versions_async,

@@ -10,7 +10,7 @@
 
 import datetime
 import logging
-from typing import List, cast
+from typing import List
 
 from bson.objectid import ObjectId
 from quart_babel import lazy_gettext

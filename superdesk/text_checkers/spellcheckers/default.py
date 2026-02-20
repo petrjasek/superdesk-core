@@ -10,7 +10,6 @@
 
 import re
 import logging
-from inspect import isawaitable
 
 # from superdesk.errors import SuperdeskApiError
 import superdesk

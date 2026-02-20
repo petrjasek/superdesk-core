@@ -1,4 +1,3 @@
-from superdesk.core.module import Module
 from superdesk.core.resources import ResourceModel, ResourceConfig, ElasticResourceConfig
 
 

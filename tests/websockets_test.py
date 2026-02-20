@@ -1,5 +1,3 @@
-from typing import List
-import asyncio
 import unittest
 from unittest.mock import MagicMock, patch, ANY
 from json import dumps
@@ -7,8 +5,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 from superdesk.websockets_comms import SocketCommunication
 from superdesk.types import WebsocketMessageData
-from websockets import ServerConnection, ServerProtocol
-from websockets.protocol import OPEN
+from websockets import ServerConnection
 
 
 class TestClient(ServerConnection):

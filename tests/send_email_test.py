@@ -1,5 +1,5 @@
 from superdesk.emails import send_user_status_changed_email, send_activity_emails, send_email, send_translation_changed
-from superdesk.tests import TestCase, markers
+from superdesk.tests import TestCase
 from unittest.mock import patch, AsyncMock
 
 

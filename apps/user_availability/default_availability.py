@@ -4,7 +4,6 @@ from datetime import timedelta
 from dateutil.rrule import rrule, WEEKLY
 from quart import current_app as app
 from typing import TYPE_CHECKING
-from dateutil.rrule import rrule, WEEKLY
 
 from apps.auth import get_user_id
 from superdesk.dates import get_local_today

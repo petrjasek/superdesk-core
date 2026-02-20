@@ -8,7 +8,7 @@
 
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Iterable, cast
+from typing import Any, Iterable
 
 import bson
 from bson import ObjectId
@@ -18,7 +18,7 @@ from apps.auth import get_user_id
 from apps.desks import remove_profile_from_desks_async
 import superdesk
 from superdesk.core.resources.service import AsyncCacheableService
-from superdesk.core.types.search import ProjectedFieldArg, SearchRequest
+from superdesk.core.types.search import ProjectedFieldArg
 from superdesk.default_schema import DEFAULT_EDITOR, DEFAULT_SCHEMA, DEFAULT_SCHEMA_MAP
 from superdesk.errors import SuperdeskApiError
 from superdesk.resource_fields import ID_FIELD

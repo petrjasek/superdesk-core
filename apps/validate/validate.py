@@ -24,7 +24,7 @@ from superdesk import get_resource_service
 from _collections_abc import MutableMapping  # typing: ignore
 from superdesk.signals import item_validate
 from superdesk.validator import BaseErrorHandler
-from quart_babel import lazy_gettext, gettext as _
+from quart_babel import lazy_gettext
 from superdesk.default_schema import DEFAULT_SCHEMA_MAP
 
 
@@ -481,7 +481,7 @@ class ValidateService(AsyncBaseService):
                     doc[field_schema] = doc["associations"][media_field]
                     if media_field != "featuremedia":
                         del doc["associations"][media_field]
-                    elif not doc.get("feature_media", None) is None and "description_text" in doc["feature_media"]:
+                    elif doc.get("feature_media", None) is not None and "description_text" in doc["feature_media"]:
                         doc["media_description"] = doc["feature_media"]["description_text"]
 
     def _process_sms(self, doc, schema):

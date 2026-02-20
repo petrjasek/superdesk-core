@@ -9,7 +9,6 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from superdesk.core.resources import ResourceConfig, MongoResourceConfig, MongoIndexOptions, ElasticResourceConfig
-from superdesk.core.resources.resource_rest_endpoints import RestEndpointConfig
 from superdesk.types.archived import ArchivedResourceModel
 from .service import ArchivedService
 

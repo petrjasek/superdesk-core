@@ -12,7 +12,6 @@
 # codes extracted from IPTC IIM v4.2 specifications
 
 
-from typing import Dict, Tuple
 
 
 class TAG:

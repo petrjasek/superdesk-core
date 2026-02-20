@@ -23,7 +23,6 @@ from superdesk.eve_async.cursors import AsyncEveCursor
 from superdesk.eve_async.service import AsyncBaseService
 from superdesk.types import DesksResourceModel
 from superdesk.resource_fields import ID_FIELD, DATE_CREATED, LAST_UPDATED, ETAG, VERSION, ITEMS
-from superdesk.flask import render_template_string
 from superdesk.types import ContentTypesResourceModel
 from superdesk import Resource, get_resource_service
 from superdesk.utils import SuperdeskBaseEnum, plaintext_filter

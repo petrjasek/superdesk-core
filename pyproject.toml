@@ -17,6 +17,31 @@ exclude = '''
 )
 '''
 
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = [
+    ".eggs",
+    ".git",
+    ".mypy_cache",
+    ".tox",
+    ".env",
+    "_build",
+    "build",
+    "dist",
+    "env",
+    "src",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+# Disable rules that conflict with black or are undesired
+ignore = [
+    "E203",  # whitespace before ':'
+    "E501",  # line too long (handled by black)
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests", "superdesk", "apps", "content_api"]
 python_files = "*_test.py *_tests.py test_*.py tests_*.py tests.py test.py"

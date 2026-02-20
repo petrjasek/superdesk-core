@@ -6,7 +6,7 @@ import superdesk
 from quart_babel import gettext as _
 from datetime import timedelta
 
-from superdesk.core import get_current_app, get_config, get_current_async_app
+from superdesk.core import get_config, get_current_async_app
 from superdesk.eve_async import AsyncBaseService, AsyncListCursor
 from superdesk.types import ArchiveResourceModel
 from superdesk.flask import request
