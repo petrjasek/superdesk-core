@@ -12,7 +12,6 @@ import logging
 from typing import Any
 
 from quart_babel import lazy_gettext
-import superdesk
 
 from superdesk.celery_app import celery
 from superdesk import get_backend, privilege
@@ -35,9 +34,7 @@ from .service import (
 from .commands import (
     ImportLegalPublishQueueCommand,
     ImportLegalArchiveCommand,
-    cli_legal_publish_queue_import,
-    cli_legal_archive_import,
-)  # noqa
+)
 
 logger = logging.getLogger(__name__)
 

@@ -42,13 +42,11 @@ from superdesk.metadata.item import (
     ASSOCIATIONS,
     LAST_AUTHORING_DESK,
     LAST_PRODUCTION_DESK,
-    ITEM_EVENT_ID,
 )
 from superdesk.workflow import set_default_state, is_workflow_state_transition_valid
 from superdesk.metadata.item import GUID_NEWSML, GUID_FIELD, GUID_TAG, not_analyzed, FAMILY_ID, INGEST_ID
 from superdesk.metadata.utils import generate_guid
 from superdesk.errors import SuperdeskApiError, IdentifierGenerationError
-from superdesk.logging import logger
 from apps.auth import get_user, get_auth  # noqa
 from quart_babel import gettext as _
 

@@ -14,7 +14,7 @@ from . import (  # noqa: E402
     privileges,
     rundowns,
     rundown_items,
-    tasks,
+    tasks as tasks,
     export,
     comments,
 )

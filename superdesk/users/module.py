@@ -4,7 +4,7 @@ from superdesk.core.resources import (
     MongoResourceConfig,
 )
 from superdesk.types import UsersResourceModel
-from .async_service import UsersAsyncService, DBUsersAsyncService
+from .async_service import DBUsersAsyncService
 
 
 users_resource_config = ResourceConfig(

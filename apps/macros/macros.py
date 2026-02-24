@@ -8,7 +8,6 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from inspect import isawaitable
 import logging
 
 from superdesk import Resource, get_resource_service

@@ -17,7 +17,7 @@ from eve.io.media import MediaStorage
 from eve.io.mongo.media import GridFSMediaStorage, GridFS
 
 from superdesk.core import get_current_app
-from .utils import get_mimetype
+from .utils import get_mimetype as get_mimetype
 from .mimetype_mixin import MimetypeMixin
 
 

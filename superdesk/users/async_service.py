@@ -272,15 +272,6 @@ class UsersAsyncService(AsyncResourceService[UsersResourceModel]):
         await self.handle_user_type_changed(updates, original)
         await self.__send_notification(updates, original)
 
-    async def on_delete(self, doc: UsersResourceModel):
-        """Overriding the method to prevent user from the below:
-
-        1. Check if the user is updating his/her own status.
-        2. Check if the user is changing the status of other logged-in users.
-        3. A user without 'User Management' privilege is changing role/user_type/privileges
-        """
-        updates = {"is_enabled": False, "is_active": False}
-
     async def delete(self, doc: UsersResourceModel, etag: str | None = None):
         """
         Overriding the method to prevent from hard delete

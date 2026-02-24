@@ -43,7 +43,7 @@ __all__ = [
     "ResourceConfig",
     "dataclass",
     "Dataclass",
-    "fields",
+    "default_model_config",
     "RestEndpointConfig",
     "RestParentLink",
     "get_id_url_type",

@@ -23,7 +23,7 @@ from inspect import get_annotations
 from copy import deepcopy
 from datetime import datetime
 from dataclasses import field as dataclass_field
-from typing_extensions import dataclass_transform, Self, overload
+from typing_extensions import dataclass_transform, Self
 
 from pydantic import (
     ConfigDict,

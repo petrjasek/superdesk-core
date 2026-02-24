@@ -109,7 +109,7 @@ class SamlAuthTestCase(tests.TestCase):
                     "USER_EXTERNAL_DESK": "sports",
                 },
             ):
-                resp = await saml.index()
+                await saml.index()
 
             user = self.app.data.find_one("users", req=None, email="foo.bar@example.com")
             self.assertIsNotNone(user)
@@ -142,7 +142,7 @@ class SamlAuthTestCase(tests.TestCase):
                     "USER_EXTERNAL_DESK": "sports",
                 },
             ):
-                resp = await saml.index()
+                await saml.index()
 
         user = self.app.data.find_one("users", req=None, email="foo.bar@example.com")
         self.assertEqual("John", user["first_name"])

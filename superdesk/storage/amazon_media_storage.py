@@ -18,7 +18,6 @@ import json
 import logging
 import time
 import unidecode
-from io import BytesIO
 
 from os.path import splitext
 from urllib.parse import urlparse

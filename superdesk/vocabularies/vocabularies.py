@@ -11,7 +11,7 @@
 
 import logging
 import json
-from typing import List, Any, Dict, Optional
+from typing import Dict
 
 from eve.methods.common import serialize_value
 from quart_babel import gettext as _, lazy_gettext

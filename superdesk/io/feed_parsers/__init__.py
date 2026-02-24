@@ -17,7 +17,6 @@ from superdesk.metadata.item import Priority
 from collections import OrderedDict
 import inspect
 from lxml import etree
-import superdesk
 import logging
 
 logger = logging.getLogger(__name__)

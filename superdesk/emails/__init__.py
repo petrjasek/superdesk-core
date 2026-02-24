@@ -20,7 +20,6 @@ from flask_mail import Message
 from superdesk.celery_app import celery
 from superdesk.core import get_current_app, get_app_config
 from superdesk.flask import render_template, render_template_string
-from superdesk import get_resource_service
 from superdesk.types import UsersResourceModel
 
 logger = logging.getLogger(__name__)

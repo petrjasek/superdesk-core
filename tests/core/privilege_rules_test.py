@@ -31,7 +31,7 @@ class TestPrivilegeRules(IsolatedAsyncioTestCase):
         rule = required_privilege_rule("test_privilege")
 
         with self.assertRaises(SuperdeskApiError) as error:
-            result = await rule(mock_request)
+            await rule(mock_request)
 
         self.assertEqual(error.exception.status_code, 403)
         self.assertIn("Insufficient privileges", str(error.exception))

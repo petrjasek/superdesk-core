@@ -227,7 +227,7 @@ class PrepopulateService(AsyncBaseService):
             # This endpoint should not be available when not in testing
             return abort(404)
 
-        with multiprocessing.Lock() as lock:
+        with multiprocessing.Lock():
             with timer("prepopulate"):
                 await self._create_async(docs)
             if get_app_config("SUPERDESK_TESTING"):

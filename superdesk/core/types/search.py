@@ -1,6 +1,6 @@
 from typing import Any, Literal, TypeAlias
 from typing_extensions import TypedDict
-from enum import Enum, unique
+from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, NonNegativeInt, field_validator, Field
 from pydantic.dataclasses import dataclass

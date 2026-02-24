@@ -13,7 +13,7 @@ import os
 
 import superdesk
 from superdesk.io.feed_parsers.rfc822 import EMailRFC822FeedParser
-from superdesk.tests import TestCase, setup
+from superdesk.tests import TestCase
 from superdesk.errors import IngestEmailError
 from superdesk.users.services import UsersService
 

@@ -13,7 +13,6 @@ from superdesk.types import (
     PublishSenderType,
 )
 from superdesk.publish_async import get_exchange_factory
-from superdesk.publish_async.exchanges import DefaultPublishExchangeFactory
 from superdesk.resource_fields import ID_FIELD
 from superdesk.utc import utcnow
 from superdesk.tests import TestCase

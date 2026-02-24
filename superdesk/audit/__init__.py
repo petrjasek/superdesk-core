@@ -12,7 +12,7 @@
 import superdesk
 from superdesk.celery_app import celery
 from .audit import AuditService, AuditResource
-from .commands import cli_audit_purge, PurgeAudit
+from .commands import PurgeAudit
 import logging
 
 from superdesk.core.resources import global_signals

@@ -12,7 +12,7 @@
 from datetime import datetime
 from time import struct_time
 from unittest import mock
-from unittest.mock import call, MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock
 
 from superdesk.tests import TestCase
 from superdesk.io.commands.update_ingest import LAST_ITEM_UPDATE

@@ -12,7 +12,6 @@ from typing import Dict, Any, Tuple
 import os
 import functools
 import logging
-import socket
 from pathlib import Path
 from dataclasses import dataclass
 
@@ -31,7 +30,6 @@ from .async_case import IsolatedAsyncioTestCase
 from superdesk.core import json
 from superdesk.flask import Config
 from apps.ldap import ADAuth
-from superdesk import get_resource_service
 from superdesk.cache import cache
 from superdesk.factory import get_app
 from superdesk.factory.app import get_media_storage_class, SuperdeskApp
@@ -334,35 +332,9 @@ async def clean_dbs(app=None, async_app: SuperdeskAsyncApp | None = None, force=
             cache.clean()
 
 
-def retry(exc, count=1):
-    def wrapper(fn):
-        num = 0
-
-        @functools.wraps(fn)
-        def inner(*a, **kw):
-            global num
-
-            try:
-                return fn(*a, **kw)
-            except exc as e:
-                logging.exception(e)
-                if num < count:
-                    num += 1
-                    return inner(*a, **kw)
-
-        return inner
-
-    return wrapper
-
-
 async def _clean_es(app):
     async with app.app_context():
         app.data.elastic.drop_index()
-
-
-@retry(socket.timeout, 2)
-async def clean_es(app, force=False):
-    use_snapshot(app, "clean", [snapshot_es], force)(_clean_es)(app)
 
 
 def snapshot(fn):

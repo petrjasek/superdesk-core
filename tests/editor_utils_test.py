@@ -2126,7 +2126,7 @@ class Editor3TestCase(TestCase):
     def test_export_embedded_article(self):
         with open(pathlib.Path(__file__).parent / "fixtures" / "article_with_embedded_article.json") as fixture:
             item = json.load(fixture)
-            body_html = item.pop("body_html", "")
+            item.pop("body_html", "")
         editor_utils.generate_fields(item, fields=["body_html"])
         assert (
             """

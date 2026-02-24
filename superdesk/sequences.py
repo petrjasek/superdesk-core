@@ -1,6 +1,5 @@
 import superdesk
 import traceback
-from superdesk import get_resource_service
 from .resource import Resource
 from superdesk.eve_async.service import AsyncBaseService
 import logging
