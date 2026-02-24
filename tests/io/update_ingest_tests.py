@@ -698,7 +698,7 @@ class UpdateIngestTest(TestCase):
             "content_expiry": 525700,
         }
         event_service = get_resource_service("events")
-        events_post_service = get_resource_service("events_post")
+        get_resource_service("events_post")
 
         # ingest first version
         ingested, ids = await ingest_item(item, provider=provider, feeding_service={})

@@ -19,9 +19,6 @@ from superdesk.resource_fields import (
     GUID_FIELD,
     ITEM_TYPE,
     ITEM_OPERATION,
-    SCHEDULE_SETTINGS,
-    QUEUE_STATE,
-    PUBLISH_SCHEDULE,
 )
 
 from .items import is_doc_targeted

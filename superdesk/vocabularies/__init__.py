@@ -11,7 +11,7 @@
 import superdesk
 
 from superdesk.signals import item_published_async
-from .vocabularies import VocabulariesResource, VocabulariesService, is_related_content
+from .vocabularies import VocabulariesResource, VocabulariesService, is_related_content as is_related_content
 from .commands import update_vocabularies_in_items_command  # noqa
 from .keywords import add_missing_keywords
 from quart_babel import lazy_gettext

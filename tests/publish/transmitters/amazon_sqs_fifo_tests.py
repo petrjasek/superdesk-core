@@ -12,7 +12,7 @@ import json
 import boto3
 
 from moto import mock_aws
-from unittest import TestCase, mock
+from unittest import mock
 
 from superdesk.publish.transmitters.amazon_sqs_fifo import AmazonSQSFIFOPublishService
 from superdesk.errors import PublishAmazonSQSError

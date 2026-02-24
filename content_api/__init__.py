@@ -9,7 +9,8 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from superdesk.core import get_app_config
-from .commands import cli_content_api_remove_expired  # noqa
+
+from . import commands  # noqa
 
 
 MONGO_PREFIX = "CONTENTAPI_MONGO"

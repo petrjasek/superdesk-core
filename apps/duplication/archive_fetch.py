@@ -150,7 +150,7 @@ class FetchService(AsyncBaseService):
                 new_item["desk"] = desk
                 new_item["stage"] = stage
                 new_item["state"] = state
-                new_ids = await self.fetch([new_item], id=None, notify=False)
+                await self.fetch([new_item], id=None, notify=False)
                 item.update(new_item)
 
     async def __fetch_items_in_package(self, dest_doc, desk, stage, state):

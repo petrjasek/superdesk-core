@@ -1,12 +1,12 @@
 import io
 import reportlab.lib.colors as colors
 
-from typing import List, Sequence, Union
+from typing import List
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Flowable, Table
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import landscape, A4
-from reportlab.lib.units import cm, inch
+from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
@@ -14,7 +14,6 @@ from superdesk.editor_utils import get_field_content_state
 
 from . import BaseFormatter, utils
 from .. import utils as rundown_utils
-from .csv import TableCSVFormatter
 
 from superdesk.text_utils import get_text
 

@@ -9,11 +9,13 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import logging
-from lxml import etree
 from datetime import timedelta
 
+import pytz
+from lxml import etree
+
 from superdesk.core import get_app_config
-from superdesk.utc import get_date, timezone
+from superdesk.utc import get_date
 from superdesk.etree import parse_html
 
 logger = logging.getLogger(__name__)
@@ -31,7 +33,7 @@ def format_datetime_filter(date_or_string, timezone_string=None, date_format=Non
         date_time = get_date(date_or_string)
 
         timezone_string = timezone_string if timezone_string else get_app_config("DEFAULT_TIMEZONE")
-        tz = timezone(timezone_string)
+        tz = pytz.timezone(timezone_string)
         if tz:
             date_time = date_time.astimezone(tz)
 

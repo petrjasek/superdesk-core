@@ -7,7 +7,6 @@ import bson
 from .enums import (
     DeskTypeEnum,
     MonitoringTypeEnum,
-    UserTypeEnum,
     PublishState,
     ContentState,
     ContentType,

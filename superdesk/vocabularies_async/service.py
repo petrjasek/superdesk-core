@@ -10,7 +10,7 @@
 
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from typing import List
 
 from quart_babel import gettext, lazy_gettext

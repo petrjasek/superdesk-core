@@ -461,7 +461,7 @@ class AsyncResourceService(Generic[ResourceModelType]):
         if model_has_versions(original):
             updates.pop("_latest_version", None)
             updates_dict.pop("_latest_version", None)
-        response = await self.mongo_async.update_one({"_id": item_id}, {"$set": updates_dict})
+        await self.mongo_async.update_one({"_id": item_id}, {"$set": updates_dict})
         try:
             await self.elastic.update(item_id, updates_dict)
         except ElasticNotConfiguredForResource:

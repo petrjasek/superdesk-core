@@ -12,10 +12,10 @@ from quart_babel import lazy_gettext
 import superdesk
 
 from apps.search_providers.registry import (
-    registered_search_providers,
-    allowed_search_providers,
-    register_search_provider,
-)  # noqa
+    registered_search_providers as registered_search_providers,
+    allowed_search_providers as allowed_search_providers,
+    register_search_provider as register_search_provider,
+)
 from apps.search_providers.resource import SearchProviderResource
 from apps.search_providers.service import SearchProviderService
 from apps.search_providers.registry import SearchProviderAllowedResource, SearchProviderAllowedService

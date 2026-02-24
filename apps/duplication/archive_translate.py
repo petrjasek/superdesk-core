@@ -12,7 +12,8 @@
 import superdesk
 from superdesk.core import get_app_config
 from superdesk.eve_async.service import AsyncBaseService
-from apps.archive.archive import SOURCE as ARCHIVE, remove_is_queued
+from apps.archive.archive import SOURCE as ARCHIVE
+from apps.archive.utils import remove_is_queued
 from apps.content import push_content_notification
 from apps.auth import get_user_id
 from superdesk import get_resource_service

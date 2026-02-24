@@ -87,7 +87,7 @@ class MongoLock(object):
           `owner` - name of application/component/whatever which held a lock
         Raises `MongoLockException` if no such a lock.
         """
-        status = self.collection.find_and_modify(
+        self.collection.find_and_modify(
             {"_id": key, "owner": owner}, {"locked": False, "owner": None, "created": None, "expire": None}
         )
 

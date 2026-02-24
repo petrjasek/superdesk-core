@@ -11,7 +11,6 @@
 """Superdesk"""
 
 import eve
-import blinker
 import click
 import logging as logging_lib
 
@@ -23,7 +22,7 @@ from importlib.metadata import version
 from eve.methods.common import document_link  # noqa
 from werkzeug.exceptions import HTTPException
 
-from .core import get_app_config, json
+from .core import get_app_config, json as json
 from .eve_backend import EveBackend
 from .datalayer import SuperdeskDataLayer  # noqa
 from .services import BaseService as Service  # noqa
@@ -202,7 +201,9 @@ def register_default_session_preference(preference_name, preference):
     default_session_preferences[preference_name] = preference
 
 
-def register_resource(name, resource, service=None, backend=None, privilege=None, _app=None, service_instance=None):
+def register_resource(
+    name, resource, service=None, backend=None, privilege=None, _app=None, service_instance=None  # noqa: F811
+):
     """Shortcut for registering resource and service together.
 
     :param name: resource name

@@ -11,7 +11,6 @@
 
 from typing import Dict, Any
 import json
-import requests
 import logging
 from datetime import timedelta, datetime
 

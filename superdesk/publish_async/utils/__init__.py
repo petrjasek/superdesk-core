@@ -1,10 +1,12 @@
+from superdesk.resource_fields import (
+    QUEUE_STATE,
+    PUBLISH_SCHEDULE,
+    SCHEDULE_SETTINGS,
+)
 from .common import (
     ITEM_PUBLISH,
-    QUEUE_STATE,
     PUBLISHED,
     ERROR_MESSAGE,
-    SCHEDULE_SETTINGS,
-    PUBLISH_SCHEDULE,
     get_publish_request_from_item,
     item_target_matches_product_target,
     item_target_matches_subscriber_target,

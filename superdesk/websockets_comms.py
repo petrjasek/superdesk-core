@@ -31,7 +31,6 @@ from kombu.pools import producers
 
 from superdesk.core import json
 
-from kombu.common import Broadcast
 from kombu.utils.debug import setup_logging
 
 

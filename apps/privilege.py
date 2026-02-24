@@ -10,7 +10,6 @@
 
 import superdesk
 
-from quart_babel import gettext as _
 from operator import itemgetter
 
 from superdesk.utils import ListCursor

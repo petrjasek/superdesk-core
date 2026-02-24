@@ -2,7 +2,6 @@ import asyncio
 from unittest.mock import patch
 
 from superdesk.errors import SuperdeskError
-from superdesk.celery_app import HybridAppContextTask
 from superdesk.tests import AsyncFlaskTestCase
 
 # NOTE: all tasks below are in eager mode because of global

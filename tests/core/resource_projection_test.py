@@ -4,14 +4,13 @@ from bson import ObjectId
 from pydantic import ValidationError
 
 from superdesk.core import json
-from superdesk.core.types import SearchRequest, ProjectedFieldArg
+from superdesk.core.types import SearchRequest
 from superdesk.core.resources import (
     ResourceModelWithObjectId,
     ResourceConfig,
     default_model_config,
-    get_projection_from_request,
 )
-from superdesk.core.resources.utils import combine_projection_args, SYSTEM_FIELDS
+from superdesk.core.resources.utils import combine_projection_args
 from superdesk.tests import AsyncFlaskTestCase, AsyncTestCase
 from superdesk.errors import SuperdeskApiError
 

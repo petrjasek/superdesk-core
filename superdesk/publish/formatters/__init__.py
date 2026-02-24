@@ -17,7 +17,7 @@ from superdesk.metadata.item import ITEM_TYPE, CONTENT_TYPE, FORMATS, FORMAT
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
 
-formatters = []  # type: List[Type[Formatter]]
+formatters: list[Type["Formatter"]] = []
 
 logger = logging.getLogger(__name__)
 

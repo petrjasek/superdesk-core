@@ -1021,7 +1021,7 @@ class RestoreRecordService(AsyncBaseService):
             await StorageRestoreRecord().run(record_file=name, force_db_reset=True)
 
     async def create_async(self, docs, **kwargs):
-        with Lock() as lock:
+        with Lock():
             with timer("restore_record"):
                 await self._create(docs)
             return ["OK"]

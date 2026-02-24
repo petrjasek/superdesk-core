@@ -103,7 +103,7 @@ class AuthTestCase(TestCase):
                 {"username": "bar", "user_type": "user"},
             ],
         )
-        auth_ids = self.app.data.insert(
+        self.app.data.insert(
             "auth",
             [
                 {"user": user_ids[0], "_updated": utcnow(), "token": "foo"},

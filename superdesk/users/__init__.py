@@ -16,7 +16,7 @@ from superdesk.core.module import Module
 from .users import UsersResource
 from .services import UsersService, DBUsersService, is_admin  # noqa
 from .user_metrics import UserMetricsResource, user_metrics_service  # noqa
-from .async_service import UsersAsyncService
+from .async_service import UsersAsyncService  # noqa
 from .module import users_resource_config
 
 

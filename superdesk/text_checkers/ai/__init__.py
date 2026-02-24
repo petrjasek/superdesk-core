@@ -11,7 +11,7 @@ from superdesk.eve_async.service import AsyncBaseService
 from superdesk.resource import Resource
 from superdesk.errors import SuperdeskApiError
 from superdesk.utils import AllowedContainer
-from .. import tools
+from .. import tools as tools
 from .base import registered_ai_services
 import superdesk
 

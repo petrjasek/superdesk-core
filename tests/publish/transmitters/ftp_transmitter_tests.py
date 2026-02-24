@@ -10,7 +10,6 @@
 
 
 import os
-from unittest.mock import create_autospec
 from superdesk.tests import TestCase
 import ftplib
 from apps.publish import init_app

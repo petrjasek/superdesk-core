@@ -67,7 +67,6 @@ from superdesk.metadata.item import (
     CONTENT_TYPE,
     EMBARGO,
     ITEM_STATE,
-    ITEM_TYPE,
     MEDIA_TYPES,
     PUBLISH_STATES,
     PUB_STATUS,

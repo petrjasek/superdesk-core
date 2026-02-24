@@ -262,7 +262,7 @@ class FTPFeedingService(FeedingService):
                         self._timer.split("retrieve_parse"), os.path.getsize(local_file_path), filename
                     )
                 )
-            except ftplib.all_errors as err:
+            except ftplib.all_errors:
                 self._log_msg(
                     "Download failed. Exec time: {:.4f} secs. File: {}.".format(
                         self._timer.stop("retrieve_parse"), filename

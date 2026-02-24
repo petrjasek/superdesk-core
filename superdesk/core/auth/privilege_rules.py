@@ -1,5 +1,3 @@
-from typing import Any, cast
-
 from quart_babel import gettext
 from superdesk.errors import SuperdeskApiError
 from superdesk.users.async_service import get_privileges, is_admin

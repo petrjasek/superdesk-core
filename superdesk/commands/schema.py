@@ -12,7 +12,6 @@
 
 import superdesk
 
-from superdesk.flask import Flask
 from superdesk.lock import lock, unlock
 from superdesk.core import get_app_config, get_current_app
 from superdesk.commands.rebuild_elastic_index import RebuildElasticIndex

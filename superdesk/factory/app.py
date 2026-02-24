@@ -22,7 +22,6 @@ from pydantic import ValidationError
 from celery import Celery
 from flask_mail import Mail
 from quart_babel import Babel
-from babel import parse_locale
 from eve.auth import TokenAuth
 from eve.render import send_response
 from eve.io.media import MediaStorage
@@ -68,7 +67,7 @@ from superdesk.core.types import (
     Response,
 )
 from superdesk.core.app import SuperdeskAsyncApp
-from superdesk.core.resources import ResourceRestEndpoints, ResourceConfig
+from superdesk.core.resources import ResourceRestEndpoints
 from superdesk.core.resources.validators import convert_pydantic_validation_error_for_response
 from superdesk.core.web import NullEndpoint
 
@@ -585,7 +584,7 @@ def get_app(config=None, media_storage=None, config_object=None, init_elastic=No
 
     # setup babel
     app.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", os.path.join(SUPERDESK_PATH, "translations"))
-    babel = Babel(app, configure_jinja=False)
+    babel = Babel(app, configure_jinja=False)  # noqa: F841
 
     # TODO: Fix this after Flask3 upgrade
     # @babel.localeselector

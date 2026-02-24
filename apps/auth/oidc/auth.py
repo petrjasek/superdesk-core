@@ -21,8 +21,6 @@ from superdesk import get_resource_service
 from superdesk.resource import Resource
 from superdesk.utils import ignorecase_query
 
-from ..errors import CredentialsAuthError
-
 
 class OIDCAuthResource(Resource):
     schema = {"token": {"type": "string"}, "user": Resource.rel("users", True)}

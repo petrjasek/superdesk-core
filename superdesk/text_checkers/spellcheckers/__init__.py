@@ -15,10 +15,9 @@ from inspect import isawaitable
 import superdesk
 from superdesk.eve_async.service import AsyncBaseService
 from superdesk.resource import Resource
-from superdesk.services import BaseService
 from superdesk.errors import SuperdeskApiError
-from .. import tools
-from .base import registered_spellcheckers, SpellcheckerBase
+from .. import tools as tools
+from .base import registered_spellcheckers, SpellcheckerBase as SpellcheckerBase
 
 logger = logging.getLogger(__name__)
 

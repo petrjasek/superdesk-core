@@ -17,7 +17,7 @@ from superdesk.eve_async.service import AsyncBaseService
 from superdesk.resource_fields import ID_FIELD
 from superdesk.flask import request
 from apps.archive import ArchiveSpikeService
-from superdesk import get_resource_service, Service
+from superdesk import get_resource_service
 from superdesk.metadata.item import (
     ITEM_STATE,
     EMBARGO,
@@ -164,7 +164,7 @@ class ArchiveRewriteService(AsyncBaseService):
 
         if (
             original.get("rewrite_of")
-            and not (original.get(ITEM_STATE) in PUBLISH_STATES)
+            and original.get(ITEM_STATE) not in PUBLISH_STATES
             and not get_app_config("WORKFLOW_ALLOW_MULTIPLE_UPDATES")
         ):
             raise SuperdeskApiError.badRequestError(

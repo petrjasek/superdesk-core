@@ -33,28 +33,6 @@ class PublishChannelConfigTestCase(TestCase):
         self.assertIsInstance(exchange._router, CeleryPublishRouter)
 
     async def test_get_publish_channel_config(self):
-        item_types = [
-            ContentType.TEXT,
-            ContentType.PREFORMATTED,
-            ContentType.AUDIO,
-            ContentType.VIDEO,
-            ContentType.PICTURE,
-            ContentType.GRAPHIC,
-            ContentType.COMPOSITE,
-            ContentType.EVENT,
-            ContentType.PLANNING,
-            ContentType.FEATURED_PLANNING,
-        ]
-        operations = [
-            "publish",
-            "correct",
-            "kill",
-            "takedown",
-            "unpublish",
-            "being_corrected",
-            "resend",
-        ]
-
         self.assertEqual(
             get_publish_channel_config({}, ContentType.TEXT, "publish", "api"),
             ExchangeConfig(

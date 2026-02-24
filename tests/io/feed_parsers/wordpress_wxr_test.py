@@ -12,7 +12,7 @@
 import os
 import datetime
 
-from unittest import TestCase, mock
+from unittest import mock
 from superdesk.tests import IsolatedAsyncioTestCase
 from superdesk.etree import etree
 from superdesk.io.feed_parsers import wordpress_wxr

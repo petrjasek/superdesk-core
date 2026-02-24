@@ -210,7 +210,7 @@ class FTPNinjsFormatterTest(TestCase):
             ],
         )
 
-        embargoed = utcnow() + timedelta(days=2)
+        utcnow() + timedelta(days=2)
         article = {
             "_id": "urn:newsml:localhost:2020-03-12T15:19:39.654956:e78f3dd6-c096-43d5-9ba0-014e07dc4f1f",
             "target_regions": [],
