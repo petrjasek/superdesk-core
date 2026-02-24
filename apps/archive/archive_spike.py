@@ -23,6 +23,7 @@ from superdesk.metadata.item import (
     GUID_FIELD,
     GUID_TAG,
     PUBLISH_STATES,
+    ITEM_EVENT_ID,
 )
 from superdesk.notification import push_notification
 from superdesk.eve_async import AsyncBaseService
@@ -34,7 +35,6 @@ from .common import (
     ITEM_OPERATION,
     set_sign_off,
     get_auth,
-    ITEM_EVENT_ID,
     ITEM_UNLINK,
     clear_rewritten_flag,
 )

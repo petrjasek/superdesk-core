@@ -16,7 +16,8 @@ from superdesk.eve_async.service import AsyncBaseService
 from superdesk.resource_fields import ID_FIELD, PUBLISH_SCHEDULE, SCHEDULE_SETTINGS
 from superdesk.flask import request
 import superdesk
-from apps.archive.archive import SOURCE as ARCHIVE, remove_is_queued
+from apps.archive.archive import SOURCE as ARCHIVE
+from apps.archive.utils import remove_is_queued
 from apps.auth import get_user, get_user_id
 from apps.content import push_content_notification
 from apps.tasks import send_to

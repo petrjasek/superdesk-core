@@ -39,7 +39,7 @@ class LegalArchiveResource(LegalResource, ArchiveResource):
     schema = get_schema()
     datasource = {"source": LEGAL_ARCHIVE_NAME}
     versioning = True
-    mongo_indexes = ArchiveResource.mongo_indexes.copy()  # type: Any
+    mongo_indexes = ArchiveResource.mongo_indexes.copy() if ArchiveResource.mongo_indexes else {}
     mongo_indexes.update(
         {
             "text": (

@@ -10,10 +10,10 @@
 
 import logging
 from lxml import etree
-from datetime import timedelta
+from datetime import timedelta, timezone
 
 from superdesk.core import get_app_config
-from superdesk.utc import get_date, timezone
+from superdesk.utc import get_date
 from superdesk.etree import parse_html
 
 logger = logging.getLogger(__name__)
