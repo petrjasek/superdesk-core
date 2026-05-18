@@ -531,3 +531,18 @@ class DeleteMethodTestCase(ContentFilterTests):
             self.f.delete({"_id": 4})
 
         self.assertEqual(ctx.exception.status_code, 400)  # bad request error
+
+
+class ValidationTests(ContentFilterTests):
+    def test_does_match_returns_false_for_empty_filter_statement(self):
+        doc = {"content_filter": [{"expression": {"fc": []}}], "name": "invalid-filter"}
+
+        with self.app.app_context():
+            self.assertFalse(self.f.does_match(doc, self.articles[0], cache=False))
+
+    def test_does_match_ignores_empty_filter_statement_in_or_branch(self):
+        doc = {"content_filter": [{"expression": {"fc": [3, 4]}}, {"expression": {"fc": []}}], "name": "pf-1"}
+
+        with self.app.app_context():
+            self.assertFalse(self.f.does_match(doc, self.articles[0], cache=False))
+            self.assertTrue(self.f.does_match(doc, self.articles[2], cache=False))

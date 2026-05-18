@@ -204,15 +204,20 @@ class ContentFilterService(CacheableService):
         return getattr(flask.g, cache_id)
 
     def _does_match(self, content_filter, article, filters, cache=True):
-        for index, expression in enumerate(content_filter.get("content_filter", [])):
-            if not expression.get("expression"):
-                raise SuperdeskApiError.badRequestError(
-                    _("Filter statement {index} does not have a filter condition").format(index=index + 1)
-                )
-            if "fc" in expression.get("expression", {}):
+        for expression in content_filter.get("content_filter", []):
+            filter_expression = expression.get("expression") or {}
+            if not filter_expression:
+                continue
+
+            filter_conditions = filter_expression.get("fc") or []
+            content_filters = filter_expression.get("pf") or []
+            if len(filter_conditions) == 0 and len(content_filters) == 0:
+                continue
+
+            if "fc" in filter_expression:
                 if not self._does_filter_condition_match(content_filter, article, filters, expression, cache):
                     continue
-            if "pf" in expression.get("expression", {}):
+            if "pf" in filter_expression:
                 if not self._does_content_filter_match(content_filter, article, filters, expression, cache):
                     continue
             return True
