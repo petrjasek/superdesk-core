@@ -95,4 +95,7 @@ class IngestService(AsyncBaseService):
             push_notification("item:deleted", item=str(docs[0].get(ID_FIELD)), user=str(user))
 
     def should_update(self, old_item, new_item, provider):
+        # Don't update items that have been killed (e.g., unpublished events)
+        if old_item.get("state") == "killed":
+            return False
         return True
