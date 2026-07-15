@@ -365,7 +365,9 @@ class FTPFeedingService(FeedingService):
                     except EmptyFile:
                         continue
                     except Exception as e:
-                        logger.error("Error while parsing {filename}: {msg}".format(filename=filename, msg=e))
+                        logger.exception(
+                            "Error while parsing file from FTP", extra={"filename": filename, "msg": str(e)}
+                        )
 
                         if do_move:
                             move_dest_file_path_error = os.path.join(move_path_error, filename)
