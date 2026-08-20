@@ -39,7 +39,6 @@ jobs:
     - name: Install dependencies
       working-directory: ./tests/test_instance/server
       run: |
-        pip install -U pip wheel setuptools
         pip install -r requirements.txt
 
     - name: Prepare instance
