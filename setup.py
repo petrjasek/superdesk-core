@@ -34,7 +34,7 @@ install_requires = [
     "boto3>=1.26,<2.0",
     "websockets>=14.2,<17",
     "PyYAML>=6.0.1",
-    "lxml>=5.2.2,<5.4",
+    "lxml>=6.0.2,<6.2",
     "lxml_html_clean>=0.1.1,<0.5",
     "chardet<6.0",
     "pymongo>=4.9.1,<4.16",
@@ -50,7 +50,7 @@ install_requires = [
     "reportlab>=3.6.11,<5.1",
     "pyjwt>=2.4.0,<2.14",
     "pymemcache>=4.0,<4.1",
-    "xmlsec>=1.3.13,<1.3.15",
+    "xmlsec>=1.3.17,<1.3.18",
     # Async libraries
     "motor>=3.4.0,<4.0",
     # There's a breaking change in 2.13 that's affecting our usage, so pinning to 2.12
