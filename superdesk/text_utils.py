@@ -87,15 +87,10 @@ def get_word_count(markup: str, no_html: bool = False) -> int:
         being counted as one word.
     :return int: count of words inside the text
     """
-    print("IN", markup, no_html)
-
     if no_html:
         text = get_text(markup, content="xml", space_on_elements=True)
     else:
         text = get_text(markup, content="html", lf_on_block=True)
-
-    print("OUT", text)
-
     return get_text_word_count(text)
 
 
