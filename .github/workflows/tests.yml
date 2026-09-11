@@ -17,9 +17,6 @@ jobs:
           - os: ubuntu-24.04
             python-version: '3.12'
             elastic: '8.19.6'
-          - os: ubuntu-26.04
-            python-version: '3.14'
-            elastic: '7.17.29'
 
     runs-on: ${{ matrix.os }}
 
@@ -88,9 +85,6 @@ jobs:
           - os: ubuntu-24.04
             python-version: '3.12'
             elastic: '8.19.6'
-          - os: ubuntu-26.04
-            python-version: '3.14'
-            elastic: '7.17.29'
 
     runs-on: ${{ matrix.os }}
 
