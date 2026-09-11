@@ -111,6 +111,7 @@ def parse_html(html, content="xml", lf_on_block=False, space_on_elements=False, 
         parser = etree.XMLParser(recover=True, remove_blank_text=True, resolve_entities=False)
         root = etree.fromstring("<div>" + html + "</div>", parser)
     elif content == "html":
+        html = html.replace("\r", "&#13;")
         parser = etree.HTMLParser(recover=True, remove_blank_text=True)
         root = etree.fromstring(html, parser)
         if root is None:
@@ -121,17 +122,28 @@ def parse_html(html, content="xml", lf_on_block=False, space_on_elements=False, 
             # <script> can be used in embed, and the parser will move them to <head>
             # so we need both <head> and <body>
             for elt in root:
+                if elt.text:
+                    if len(div):
+                        div[-1].tail = (div[-1].tail or "") + elt.text
+                    else:
+                        div.text = (div.text or "") + elt.text
                 div.extend(elt)
             root = div
     else:
         raise ValueError("invalid content: {}".format(content))
     if lf_on_block:
         for elem in root.iterfind(".//"):
-            # append \n to the tail
             if elem.tag in BLOCK_ELEMENTS:
-                elem.tail = (elem.tail or "") + "\n"
-            # prepend \n to the tail
-            elif elem.tag in ("br",):
+                previous = elem.getprevious()
+                if previous is not None:
+                    if not (previous.tail or "").endswith("\n"):
+                        previous.tail = (previous.tail or "") + "\n"
+                elif elem.getparent() is not None and (elem.getparent().text or "").strip():
+                    if not elem.getparent().text.endswith("\n"):
+                        elem.getparent().text += "\n"
+                if not (elem.tail or "").startswith("\n"):
+                    elem.tail = "\n" + (elem.tail or "")
+            elif elem.tag == "br":
                 elem.tail = "\n" + (elem.tail or "")
     if space_on_elements:
         for elem in root.iterfind(".//"):

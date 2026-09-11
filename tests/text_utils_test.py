@@ -3,6 +3,25 @@ from superdesk import text_utils
 
 
 class WordCountTestCase(unittest.TestCase):
+    def test_get_text_html_fragment(self):
+        self.assertEqual("plain text", text_utils.get_text("plain text", content="html"))
+        self.assertEqual(
+            "prefix bold suffix",
+            text_utils.get_text("prefix <b>bold</b> suffix", content="html"),
+        )
+        self.assertEqual(
+            "The story body\ncall helpline 999 if you are planning to quit smoking\n",
+            text_utils.get_text(
+                "The story body<p>call helpline 999 if you are planning to quit smoking</p>",
+                content="html",
+                lf_on_block=True,
+            ),
+        )
+        self.assertEqual(
+            "one\nbetween\ntwo\n",
+            text_utils.get_text("<p>one</p>between<p>two</p>", content="html", lf_on_block=True),
+        )
+
     def test_word_count_whitespace_string(self):
         self.assertEqual(0, text_utils.get_word_count("   "))
 

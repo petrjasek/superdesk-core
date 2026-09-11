@@ -77,7 +77,7 @@ def get_text(markup, content="xml", lf_on_block=False, space_on_elements=False, 
         return markup
 
 
-def get_word_count(markup, no_html=False):
+def get_word_count(markup: str, no_html: bool = False) -> int:
     """Get word count for given html.
 
     :param str markup: xhtml (or other xml) markup
@@ -87,10 +87,16 @@ def get_word_count(markup, no_html=False):
         being counted as one word.
     :return int: count of words inside the text
     """
+    print("IN", markup, no_html)
+
     if no_html:
-        return get_text_word_count(get_text(markup, content="xml", space_on_elements=True))
+        text = get_text(markup, content="xml", space_on_elements=True)
     else:
-        return get_text_word_count(get_text(markup, content="html", lf_on_block=True))
+        text = get_text(markup, content="html", lf_on_block=True)
+
+    print("OUT", text)
+
+    return get_text_word_count(text)
 
 
 def update_word_count(update, original=None):

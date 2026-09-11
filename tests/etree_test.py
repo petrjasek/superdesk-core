@@ -5,6 +5,20 @@ from textwrap import dedent
 
 
 class ParseHtmlTestCase(TestCase):
+    def test_html_fragment_text(self):
+        parsed = sd_etree.parse_html("prefix <b>bold</b> suffix", content="html")
+        self.assertEqual("prefix bold suffix", etree.tostring(parsed, encoding="unicode", method="text"))
+
+        parsed = sd_etree.parse_html(
+            "The story body<p>call helpline 999 if you are planning to quit smoking</p>",
+            content="html",
+            lf_on_block=True,
+        )
+        self.assertEqual(
+            "The story body\ncall helpline 999 if you are planning to quit smoking\n",
+            etree.tostring(parsed, encoding="unicode", method="text"),
+        )
+
     def test_encode_carriage_return(self):
         text = "This is first line.\r\nThis is second line.\r\n"
         parsed = sd_etree.parse_html(text)
