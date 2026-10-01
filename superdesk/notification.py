@@ -15,7 +15,7 @@ import logging
 import os
 import json
 
-from datetime import datetime
+from datetime import datetime, timezone
 from superdesk.core import get_current_app, get_current_async_app
 from superdesk.utils import json_serialize_datetime_objectId
 from superdesk.websockets_comms import SocketMessageProducer
@@ -51,7 +51,7 @@ def init_app(app) -> None:
 
 def _create_socket_message(**kwargs) -> str:
     """Send out all kwargs as json string."""
-    kwargs.setdefault("_created", datetime.utcnow().isoformat())
+    kwargs.setdefault("_created", datetime.now(timezone.utc).replace(tzinfo=None).isoformat())
     kwargs.setdefault("_process", os.getpid())
     return json.dumps(kwargs, default=json_serialize_datetime_objectId)
 

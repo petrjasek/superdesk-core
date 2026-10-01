@@ -46,8 +46,9 @@ class SearchServiceTestCase(TestCase):
         self.app.on_fetched_resource_ingest += ingest_listener
 
     async def test_query_post_processing(self):
-        docs = self.app.data.find("search", None, None)[0]
-        self.assertEqual(4, docs.count())
+        docs, _ = await self.app.data.find_async("search", None, None)
+        docs = await docs.to_list()
+        self.assertEqual(4, len(docs))
 
         ingest_docs = [doc for doc in docs if doc["_type"] == "ingest"]
         self.assertEqual("ingest", ingest_docs[0]["_resource_listener"])
@@ -59,21 +60,23 @@ class SearchServiceTestCase(TestCase):
     async def test_using_repo_request_attribute(self):
         req = ParsedRequest()
         req.args = {"repo": "ingest"}
-        docs = self.app.data.find("search", req, None)[0]
-        self.assertEqual(1, docs.count())
+        docs, _ = await self.app.data.find_async("search", req, None)
+        docs = await docs.to_list()
+        self.assertEqual(1, len(docs))
         self.assertEqual("ingest", docs[0]["_type"])
 
     async def test_it_filters_out_private_content(self):
         self.app.data.insert("archive", [{"task": {"desk": None}}, {"task": {}}])
-        cursor = self.app.data.find("search", None, None)[0]
-        self.assertEqual(4, cursor.count())
+        cursor, _ = await self.app.data.find_async("search", None, None)
+        self.assertEqual(4, len(await cursor.to_list()))
 
     async def test_it_includes_published_content(self):
-        cursor = self.app.data.find("search", None, None)[0]
-        self.assertEqual(4, cursor.count())
+        cursor, _ = await self.app.data.find_async("search", None, None)
+        self.assertEqual(4, len(await cursor.to_list()))
 
     async def test_it_excludes_published_content(self):
         req = ParsedRequest()
         req.args = {"repo": "archive"}
-        docs = self.app.data.find("search", req, None)[0]
+        docs, _ = await self.app.data.find_async("search", req, None)
+        docs = await docs.to_list()
         self.assertNotIn(CONTENT_STATE.PUBLISHED, [item["state"] for item in docs])

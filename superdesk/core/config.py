@@ -26,6 +26,8 @@ class ConfigModel(BaseModel):
 
     def __getattribute__(self, name: str):
         # Allow unrestricted access to private and pydantic private attributes
+        if name == "model_fields":
+            return type(self).model_fields
         if name.startswith("_") or name.startswith("model_") or name in ["load_from_dict", "set_frozen"]:
             return BaseModel.__getattribute__(self, name)
 

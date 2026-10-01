@@ -99,8 +99,7 @@ class EMailRFC822FeedParser(EmailFeedParser):
                     item["guid"] = msg["Message-ID"]
                     date_tuple = email.utils.parsedate_tz(msg["Date"])
                     if date_tuple:
-                        dt = datetime.datetime.utcfromtimestamp(email.utils.mktime_tz(date_tuple))
-                        dt = dt.replace(tzinfo=timezone("utc"))
+                        dt = datetime.datetime.fromtimestamp(email.utils.mktime_tz(date_tuple), tz=timezone("utc"))
                         item["firstcreated"] = dt
 
                     # this will loop through all the available multiparts in mail
@@ -323,8 +322,7 @@ class EMailRFC822FeedParser(EmailFeedParser):
                     item["guid"] = msg["Message-ID"]
                     date_tuple = email.utils.parsedate_tz(msg["Date"])
                     if date_tuple:
-                        dt = datetime.datetime.utcfromtimestamp(email.utils.mktime_tz(date_tuple))
-                        dt = dt.replace(tzinfo=timezone("utc"))
+                        dt = datetime.datetime.fromtimestamp(email.utils.mktime_tz(date_tuple), tz=timezone("utc"))
                         item["firstcreated"] = dt
 
                     for part in msg.walk():

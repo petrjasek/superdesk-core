@@ -1,15 +1,16 @@
-from typing import cast
+from typing import Annotated, cast
 
-from pydantic import ValidationError
+from pydantic import Field, ValidationError
 from quart_babel import gettext
 
 from superdesk.core.auth.privilege_rules import request_user_has_privilege, required_privilege_rule
-from superdesk.core.resources import ResourceRestEndpoints
+from superdesk.core.resources import BaseModel, ResourceRestEndpoints
 from superdesk.core.resources.validators import get_field_errors_from_pydantic_validation_error
 from superdesk.core.types import Request, Response
-from superdesk.core.web import Endpoint, ItemRequestViewArgs
+from superdesk.core.web import Endpoint, EndpointGroup, ItemRequestViewArgs
 from superdesk.errors import SuperdeskApiError
 
+from . import vectors
 from .actions_service import AIActionsService
 from .errors import AIProviderError, to_api_error
 from .models import AIAction, AIEvent, AIProvider, RunActionPayload
@@ -190,3 +191,35 @@ class AIEventsEndpoints(ResourceRestEndpoints):
             raise SuperdeskApiError.forbiddenError(
                 message=gettext("Only the user an AI action was run for can report what was done with its answers")
             )
+
+
+ai_endpoints = EndpointGroup("ai", __name__)
+
+
+class VectorSearchPayload(BaseModel):
+    query: Annotated[str, Field(min_length=1, max_length=2000)]
+    size: Annotated[int, Field(ge=1, le=50)] = 10
+
+
+@ai_endpoints.endpoint("ai/search", "ai_search", methods=["POST"], auth=[required_privilege_rule(AI_PRIVILEGE)])
+async def vector_search(request: Request) -> Response:
+    """Hybrid keyword and semantic search over published articles chunks"""
+
+    if not vectors.is_enabled():
+        raise SuperdeskApiError(status_code=503, message=gettext("Vector search is not configured"))
+
+    try:
+        payload = VectorSearchPayload.model_validate(await request.get_json() or {})
+    except ValidationError as error:
+        raise SuperdeskApiError.badRequestError(
+            message=gettext("Invalid payload"),
+            payload=get_field_errors_from_pydantic_validation_error(error),
+        )
+
+    async with vectors.VectorIndex() as index:
+        try:
+            items = await index.search(payload.query, payload.size)
+        except AIProviderError as error:
+            raise to_api_error(error)
+
+    return Response(body={"_items": items}, status_code=200)

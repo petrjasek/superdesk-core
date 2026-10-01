@@ -1146,4 +1146,4 @@ class NewsMLG2FormatterTest(TestCase):
                 "anpa_category": None,
             }
         )
-        assert item
+        assert item is not None

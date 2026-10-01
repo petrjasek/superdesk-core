@@ -2,7 +2,7 @@
 
 import time
 import contextlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
@@ -65,19 +65,27 @@ class MongoLock(object):
 
         Raises `MongoLockTimeout` if can't achieve a lock before timeout.
         """
-        expire = datetime.utcnow() + timedelta(seconds=expire) if expire else None
+        expire = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=expire) if expire else None
         try:
             self.collection.insert_one(
-                {"_id": key, "locked": True, "owner": owner, "created": datetime.utcnow(), "expire": expire}
+                {
+                    "_id": key,
+                    "locked": True,
+                    "owner": owner,
+                    "created": datetime.now(timezone.utc).replace(tzinfo=None),
+                    "expire": expire,
+                }
             )
             return True
         except DuplicateKeyError:
-            start_time = datetime.utcnow()
+            start_time = datetime.now(timezone.utc).replace(tzinfo=None)
             while True:
                 if self._try_get_lock(key, owner, expire):
                     return True
 
-                if not timeout or datetime.utcnow() >= start_time + timedelta(seconds=timeout):
+                if not timeout or datetime.now(timezone.utc).replace(tzinfo=None) >= start_time + timedelta(
+                    seconds=timeout
+                ):
                     return False
                 time.sleep(self.acquire_retry_step)
 
@@ -100,7 +108,10 @@ class MongoLock(object):
         return not (
             not lock_info
             or not lock_info["locked"]
-            or (lock_info["expire"] is not None and lock_info["expire"] < datetime.utcnow())
+            or (
+                lock_info["expire"] is not None
+                and lock_info["expire"] < datetime.now(timezone.utc).replace(tzinfo=None)
+            )
         )
 
     def touch(self, key, owner, expire=None):
@@ -112,11 +123,11 @@ class MongoLock(object):
             return
         if not expire:
             raise MongoLockException("Can't touch lock without expire for {0}: {1}".format(key, owner))
-        expire = datetime.utcnow() + timedelta(seconds=expire)
+        expire = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=expire)
         self.collection.update_one({"_id": key, "owner": owner}, {"$set": {"expire": expire}})
 
     def _try_get_lock(self, key, owner, expire):
-        dtnow = datetime.utcnow()
+        dtnow = datetime.now(timezone.utc).replace(tzinfo=None)
         result = self.collection.update_one(
             {
                 "$or": [

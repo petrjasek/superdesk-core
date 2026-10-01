@@ -85,9 +85,9 @@ class EveBackend:
             item_search = search_backend.find_one(endpoint_name, req=req, **lookup)
             if item is None and item_search:
                 item = item_search
-                logger.warn(item_msg("item is only in elastic", item))
+                logger.warning(item_msg("item is only in elastic", item))
             elif item_search is None and item:
-                logger.warn(item_msg("item is only in mongo", item))
+                logger.warning(item_msg("item is only in mongo", item))
                 try:
                     logger.info(item_msg("trying to add item to elastic", item))
                     search_backend.insert(endpoint_name, [item])
@@ -112,9 +112,9 @@ class EveBackend:
 
             if item is None and item_search:
                 item = item_search
-                logger.warn(item_msg("item is only in elastic", item))
+                logger.warning(item_msg("item is only in elastic", item))
             elif item_search is None and item:
-                logger.warn(item_msg("item is only in mongo", item))
+                logger.warning(item_msg("item is only in mongo", item))
                 try:
                     logger.info(item_msg("trying to add item to elastic", item))
                     await search_backend.insert(endpoint_name, [item])
@@ -513,7 +513,7 @@ class EveBackend:
         except eve.io.base.DataLayer.OriginalChangedError:
             if search_backend and not backend.find_one(endpoint_name, req=None, _id=id):
                 # item is in elastic, not in mongo - not good
-                logger.warn("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
+                logger.warning("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
                 item = search_backend.find_one(endpoint_name, req=None, _id=id)
                 if item:
                     self.remove_from_search(endpoint_name, item)
@@ -534,7 +534,7 @@ class EveBackend:
         if search_backend:
             doc = backend.find_one(endpoint_name, req=None, _id=id)
             if not doc:  # there is no doc in mongo, remove it from elastic
-                logger.warn("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
+                logger.warning("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
                 item = search_backend.find_one(endpoint_name, req=None, _id=id)
                 if item:
                     self.remove_from_search(endpoint_name, item)
@@ -566,7 +566,7 @@ class EveBackend:
         except eve.io.base.DataLayer.OriginalChangedError:
             if not await backend.find_one(endpoint_name, req=None, _id=id) and search_backend:
                 # item is in elastic, not in mongo - not good
-                logger.warn("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
+                logger.warning("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
                 item = await search_backend.find_one(endpoint_name, req=None, _id=id)
                 if item:
                     await self.remove_from_search_async(endpoint_name, item)
@@ -587,7 +587,7 @@ class EveBackend:
         if search_backend:
             doc = await backend.find_one(endpoint_name, req=None, _id=id)
             if not doc:  # there is no doc in mongo, remove it from elastic
-                logger.warn("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
+                logger.warning("Item is missing in mongo resource={} id={}".format(endpoint_name, id))
                 item = await search_backend.find_one(endpoint_name, req=None, _id=id)
                 if item:
                     await self.remove_from_search_async(endpoint_name, item)
@@ -807,7 +807,7 @@ class EveBackend:
             for doc in docs:
                 self._push_resource_notification("deleted", endpoint_name, _id=str(doc["_id"]))
         else:
-            logger.warn("No documents for %s resource were deleted.", endpoint_name)
+            logger.warning("No documents for %s resource were deleted.", endpoint_name)
         return removed_ids
 
     async def delete_docs_async(self, endpoint_name, docs):
@@ -836,7 +836,7 @@ class EveBackend:
             for doc in docs:
                 self._push_resource_notification("deleted", endpoint_name, _id=str(doc["_id"]))
         else:
-            logger.warn("No documents for %s resource were deleted.", endpoint_name)
+            logger.warning("No documents for %s resource were deleted.", endpoint_name)
         return removed_ids
 
     def delete_ids_from_mongo(self, endpoint_name, ids):

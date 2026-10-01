@@ -10,7 +10,7 @@
 
 
 import os
-import unittest
+from unittest import IsolatedAsyncioTestCase
 
 from xml.etree import ElementTree
 
@@ -19,8 +19,8 @@ from superdesk.io.feed_parsers.newsml_2_0 import NewsMLTwoFeedParser
 from superdesk.io.subjectcodes import init_app as init_subjects
 
 
-class BaseNewMLTwoTestCase(unittest.TestCase):
-    async def test_app_subjects(self):
+class BaseNewMLTwoTestCase(IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):
         app = Flask(__name__)
         app.api_prefix = "/api"
         init_subjects(app)

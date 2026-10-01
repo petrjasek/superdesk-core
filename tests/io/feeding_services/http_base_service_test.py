@@ -1,6 +1,5 @@
-import unittest
-
 from superdesk.io.feeding_services.http_base_service import HTTPFeedingServiceBase
+from superdesk.tests import AsyncTestCase
 
 
 class FeedingServiceWithUrl(HTTPFeedingServiceBase):
@@ -12,8 +11,8 @@ class FeedingServiceWithUrl(HTTPFeedingServiceBase):
         pass
 
 
-class TestFeedingService(unittest.TestCase):
-    def test_validate_config_url_null(self):
+class TestFeedingService(AsyncTestCase):
+    async def test_validate_config_url_null(self):
         service = FeedingServiceWithUrl()
         service.provider = {"config": {"url": None}}
-        service.validate_config()
+        await service.validate_config()

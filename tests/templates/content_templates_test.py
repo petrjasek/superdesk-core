@@ -22,7 +22,7 @@ class TemplatesTestCase(TestCase):
     async def asyncSetUp(self):
         await super().asyncSetUp()
         # now is today at 09:05:03
-        self.now = datetime.utcnow().replace(hour=9, minute=5, second=3)
+        self.now = utcnow(microseconds=True).replace(tzinfo=None, hour=9, minute=5, second=3)
         self.weekdays = [day.name for day in Weekdays]
 
     def get_delta(self, create_at, weekdays, time_zone=None, now=None, cron_list=None):

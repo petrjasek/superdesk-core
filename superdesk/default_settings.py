@@ -1174,6 +1174,20 @@ EMAIL_TIMEOUT = 10
 #: The server and proxy request timeouts have to be above this one, see :ref:`ai_providers_and_actions`
 AI_REQUEST_TIMEOUT = int(env("AI_REQUEST_TIMEOUT", 60))
 
+#: base URL of an OpenAI compatible embeddings service, e.g. ``http://localhost:13305/v1`` for Lemonade
+#:
+#: Vector indexing and search are disabled when empty.
+AI_EMBEDDINGS_URL = env("AI_EMBEDDINGS_URL", "")
+
+#: embeddings model used both for indexing and for search queries
+AI_EMBEDDINGS_MODEL = env("AI_EMBEDDINGS_MODEL", "nomic-embed-text-v1")
+
+#: elastic url for the vector index, can point to a newer elastic (8+) cluster
+AI_VECTOR_ELASTICSEARCH_URL = env("AI_VECTOR_ELASTICSEARCH_URL", ELASTICSEARCH_URL)
+
+#: name of the vector index
+AI_VECTOR_INDEX = env("AI_VECTOR_INDEX", "{}_vectors".format(ELASTICSEARCH_INDEX))
+
 #: This setting is used to overide the desk/stage expiry for items when spiked
 #:
 #: .. versionchanged:: 2.10

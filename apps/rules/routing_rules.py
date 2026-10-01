@@ -202,7 +202,7 @@ class RoutingRuleSchemeService(AsyncBaseService):
                 % (provider.get("name"), routing_scheme.get("name"))
             )
 
-        now = datetime.utcnow()
+        now = utcnow().replace(tzinfo=None)
         item_id = ingest_item.get("guid") or ingest_item.get("_id")
         await PublishCache.init()
 

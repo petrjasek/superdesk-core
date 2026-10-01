@@ -26,7 +26,7 @@ from .events_service import AIEventsService
 from .models import AIAction, AIEvent, AIProvider
 from .privileges import AI_PRIVILEGE, AI_STUDIO_PRIVILEGE
 from .providers_service import AIProvidersService
-from .rest_endpoints import AIActionsEndpoints, AIEventsEndpoints, AIProvidersEndpoints
+from .rest_endpoints import AIActionsEndpoints, AIEventsEndpoints, AIProvidersEndpoints, ai_endpoints
 
 ai_providers_config = ResourceConfig(
     name="ai_providers",
@@ -97,6 +97,7 @@ ai_events_config = ResourceConfig(
 module = Module(
     name="superdesk.ai",
     resources=[ai_providers_config, ai_actions_config, ai_events_config],
+    endpoints=[ai_endpoints],
     config=config,
     config_prefix="AI",
     privileges=[

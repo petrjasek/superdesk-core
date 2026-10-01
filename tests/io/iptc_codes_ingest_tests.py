@@ -15,7 +15,7 @@ from superdesk.io.commands.update_ingest import process_iptc_codes
 
 
 class IPTCCodesTestCase(AsyncTestCase):
-    def test_unknown_iptc(self):
+    async def test_unknown_iptc(self):
         """Test if an unknown IPTC code is not causing a crash"""
         item = {
             "guid": "urn:newsml:localhost:2019-02-07T12:00:00.030513:369c16e0-d6b7-40e1-8838-9c5f6a61626c",
@@ -24,5 +24,5 @@ class IPTCCodesTestCase(AsyncTestCase):
         # item should not be modified
         expected = deepcopy(item)
 
-        process_iptc_codes(item, {})
+        await process_iptc_codes(item, {})
         self.assertEqual(item, expected)

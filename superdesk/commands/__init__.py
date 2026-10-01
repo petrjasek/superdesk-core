@@ -1,6 +1,7 @@
 from .clean_images import cli_clean_images  # noqa
 from .rebuild_elastic_index import cli_rebuild_elastic_index  # noqa
 from .index_from_mongo import cli_index_from_mongo  # noqa
+from .index_vectors import cli_index_vectors  # noqa
 from .run_macro import run_macro  # noqa
 from .data_updates import *  # noqa
 from .delete_archived_document import *  # noqa

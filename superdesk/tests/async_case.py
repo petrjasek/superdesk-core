@@ -2,12 +2,17 @@ import asyncio
 
 from unittest import IsolatedAsyncioTestCase as AsyncTestCase
 
+_event_loop = None
+
 
 def get_loop():
+    global _event_loop
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
     except RuntimeError:
-        loop = asyncio.new_event_loop()
+        if _event_loop is None or _event_loop.is_closed():
+            _event_loop = asyncio.new_event_loop()
+        loop = _event_loop
 
     asyncio.set_event_loop(loop)
     loop.set_debug(True)

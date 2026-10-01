@@ -1,12 +1,12 @@
 import io
-import unittest
 import requests_mock
 
 from superdesk.flask import Flask
 from superdesk.media.media_operations import download_file_from_url
+from superdesk.tests import AsyncTestCase
 
 
-class MediaOperationsTestCase(unittest.TestCase):
+class MediaOperationsTestCase(AsyncTestCase):
     async def test_download_file_from_url_relative(self):
         app = Flask(__name__)
         app.config["SERVER_NAME"] = "localhost"

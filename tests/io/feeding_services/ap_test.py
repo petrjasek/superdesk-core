@@ -76,15 +76,18 @@ class APTestCase(TestCase):
         service.provider = provider
 
         self.assertNotIn("private", provider)
-        with mock.patch.object(feed_parser, "parse"):
+        parsed_items = mock.Mock()
+        parsed_items.reverse = mock.Mock()
+        with mock.patch.object(feed_parser, "parse", return_value=parsed_items):
             update = {}
-            items = (await service._update(provider, update))[0]
-            items.reverse.assert_called_once_with()
+            await service._update(provider, update)
+            parsed_items.reverse.assert_called_once_with()
             provider.update(update)
 
         # because the provider has been run at least one time,
         # private data must now be present
         self.assertIn("private", provider)
-        with mock.patch.object(feed_parser, "parse"):
-            items = (await service._update(provider, {}))[0]
-            items.reverse.assert_not_called()
+        parsed_items.reverse.reset_mock()
+        with mock.patch.object(feed_parser, "parse", return_value=parsed_items):
+            await service._update(provider, {})
+            parsed_items.reverse.assert_not_called()

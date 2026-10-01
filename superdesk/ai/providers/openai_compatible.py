@@ -64,6 +64,23 @@ class OpenAICompatibleClient(AIProviderClient):
                 gettext("The AI provider response did not contain a model list"),
             )
 
+    async def embed(self, texts: list[str], model: str) -> list[list[float]]:
+        data = await self._request("POST", "embeddings", {"input": texts, "model": model})
+
+        try:
+            entries = sorted(data["data"], key=lambda entry: entry.get("index", 0))
+            vectors = [list(entry["embedding"]) for entry in entries]
+        except (KeyError, TypeError, AttributeError):
+            vectors = []
+
+        if len(vectors) != len(texts):
+            raise AIProviderError(
+                AIErrorKind.INVALID_RESPONSE,
+                gettext("The AI provider response did not contain embeddings"),
+            )
+
+        return vectors
+
     async def _request(self, method: str, path: str, payload: dict[str, Any] | None = None) -> Any:
         url = f"{self.base_url}/{path}"
         timeout = aiohttp.ClientTimeout(total=ai_config.request_timeout)
