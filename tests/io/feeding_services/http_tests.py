@@ -19,7 +19,7 @@ from superdesk.io.registry import register_feeding_service
 from superdesk.io.feeding_services.http_service import HTTPFeedingService
 
 from superdesk.tests import TestCase, utils as test_utils
-from superdesk.tests.http_mocks import mock_http, CallbackResult
+from superdesk.tests.http_mocks import mock_http, CallbackResult, start_mock_http
 from superdesk.errors import IngestApiError
 
 
@@ -60,6 +60,10 @@ class ErrorResponseSession(MagicMock):
 
 
 class GetTokenTestCase(TestCase):
+    async def asyncSetUp(self):
+        await super().asyncSetUp()
+        await start_mock_http(self)
+
     async def test_get_null_token(self):
         provider = {}
         self.assertEqual("", await TestFeedingService()._get_auth_token(provider))

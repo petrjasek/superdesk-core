@@ -18,6 +18,7 @@ import re
 from aiohttp import BasicAuth
 
 from superdesk.tests import TestCase
+from superdesk.tests.http_mocks import start_mock_http
 from superdesk.tests.http_mocks import mock_http
 from superdesk.io.commands.update_ingest import LAST_ITEM_UPDATE
 
@@ -66,6 +67,14 @@ class FakeIngestApiError(Exception):
         return FakeIngestApiError("general_error", exception, provider)
 
     @classmethod
+    def apiConnectionError(cls, exception, provider):
+        return FakeIngestApiError("connection_error", exception, provider)
+
+    @classmethod
+    def apiRequestError(cls, exception, provider):
+        return FakeIngestApiError("request_error", exception, provider)
+
+    @classmethod
     def apiNotFoundError(cls, exception, provider):
         return FakeIngestApiError("not_found_error", exception, provider)
 
@@ -88,6 +97,7 @@ class RssIngestServiceTest(TestCase):
 
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        await start_mock_http(self)
         # super().setUpForChildren()
         try:
             from superdesk.io.feeding_services.rss import RSSFeedingService
@@ -149,15 +159,9 @@ class UpdateMethodTestCase(RssIngestServiceTest):
     async def test_raises_ingest_error_if_fetching_data_fails(self):
         self.instance.provider = {"config": {"url": "http://example.com/rss.xml"}}
 
-        mock_http(self).get(
-            re.compile(r".*"),
-            exception=FakeIngestApiError.apiGeneralError(Exception("Fetch error!"), self.instance.provider),
-        )
-        try:
-            with self.assertRaises(FakeIngestApiError):
-                await self.instance._update({}, {})
-        except Exception:
-            self.fail("Expected exception type was not raised.")
+        mock_http(self).get(re.compile(r".*"), exception=True)
+        with self.assertRaises(FakeIngestApiError):
+            await self.instance._update({}, {})
 
     async def test_raises_ingest_error_on_parse_error(self):
         mock_http(self).get(
@@ -301,7 +305,7 @@ class FetchDataMethodTestCase(RssIngestServiceTest):
         http_mock.get(re.compile(r".*"), status=200)
         self.fake_provider["config"].update(
             {
-                "url": "foo",
+                "url": "http://news.com/foo",
                 "auth_required": True,
                 "username": "james",
                 "password": "bond+007",
@@ -310,7 +314,12 @@ class FetchDataMethodTestCase(RssIngestServiceTest):
 
         await self.instance._update(self.fake_provider, {})
         self.assertEqual(self.instance.auth_info, ("james", "bond+007"))
-        http_mock.assert_called_with("foo", auth=BasicAuth("james", "bond+007"))
+        request = http_mock.last_request
+        self.assertEqual(str(request.url), "http://news.com/foo")
+        self.assertEqual(
+            request.headers["Authorization"],
+            BasicAuth("james", "bond+007").encode(),
+        )
 
     async def test_provides_auth_info_if_required(self):
         http_mock = mock_http(self)

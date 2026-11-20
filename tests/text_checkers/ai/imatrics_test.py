@@ -9,7 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import re
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 from yarl import URL
 from urllib.parse import urljoin
 from superdesk.tests import TestCase
@@ -85,7 +85,7 @@ class IMatricsTestCase(TestCase):
         api_url = urljoin(TEST_BASE_URL, "article/analysis")
         api_url_regex = re.compile(rf"{api_url}\?.*$")
 
-        with aioresponses() as mock_http:
+        async with aiointercept(mock_external_urls=True) as mock_http:
             mock_http.post(
                 api_url_regex,
                 payload={
@@ -210,7 +210,7 @@ class IMatricsTestCase(TestCase):
         api_url = urljoin(TEST_BASE_URL, "concept/get")
         api_url_regex = re.compile(rf"{api_url}\?.*$")
 
-        with aioresponses() as mock_http:
+        async with aiointercept(mock_external_urls=True) as mock_http:
             mock_http.post(
                 api_url_regex,
                 payload={
@@ -298,7 +298,7 @@ class IMatricsTestCase(TestCase):
         ai_data_op_service = get_resource_service("ai_data_op")
         api_url = urljoin(TEST_BASE_URL, "concept/create")
 
-        with aioresponses() as mock_http:
+        async with aiointercept(mock_external_urls=True) as mock_http:
             mock_http.post(
                 api_url,
                 payload={
@@ -319,7 +319,7 @@ class IMatricsTestCase(TestCase):
         ai_data_op_service = get_resource_service("ai_data_op")
         api_url = urljoin(TEST_BASE_URL, "concept/create")
 
-        with aioresponses() as mock_http:
+        async with aiointercept(mock_external_urls=True) as mock_http:
             mock_http.post(
                 api_url,
                 payload={
@@ -344,7 +344,7 @@ class IMatricsTestCase(TestCase):
         ai_data_op_service = get_resource_service("ai_data_op")
         api_url = urljoin(TEST_BASE_URL, "concept/delete") + "?uuid=afc7e49d-57d0-34af-b184-b7600af362a9"
 
-        with aioresponses() as mock_http:
+        async with aiointercept(mock_external_urls=True) as mock_http:
             mock_http.delete(api_url, payload={"error": False})
             await ai_data_op_service.create_async([doc])
             self.assertEqual(doc["result"], {})
@@ -422,7 +422,7 @@ class IMatricsTestCase(TestCase):
         }
         api_url = urljoin(TEST_BASE_URL, "article/store")
 
-        with aioresponses() as http_mock:
+        async with aiointercept(mock_external_urls=True) as http_mock:
             http_mock.post(api_url, payload={"uuid": "guid"})
 
             ai_data_op_service = get_resource_service("ai_data_op")

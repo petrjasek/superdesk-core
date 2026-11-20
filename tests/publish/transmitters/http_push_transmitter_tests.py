@@ -15,7 +15,7 @@ import hmac
 import json
 import re
 import aiohttp
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 from yarl import URL
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -179,12 +179,12 @@ class HTTPPushServiceTestCase(TestCase):
 
     @mock.patch("superdesk.errors.notifiers")
     async def test_client_publish_error_thrown(self, fake_notifiers):
-        with aioresponses() as http_mock:
+        self.destination["config"]["resource_url"] = "http://example.com"
+        async with aiointercept(mock_external_urls=True) as http_mock:
             http_mock.post(
                 re.compile(".*"),
                 status=401,
                 body="client 4xx",
-                exception=PublishHTTPPushClientError.httpPushError(Exception("client 4xx")),
             )
 
             # needed for bad exception handling classes
@@ -198,12 +198,12 @@ class HTTPPushServiceTestCase(TestCase):
 
     @mock.patch("superdesk.errors.notifiers")
     async def test_server_publish_error_thrown(self, fake_notifiers):
-        with aioresponses() as http_mock:
+        self.destination["config"]["resource_url"] = "http://example.com"
+        async with aiointercept(mock_external_urls=True) as http_mock:
             http_mock.post(
                 re.compile(".*"),
                 status=503,
                 body="server 5xx",
-                exception=PublishHTTPPushServerError.httpPushError(Exception("server 5xx")),
             )
 
             # needed for bad exception handling classes
@@ -216,7 +216,7 @@ class HTTPPushServiceTestCase(TestCase):
                     await service._push_item(self.destination, json.dumps(self.item))
 
     async def test_push_associated_assets(self):
-        with aioresponses() as http_mock:
+        async with aiointercept(mock_external_urls=True) as http_mock:
             http_mock.get(re.compile(".*"), repeat=True, status=200, payload={})
             http_mock.post(re.compile(".*"), repeat=True, status=200, payload={})
 
@@ -246,7 +246,7 @@ class HTTPPushServiceTestCase(TestCase):
     async def test_push_attachments(self):
         test_file = TestMedia(b"bin")
 
-        with aioresponses() as http_mock:
+        async with aiointercept(mock_external_urls=True) as http_mock:
             http_mock.get("http://example.com/media-id", repeat=True, status=404, payload={})
             http_mock.post("http://example.com", repeat=True, status=201, payload={})
 
@@ -270,11 +270,9 @@ class HTTPPushServiceTestCase(TestCase):
                 post_requests = http_mock.requests[("POST", URL("http://example.com"))]
                 self.assertEqual(len(post_requests), 1)
 
-                request_body = post_requests[0].kwargs["data"]
-                self.assertIsInstance(request_body, aiohttp.FormData)
+                request_body_bytes = post_requests[0].captured_body
 
                 headers = post_requests[0].kwargs["headers"]
-                request_body_bytes = await request_body().as_bytes()
                 expected_hash = hmac.new(b"foo", request_body_bytes, "sha1")
                 self.assertIn(b"bin", request_body_bytes)
                 self.assertIn(b"media-id", request_body_bytes)
@@ -284,7 +282,7 @@ class HTTPPushServiceTestCase(TestCase):
         media = TestMedia(b"content")
         dest = {"config": {"assets_url": "http://example.com", "secret_token": "foo"}}
 
-        with aioresponses() as http_mock:
+        async with aiointercept(mock_external_urls=True) as http_mock:
             http_mock.get("http://example.com/media-id", repeat=True, status=404, payload={})
             http_mock.post("http://example.com", repeat=True, status=201, payload={})
 
@@ -296,6 +294,5 @@ class HTTPPushServiceTestCase(TestCase):
             post_requests = http_mock.requests[("POST", URL("http://example.com"))]
             self.assertEqual(len(post_requests), 1)
 
-            request_body = post_requests[0].kwargs["data"]
-            self.assertIsInstance(request_body, aiohttp.FormData)
-            self.assertIn(b"content", await request_body().as_bytes())
+            request_body = post_requests[0].captured_body
+            self.assertIn(b"content", request_body)

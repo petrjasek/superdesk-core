@@ -20,6 +20,7 @@ from superdesk import tests
 from superdesk.factory.app import get_app
 from superdesk.default_settings import PUBLISH_MODULES
 from superdesk.tests import setup_auth_user, stop_storage_mocks
+from superdesk.tests.http_mocks import start_mock_http, stop_mock_http
 from superdesk.tests.mocks import TestSearchProvider
 from superdesk.tests.steps import get_macro_path
 from superdesk.tests.setup_teardown import setup_providers
@@ -42,6 +43,7 @@ def setup_before_all(context, config, app_factory):
 
 async def before_scenario_async(context, scenario):
     current_app = context.app
+    await start_mock_http(context)
 
     # Make sure to reset the config for each scenario, based on the config
     # created in the feature setup
@@ -171,6 +173,7 @@ def after_scenario(context, scenario):
 
     try:
         loop = asyncio.get_event_loop()
+        loop.run_until_complete(stop_mock_http(context))
         loop.run_until_complete(stop_storage_mocks(context))
     except Exception as e:
         # Make sure exceptions raised are printed to the console

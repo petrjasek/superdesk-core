@@ -15,7 +15,7 @@ import time
 import arrow
 import celery
 import shutil
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import operator
 
 from unittest import mock
@@ -672,7 +672,7 @@ async def step_impl_fetch_from_provider_ingest_with_mocking(context, provider_na
     async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
         provider = await find_one("ingest_providers", name=provider_name)
 
-        with aioresponses() as rsps:
+        async with aiointercept(mock_external_urls=True) as rsps:
             apply_mock_file(rsps, mock_file, fixture_path=get_provider_file_path(provider))
             await fetch_from_provider(context, provider_name, guid)
 
@@ -866,10 +866,10 @@ async def fetch_from_provider(context, provider_name, guid, routing_scheme=None,
         set_placeholder(context, "{}.{}".format(provider_name, item["guid"]), item["_id"])
 
 
-def apply_mock_file(rsps: aioresponses, mock_file_path: str, fixture_path: Path | str | None = None) -> None:
+def apply_mock_file(rsps: aiointercept, mock_file_path: str, fixture_path: Path | str | None = None) -> None:
     """Parse the mock file and apply it
 
-    This must be executed inside a aioresponses context.
+    This must be executed inside an aiointercept context.
     :param rsps: responses context object
     :param mock_file: name of the mock_file (inside fixture path)
     :param fixture_path: path to the directory containing the file for "binary"
@@ -1312,7 +1312,7 @@ async def step_impl_when_upload_from_url(context):
     headers = unique_headers(headers, context.headers)
     fixture_path = Path(superdesk.__file__).parent.parent / "tests" / "io" / "fixtures"
 
-    with aioresponses() as rsps:
+    async with aiointercept(mock_external_urls=True) as rsps:
         apply_mock_file(rsps, "upload_from_url_mock.json", fixture_path=fixture_path)
         context.response = await context.client.post(
             get_prefixed_url(context.app, "/upload"), form=data, headers=headers
@@ -1327,7 +1327,7 @@ async def step_impl_when_upload_from_url_with_crop(context):
     headers = unique_headers(headers, context.headers)
     fixture_path = Path(superdesk.__file__).parent.parent / "tests" / "io" / "fixtures"
 
-    with aioresponses() as rsps:
+    async with aiointercept(mock_external_urls=True) as rsps:
         apply_mock_file(rsps, "upload_from_url_mock.json", fixture_path=fixture_path)
         context.response = await context.client.post(
             get_prefixed_url(context.app, "/upload"), form=data, headers=headers

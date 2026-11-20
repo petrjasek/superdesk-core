@@ -1,5 +1,5 @@
 import pytz
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import aiohttp
 from yarl import URL
 import superdesk
@@ -22,7 +22,7 @@ class IMatricsTransmitterTestCase(TestCase):
 
     async def test_publish_article(self):
         start = datetime(2020, 10, 8, 10, 0, 0, tzinfo=pytz.UTC)
-        with aioresponses() as mock_http:
+        async with aiointercept(mock_external_urls=True) as mock_http:
             with patch.dict(superdesk.resources, resources):
                 mock_http.post(
                     self.app.config["IMATRICS_BASE_URL"] + "article/store", status=200, payload={"uuid": "guid"}
@@ -107,8 +107,8 @@ class IMatricsTransmitterTestCase(TestCase):
                 requests = mock_http.requests[("POST", URL("https://webdemo.imatrics.com/api/article/store"))]
                 self.assertEqual(len(requests), 1)
                 self.assertEqual(
-                    requests[0].kwargs["auth"],
-                    aiohttp.BasicAuth("foo", "key"),
+                    requests[0].headers["Authorization"],
+                    aiohttp.BasicAuth("foo", "key").encode(),
                 )
 
                 self.maxDiff = None

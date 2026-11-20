@@ -11,12 +11,10 @@
 
 from unittest import mock
 import os
-from aioresponses import CallbackResult
-
 from superdesk.io.feeding_services import APMediaFeedingService
 from superdesk.io.feed_parsers import APMediaFeedParser
 from superdesk.tests import TestCase
-from superdesk.tests.http_mocks import mock_multiple_endpoints
+from superdesk.tests.http_mocks import CallbackResult, mock_multiple_endpoints, start_mock_http
 
 PREFIX = "test_superdesk_"
 PROVIDER = {
@@ -34,6 +32,7 @@ PROVIDER = {
 class APTestCase(TestCase):
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        await start_mock_http(self)
         mock_multiple_endpoints(
             self,
             {

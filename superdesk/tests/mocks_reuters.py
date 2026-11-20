@@ -12,14 +12,12 @@ import os
 from os.path import basename
 import re
 from yarl import URL
-from aioresponses import CallbackResult
-
-from .http_mocks import mock_http
+from .http_mocks import CallbackResult, mock_http
 
 
-def item_request(url: URL, **kwargs) -> CallbackResult:
+def item_request(url: str, **kwargs) -> CallbackResult:
     try:
-        params = kwargs.get("params") or {}
+        params = URL(url).query
         fixtures = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../tests/io/fixtures")
         if "channel" in params:
             file = os.path.join(fixtures, params["channel"])
@@ -32,10 +30,10 @@ def item_request(url: URL, **kwargs) -> CallbackResult:
         return CallbackResult(status=404)
 
 
-def content_request(url: URL, **kwargs) -> CallbackResult:
+def content_request(url: str, **kwargs) -> CallbackResult:
     try:
         fixtures = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../tests/io/fixtures")
-        file = os.path.join(fixtures, basename(url.path))
+        file = os.path.join(fixtures, basename(URL(url).path))
         with open(file, "rb") as stored_response:
             content = stored_response.read()
             return CallbackResult(status=200, body=content, content_type="application/xml")

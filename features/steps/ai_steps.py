@@ -7,6 +7,7 @@ from behave import given, then, when
 from behave.api.async_step import async_run_until_complete
 
 from superdesk.ai.config import config as ai_config
+from superdesk.ai.providers.openai_compatible import OpenAICompatibleClient
 from superdesk.tests import get_prefixed_url
 from superdesk.tests.http_mocks import CallbackResult, mock_http
 from superdesk.tests.steps import apply_placeholders
@@ -67,14 +68,26 @@ def step_given_provider_refuses_first_connection(context, base_url):
     Has to come before ``a mocked AI provider``: the first mocked route that matches answers.
     """
 
-    refused = aiohttp.ClientConnectorError(
+    original_send = OpenAICompatibleClient._send
+    error = aiohttp.ClientConnectorError(
         MagicMock(host="provider.test", port=443, ssl=True), ConnectionRefusedError()
     )
-    mock_http(context).post(f"{base_url}/chat/completions", exception=refused)
+    refused = False
+
+    async def refuse_first_request(client, method, path, payload, timeout):
+        nonlocal refused
+        if not refused:
+            refused = True
+            raise error
+        return await original_send(client, method, path, payload, timeout)
 
     patcher = patch("superdesk.ai.providers.openai_compatible.CONNECT_RETRY_DELAY_SECONDS", 0)
     patcher.start()
     context.add_cleanup(patcher.stop)
+
+    send_patcher = patch.object(OpenAICompatibleClient, "_send", new=refuse_first_request)
+    send_patcher.start()
+    context.add_cleanup(send_patcher.stop)
 
 
 @given("AI actions are limited to {count:d} runs per minute")

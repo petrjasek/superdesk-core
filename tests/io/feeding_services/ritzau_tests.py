@@ -17,7 +17,7 @@ from superdesk.io.feeding_services import ritzau
 from superdesk.io.feed_parsers import ritzau as ritzau_feed
 
 from superdesk.tests import TestCase
-from superdesk.tests.http_mocks import mock_http
+from superdesk.tests.http_mocks import mock_http, start_mock_http
 
 PREFIX = "test_superdesk_"
 PROVIDER = {
@@ -29,6 +29,7 @@ PROVIDER = {
 class RitzauTestCase(TestCase):
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        await start_mock_http(self)
         dirname = os.path.dirname(os.path.realpath(__file__))
         fixture = os.path.normpath(os.path.join(dirname, "../fixtures", "ritzau_feed.xml"))
         with open(fixture) as f:

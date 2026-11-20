@@ -18,7 +18,7 @@ from bson import ObjectId
 
 from superdesk.ai.config import config
 from superdesk.tests import TestCase
-from superdesk.tests.http_mocks import mock_http
+from superdesk.tests.http_mocks import mock_http, start_mock_http
 
 from .actions_test import ACTION, ITEM, ITEM_ID, completion_payload
 from .openai_compatible_test import BASE_URL, COMPLETIONS_URL, capture_requests
@@ -35,6 +35,7 @@ class AIRunRateLimitTestCase(TestCase):
 
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        await start_mock_http(self)
         self._original_auth = self.async_app.auth
         self.async_app.auth = StubUserAuth(ADMIN_USER)
         self.addCleanup(self._restore_auth)

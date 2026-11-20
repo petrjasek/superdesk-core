@@ -19,7 +19,7 @@ from bson import ObjectId
 from superdesk.ai.actions_service import AIActionsService
 from superdesk.ai.prompts import CONTENT_REMINDER
 from superdesk.tests import TestCase
-from superdesk.tests.http_mocks import mock_http
+from superdesk.tests.http_mocks import mock_http, start_mock_http
 
 from .openai_compatible_test import BASE_URL, COMPLETIONS_URL, capture_requests
 from .providers_test import ADMIN_USER, PROVIDER, USER_WITHOUT_PRIVILEGES, StubUserAuth
@@ -329,6 +329,7 @@ class AIActionsRestTestCase(TestCase):
 class AIActionRunTestCase(TestCase):
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        await start_mock_http(self)
         self._original_auth = self.async_app.auth
         self.async_app.auth = StubUserAuth(ADMIN_USER)
         self.addCleanup(self._restore_auth)
@@ -695,9 +696,11 @@ class AIActionRunTestCase(TestCase):
 
     async def test_a_provider_that_does_not_answer_in_time_answers_504(self):
         action = await self._create_action()
-        self.http_mock.post(COMPLETIONS_URL, exception=asyncio.TimeoutError())
-
-        response = await self._run(action["_id"])
+        with patch(
+            "superdesk.ai.providers.openai_compatible.OpenAICompatibleClient._send",
+            side_effect=asyncio.TimeoutError(),
+        ):
+            response = await self._run(action["_id"])
 
         self.assertEqual(response.status_code, 504)
 
@@ -711,9 +714,11 @@ class AIActionRunTestCase(TestCase):
 
     async def test_a_provider_that_cannot_be_reached_answers_502(self):
         action = await self._create_action()
-        self.http_mock.post(COMPLETIONS_URL, exception=aiohttp.ClientConnectionError("no route"))
-
-        response = await self._run(action["_id"])
+        with patch(
+            "superdesk.ai.providers.openai_compatible.OpenAICompatibleClient._send",
+            side_effect=aiohttp.ClientConnectionError("no route"),
+        ):
+            response = await self._run(action["_id"])
 
         self.assertEqual(response.status_code, 502)
 
@@ -747,7 +752,7 @@ class AIActionRunTestCase(TestCase):
         failures = [
             (dict(status=401), 502, "auth"),
             (dict(status=429), 429, "rate_limit"),
-            (dict(exception=asyncio.TimeoutError()), 504, "timeout"),
+            (asyncio.TimeoutError(), 504, "timeout"),
             (dict(status=500), 502, "upstream"),
             (dict(payload={"error": "no choices here"}), 502, "invalid_response"),
         ]
@@ -755,9 +760,15 @@ class AIActionRunTestCase(TestCase):
         for mocked, status_code, error_kind in failures:
             with self.subTest(error_kind=error_kind):
                 action = await self._create_action()
-                self.http_mock.post(COMPLETIONS_URL, **mocked)
-
-                response = await self._run(action["_id"])
+                if isinstance(mocked, BaseException):
+                    with patch(
+                        "superdesk.ai.providers.openai_compatible.OpenAICompatibleClient._send",
+                        side_effect=mocked,
+                    ):
+                        response = await self._run(action["_id"])
+                else:
+                    self.http_mock.post(COMPLETIONS_URL, **mocked)
+                    response = await self._run(action["_id"])
                 body = await response.get_json()
 
                 self.assertEqual(response.status_code, status_code)

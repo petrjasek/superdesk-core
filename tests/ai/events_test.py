@@ -23,7 +23,7 @@ from superdesk.ai.models import AIActionType, AIEventSource
 from superdesk.ai.providers.base import CompletionResult
 from superdesk.ai.providers_service import AIProvidersService
 from superdesk.tests import TestCase
-from superdesk.tests.http_mocks import mock_http
+from superdesk.tests.http_mocks import mock_http, start_mock_http
 from superdesk.utc import utcnow
 
 from .actions_test import (
@@ -54,6 +54,7 @@ class AIRunLogTestCase(TestCase):
 
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        await start_mock_http(self)
         self._original_auth = self.async_app.auth
         self.async_app.auth = StubUserAuth(ADMIN_USER)
         self.addCleanup(self._restore_auth)
@@ -192,17 +193,23 @@ class AIEventsTestCase(AIRunLogTestCase):
             (dict(status=401), AIErrorKind.AUTH, 502),
             (dict(status=429), AIErrorKind.RATE_LIMIT, 429),
             (dict(status=500), AIErrorKind.UPSTREAM, 502),
-            (dict(exception=asyncio.TimeoutError()), AIErrorKind.TIMEOUT, 504),
-            (dict(exception=aiohttp.ClientConnectionError("no route")), AIErrorKind.UPSTREAM, 502),
+            (asyncio.TimeoutError(), AIErrorKind.TIMEOUT, 504),
+            (aiohttp.ClientConnectionError("no route"), AIErrorKind.UPSTREAM, 502),
         ]
 
         for answer, error_kind, status_code in failures:
             with self.subTest(error_kind=error_kind):
                 await self._clear_events()
                 action = await self._create_action()
-                self.http_mock.post(COMPLETIONS_URL, **answer)
-
-                response = await self._run(action["_id"])
+                if isinstance(answer, BaseException):
+                    with patch(
+                        "superdesk.ai.providers.openai_compatible.OpenAICompatibleClient._send",
+                        side_effect=answer,
+                    ):
+                        response = await self._run(action["_id"])
+                else:
+                    self.http_mock.post(COMPLETIONS_URL, **answer)
+                    response = await self._run(action["_id"])
 
                 self.assertEqual(response.status_code, status_code, await response.get_data())
                 event = await self._single_event()

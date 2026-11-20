@@ -18,7 +18,7 @@ from superdesk.io.feeding_services import ap
 from superdesk.io.feed_parsers import newsml_2_0
 
 from superdesk.tests import TestCase
-from superdesk.tests.http_mocks import mock_http, CallbackResult
+from superdesk.tests.http_mocks import mock_http, CallbackResult, start_mock_http
 
 
 PREFIX = "test_superdesk_"
@@ -37,6 +37,7 @@ PROVIDER = {
 class APTestCase(TestCase):
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        await start_mock_http(self)
         mock_http(self).get(re.compile(r".*"), callback=self.mock_requests, repeat=True)
 
     def mock_requests(self, url, **kwargs) -> CallbackResult:
