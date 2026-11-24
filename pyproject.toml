@@ -26,7 +26,7 @@ extend-exclude = ["src"]
 [tool.ruff.lint]
 exclude = ["bin", "build", "dist", "docs", "env", "include", "lib", "node_modules", "src"]
 select = ["E", "W", "F", "B", "D"]
-# Mirror the existing Flake8 exclusions; these can be revisited as the backlog is addressed.
+# Most exclusions mirror Flake8; these can be revisited as the backlog is addressed.
 ignore = [
     "E203",  # Whitespace before punctuation
     "E261",  # Spaces before inline comments
@@ -42,7 +42,6 @@ ignore = [
     "B017",  # Assertions that catch Exception
     "B019",  # Cached instance methods
     "B020",  # Loop variable overriding its iterable
-    "B023",  # Functions referencing loop variables
     "B028",  # Warnings without an explicit stacklevel
     # Bugbear's B9 rules are opt-in in Flake8.
     "B9",

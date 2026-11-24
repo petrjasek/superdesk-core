@@ -126,15 +126,14 @@ class TestStoreAsyncResultInWorker(AsyncFlaskTestCase):
         self.assertIn("Rendering failed", str(context.exception))
 
     async def test_list_and_falsy_results_are_stored(self):
+        @self.app.celery.task(store_async_result=True)
+        def value_task(value):
+            return value
+
         # ``get_result_async`` unwraps the stored list envelope, so these must come back unchanged
         for value in ([1, 2], [], 0, False, None, {"a": 1}):
             with self.subTest(value=value):
-
-                @self.app.celery.task(store_async_result=True, name=f"value_task_{type(value).__name__}")
-                def value_task():
-                    return value
-
-                task_id = await self._run_in_worker(value_task)
+                task_id = await self._run_in_worker(value_task, value)
                 result = await value_task.AsyncResult(task_id).get_result_async(max_timeout=5)
                 self.assertEqual(result, value)
 
