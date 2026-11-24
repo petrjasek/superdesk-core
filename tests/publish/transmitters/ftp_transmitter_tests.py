@@ -200,3 +200,36 @@ class FTPPublishServiceTestCase(TestCase):
 
         ftp_mock.upload_data.assert_any_call("5e448e47016d1f63a92f03b8.jpg", b"binary")
         ftp_mock.upload_data.assert_any_call("5e448dd1016d1f63a92f0393.png", b"binary")
+
+    @mock.patch("superdesk.publish.transmitters.ftp.ftp_connect", return_value=mock_ftp_connect())
+    @mock.patch("superdesk.storage.ProxyMediaStorage.get_async", mockGet)
+    async def test_publish_manifest_without_decoding_or_item_lookup(self, ftp_connect_mock):
+        service = FTPPublishService()
+        queue_item = {
+            "item_id": "someid",
+            "formatted_item": "<newsItem/>",
+            "encoded_item": b"<newsItem/>",
+            "destination": {"format": "newsmlg2", "config": {"push_associated": True, "file_extension": "xml"}},
+            "delivery_media": [{"media": "folder/image", "resource": "upload", "mimetype": "image/jpeg"}],
+        }
+        with mock.patch.object(service, "_get_published_item", side_effect=AssertionError("legacy lookup")):
+            await service._transmit(queue_item, subscriber={})
+
+        ftp_mock = ftp_connect_mock.return_value.ftp
+        ftp_mock.upload_data.assert_any_call("folder-image.jpg", b"binary")
+        filename, body = ftp_mock.upload_data.await_args_list[-1].args
+        self.assertEqual(filename, "someid--.xml")
+        self.assertEqual(body.getvalue(), b"<newsItem/>")
+
+    @mock.patch("superdesk.publish.transmitters.ftp.ftp_connect", return_value=mock_ftp_connect())
+    async def test_empty_manifest_does_not_use_legacy_lookup(self, ftp_connect_mock):
+        queue_item = {
+            "item_id": "someid",
+            "formatted_item": "<newsItem/>",
+            "destination": {"format": "newsmlg2", "config": {"push_associated": True}},
+            "delivery_media": [],
+        }
+        service = FTPPublishService()
+        with mock.patch.object(service, "_get_published_item", side_effect=AssertionError("legacy lookup")):
+            await service._transmit(queue_item, subscriber={})
+        self.assertEqual(ftp_connect_mock.return_value.ftp.upload_data.await_count, 1)

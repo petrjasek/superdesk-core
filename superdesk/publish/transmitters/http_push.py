@@ -84,9 +84,18 @@ class HTTPPushService(PublishService, AsyncHttpClientSessionMixin):
     """
 
     NAME = "HTTP Push"
+    include_embedded_package_media = True
+    include_associated_attachments = True
 
     headers = {"Content-type": "application/json", "Accept": "application/json"}
     hash_header = "x-superdesk-signature"
+
+    def supports_delivery_manifest(self, content_type: str | None) -> bool:
+        return bool(content_type)
+
+    def needs_delivery_media(self, config: dict) -> bool:
+        assets_url = config.get("assets_url")
+        return isinstance(assets_url, str) and bool(assets_url.strip())
 
     async def _transmit(self, queue_item, subscriber):
         """

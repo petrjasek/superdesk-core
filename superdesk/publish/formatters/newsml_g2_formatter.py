@@ -54,6 +54,7 @@ class NewsMLG2Formatter(Formatter):
     name = "NewsML G2"
     type = "newsmlg2"
     content_type = "application/xml"
+    media_from_source = True
     # Published_seq_num is used if format, so we can't use cache.
     use_cache = False
 

@@ -34,11 +34,11 @@ import json
 import superdesk
 import logging
 
-from typing import Awaitable, List, Literal, Sequence, Tuple, TypedDict
+from typing import List, Literal, Sequence, Tuple, TypedDict
 
 from superdesk.core import get_app_config
 from superdesk.resource_fields import VERSION
-from superdesk.publish.formatters import Formatter, FormatReturnType
+from superdesk.publish.formatters import DeliveryFormatItem, Formatter
 from superdesk.errors import FormatterError
 from superdesk.metadata.item import ITEM_TYPE, CONTENT_TYPE, EMBARGO, GUID_FIELD, ASSOCIATIONS
 from superdesk.metadata.packages import RESIDREF, GROUP_ID, GROUPS, ROOT_GROUP, REFS
@@ -180,16 +180,14 @@ class NINJSFormatter(Formatter):
         sequence, formatted, _ = await self._format_output(article, subscriber)
         return [(sequence, formatted)]
 
-    def format_for_delivery(
+    async def format_for_delivery(
         self, article: dict, subscriber: dict | None, codes: list | None = None
-    ) -> FormatReturnType | Awaitable[FormatReturnType]:
+    ) -> list[DeliveryFormatItem]:
         if type(self).format is not NINJSFormatter.format:
-            return self.format(article, subscriber, codes)
-        return self._format_for_delivery(article, subscriber)
-
-    async def _format_for_delivery(self, article: dict, subscriber: dict | None) -> FormatReturnType:
+            return await super().format_for_delivery(article, subscriber, codes)
         sequence, formatted, ninjs = await self._format_output(article, subscriber)
-        return [{"published_seq_num": sequence, "formatted_item": formatted, "media_item": ninjs}]
+        result: DeliveryFormatItem = {"published_seq_num": sequence, "formatted_item": formatted, "media_item": ninjs}
+        return [result]
 
     async def _format_output(self, article: dict, subscriber: dict | None) -> tuple[int, str, dict]:
         try:

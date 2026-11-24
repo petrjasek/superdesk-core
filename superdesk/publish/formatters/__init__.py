@@ -8,11 +8,13 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from typing import Awaitable
+from inspect import isawaitable
+from typing import Any, Awaitable, cast
 import logging
 
 from lxml import etree
 from typing import List, Type
+from typing_extensions import NotRequired, TypedDict
 from superdesk.metadata.item import ITEM_TYPE, CONTENT_TYPE, FORMATS, FORMAT
 from superdesk.etree import parse_html
 from superdesk.text_utils import get_text
@@ -21,7 +23,30 @@ formatters = []  # type: List[Type[Formatter]]
 
 logger = logging.getLogger(__name__)
 
+
+class DeliveryFormatItem(TypedDict):
+    published_seq_num: int
+    formatted_item: str
+    encoded_item: NotRequired[bytes | None]
+    media_item: NotRequired[dict[str, Any] | None]
+
+
 FormatReturnType = list[tuple[int, str] | dict]
+
+
+def normalize_format_items(items: FormatReturnType) -> list[DeliveryFormatItem]:
+    result: list[DeliveryFormatItem] = []
+    for item in items:
+        if isinstance(item, tuple):
+            sequence, formatted = item
+            result.append({"published_seq_num": sequence, "formatted_item": formatted})
+        elif isinstance(item, dict):
+            if "published_seq_num" not in item or "formatted_item" not in item:
+                raise RuntimeError("Invalid response from formatter")
+            result.append(cast(DeliveryFormatItem, item.copy()))
+        else:
+            raise RuntimeError("Invalid response from formatter")
+    return result
 
 
 class Formatter:
@@ -37,6 +62,8 @@ class Formatter:
     use_cache: bool = True
     #: MIME type of the formatted output, when known.
     content_type: str | None = None
+    #: Whether the source item can be used to select media when no media_item is returned.
+    media_from_source: bool = False
 
     can_preview: bool = False
     can_export: bool = False
@@ -67,11 +94,14 @@ class Formatter:
         """
         raise NotImplementedError()
 
-    def format_for_delivery(
+    async def format_for_delivery(
         self, article: dict, subscriber: dict | None, codes: list | None = None
-    ) -> FormatReturnType | Awaitable[FormatReturnType]:
-        """Format for the publish queue, optionally including a ``media_item`` in each result."""
-        return self.format(article, subscriber, codes)
+    ) -> list[DeliveryFormatItem]:
+        """Format for the publish queue, returning delivery items with optional selected media."""
+        items = self.format(article, subscriber, codes)
+        if isawaitable(items):
+            items = await items
+        return normalize_format_items(items)
 
     def export(self, article, subscriber, codes=None):
         """Formats the article and returns the output string for export"""

@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 class FTPNinjsFormatter(NINJSFormatter):
     name = "NINJS FTP"
     type = "ftp ninjs"
+    use_cache = False
 
     def __init__(self):
         super().__init__()

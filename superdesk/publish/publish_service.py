@@ -28,6 +28,16 @@ class PublishServiceBase:
     NAME: Optional[str] = None
     CONFIG: Dict[str, Any] = {}
     DEFAULT_EXT = "txt"
+    include_embedded_package_media = False
+    include_associated_attachments = False
+
+    def supports_delivery_manifest(self, content_type: str | None) -> bool:
+        """Return whether this transmitter can use a manifest for the selected output type."""
+        return False
+
+    def needs_delivery_media(self, config: dict) -> bool:
+        """Return whether this destination requires media to be included in the manifest."""
+        return False
 
     def _transmit(self, queue_item, subscriber):
         """Performs the publishing of the queued item. Implement in subclass

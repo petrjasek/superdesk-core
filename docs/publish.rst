@@ -535,24 +535,34 @@ Available core transmitters:
 .. autoclass:: HTTPPushService
 
 HTTP Push sends the encoded formatter output unchanged and signs the exact bytes sent.
-The publish queue stores the delivery MIME type and a manifest of media IDs, storage
-resources and MIME types, selected when the item is formatted. This keeps transmission
-independent of the payload format and preserves the selected media across retries.
+HTTP Push and FTP can use a publish-queue manifest of media IDs, storage resources and
+MIME types, selected when the item is formatted. Each transmitter's file providers
+determine which media are included. This keeps transmission independent of the
+payload format and preserves the selected media across retries.
 
 Formatters may declare a ``content_type`` attribute, inherited by subclasses; the
 NewsML and NITF formatters declare ``application/xml``. A destination's
 ``config.content_type`` overrides it. A formatter can override
-``format_for_delivery`` to return dictionaries containing ``published_seq_num``,
-``formatted_item``, optional ``encoded_item`` and ``media_item``. The latter is a
-structured representation used by the registered transmitter file providers; NINJS
-supplies its formatted representation to preserve its rendition filtering. Other
-formats use the source item and, for embedded packages, its package items.
+``format_for_delivery`` to return lists of ``DeliveryFormatItem`` dictionaries containing
+``published_seq_num``, ``formatted_item``, optional ``encoded_item`` and ``media_item``.
+``format_for_delivery`` is async and, by default, adapts the legacy tuple or dictionary
+results from synchronous or asynchronous ``format`` methods without changing their interface.
+The latter is an item-shaped representation used by the registered transmitter file
+providers; NINJS supplies its formatted representation to preserve rendition filtering.
+It takes precedence over source selection even when empty. Formatters that select media
+from the original item may instead set ``media_from_source = True``; this can include
+associated media not referenced in the formatted output. Formatters whose output or
+media selection depends on the subscriber or destination must set ``use_cache = False``.
+Transmitter implementations opt in through ``supports_delivery_manifest`` and
+``needs_delivery_media``. They can also opt in to associated attachments and embedded
+package media with ``include_associated_attachments`` and
+``include_embedded_package_media`` respectively.
 
-Existing queue entries, formatters without a MIME type and JSON formatters without
-``media_item`` (when assets are enabled) retain the legacy compatibility path. That
-path detects JSON and, for other formats, fetches the published item and version to
-discover media. Configure the MIME type and provide ``media_item`` where needed to
-use manifest-based delivery for custom formatters.
+Existing queue entries and formatters without a media representation retain the
+legacy compatibility path when media are requested. HTTP Push also uses that path
+when the MIME type is unknown. To enable manifest-based delivery for a custom formatter,
+declare its MIME type where needed and provide ``media_item`` or opt in to source-item
+media selection.
 
 .. autoclass:: FTPPublishService
 

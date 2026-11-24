@@ -38,6 +38,7 @@ class NITFFormatter(Formatter):
     type = "nitf"
     name = "NITF"
     content_type = "application/xml"
+    media_from_source = True
 
     _message_attrib = {"version": "-//IPTC//DTD NITF 3.6//EN"}
 

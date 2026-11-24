@@ -31,7 +31,7 @@ from superdesk.types.publish_queue import PublishMediaFile
 from superdesk.errors import SuperdeskPublishError, SuperdeskErrorWithNotifications
 from superdesk.publish_async.publish_cache import PublishCache
 from superdesk.publish_async.utils import generate_sequence_number, get_utc_schedule
-from superdesk.publish.formatters import Formatter, get_formatter
+from superdesk.publish.formatters import Formatter, get_formatter, normalize_format_items
 from superdesk.utc import utcnow
 from superdesk.lifecycle_timing import duration_ms, to_epoch_ms, duration_ms_from_epoch
 
@@ -219,13 +219,16 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
         """
 
         destination_config = destination.config or {}
-        is_http_push = destination.delivery_type == "http_push"
         delivery_content_type = destination_config.get("content_type") or formatter.content_type
-        assets_url = destination_config.get("assets_url")
-        has_assets = isinstance(assets_url, str) and bool(assets_url.strip())
+        transmitter = registered_transmitters.get(destination.delivery_type)
+        supports_manifest = getattr(transmitter, "supports_delivery_manifest", None)
+        use_manifest = callable(supports_manifest) and supports_manifest(delivery_content_type)
+        needs_media = bool(
+            use_manifest and transmitter is not None and transmitter.needs_delivery_media(destination_config)
+        )
         cache_context = formatter.name or formatter.__class__.__name__
-        if is_http_push:
-            cache_context = f"{cache_context}-http-push-{delivery_content_type}-{has_assets}"
+        if use_manifest and transmitter is not None:
+            cache_context = f"{cache_context}-{destination.delivery_type}-{delivery_content_type}-{needs_media}"
         cache_id = PublishCache.generate_cache_id("format-item", cache_context, request.item_id)
         # Only cache the formatted item if the Formatter supports it and the item is not a package
         # (as package associations can be different based on the subscriber permissions)
@@ -267,14 +270,18 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
             # this document.
 
             try:
-                format_item = formatter.format_for_delivery if is_http_push else formatter.format
-                formatted_items = format_item(
+                format_args = (
                     self.filter_item_fields(item) if embed_package_items else item.copy(),
                     subscriber_dict,
                     list(response.subscriber_codes.get(subscriber.id) or set()),
                 )
-                if isawaitable(formatted_items):
-                    formatted_items = await formatted_items
+                if use_manifest:
+                    formatted_items = await formatter.format_for_delivery(*format_args)
+                else:
+                    legacy_items = formatter.format(*format_args)
+                    if isawaitable(legacy_items):
+                        legacy_items = await legacy_items
+                    formatted_items = normalize_format_items(legacy_items)
             except Exception as error:
                 await self._record_format_error(
                     error, request, item, subscriber, response, destination, lifecycle_started_at, lifecycle_started_ms
@@ -283,31 +290,23 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
 
             had_delivery_errors = False
             for publish_data in formatted_items:
-                if isinstance(publish_data, tuple):
-                    pub_seq_num, formatted_doc = publish_data
-                    encoded_item = None
-                    media_item = None
-                elif isinstance(publish_data, dict):
-                    try:
-                        pub_seq_num = publish_data["published_seq_num"]
-                        formatted_doc = publish_data["formatted_item"]
-                        encoded_item = publish_data.get("encoded_item")
-                        media_item = publish_data.get("media_item")
-                    except KeyError:
-                        raise RuntimeError("Invalid response from formatter")
-                else:
-                    raise RuntimeError("Invalid response from formatter")
+                pub_seq_num = publish_data["published_seq_num"]
+                formatted_doc = publish_data["formatted_item"]
+                encoded_item = publish_data.get("encoded_item")
+                media_item = publish_data.get("media_item")
 
                 delivery_media = None
-                if is_http_push and delivery_content_type:
-                    is_json = delivery_content_type.split(";", 1)[0].strip().lower() == "application/json"
-                    if not has_assets or not is_json or media_item is not None:
+                if use_manifest and transmitter is not None:
+                    if not needs_media or media_item is not None or formatter.media_from_source:
                         delivery_media = []
-                        if has_assets:
+                        if needs_media:
                             try:
                                 delivery_media = await self._get_delivery_media(
                                     media_item if media_item is not None else item,
-                                    embed_package_items and media_item is None,
+                                    embed_package_items
+                                    and media_item is None
+                                    and transmitter.include_embedded_package_media,
+                                    transmitter.NAME or destination.delivery_type,
                                 )
                             except Exception as error:
                                 had_delivery_errors = True
@@ -339,7 +338,7 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
                     encoded_item,
                     lifecycle_started_at=lifecycle_started_at,
                     lifecycle_started_ms=lifecycle_started_ms,
-                    delivery_content_type=delivery_content_type if is_http_push else None,
+                    delivery_content_type=delivery_content_type if use_manifest else None,
                     delivery_media=delivery_media,
                 )
 
@@ -454,7 +453,9 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
 
         return publish_queue_item
 
-    async def _get_delivery_media(self, item: dict, include_package_items: bool) -> list[PublishMediaFile]:
+    async def _get_delivery_media(
+        self, item: dict, include_package_items: bool, transmitter_name: str
+    ) -> list[PublishMediaFile]:
         sources = [item]
         if include_package_items:
             sources.extend(
@@ -465,25 +466,20 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
             )
 
         files = {}
-        transmitter_name = registered_transmitters["http_push"].NAME
         for source in sources:
             source = deepcopy(source)
-            await self._resolve_delivery_attachments(source)
+            await self._resolve_delivery_attachments(source, transmitter_name)
             files.update(get_transmitter_files(transmitter_name, source))
         return [
             {"media": str(media_id), "resource": entry.get("resource", "upload"), "mimetype": entry.get("mimetype")}
             for media_id, entry in files.items()
         ]
 
-    async def _resolve_delivery_attachments(self, item: dict) -> None:
-        items = [item]
-        for association in (item.get(ASSOCIATIONS) or {}).values():
-            if association is not None:
-                items.append(association)
-                items.extend(child for child in (association.get(ASSOCIATIONS) or {}).values() if child is not None)
+    async def _resolve_delivery_attachments(self, item: dict, transmitter_name: str) -> None:
+        from superdesk.publish.transmitters.file_providers.attachments import iter_attachment_sources
 
         attachments_service = None
-        for source in items:
+        for source in iter_attachment_sources(transmitter_name, item):
             attachments = source.get("attachments")
             if not attachments:
                 continue
