@@ -14,6 +14,7 @@ import os
 import hmac
 import json
 import re
+import unittest
 import aiohttp
 from aioresponses import aioresponses
 from yarl import URL
@@ -27,6 +28,218 @@ from superdesk.publish.transmitters.http_push import HTTPPushService
 from unittest import mock
 from superdesk.errors import PublishHTTPPushServerError, PublishHTTPPushClientError
 from superdesk.tests import TestCase
+
+
+class HTTPPushFormatTestCase(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.service = HTTPPushService()
+        self.destination = {
+            "format": "newsmlg2",
+            "config": {"resource_url": "http://example.com/push", "secret_token": "secret"},
+        }
+        self.item = {
+            "item_id": "item1",
+            "item_version": 2,
+            "destination": self.destination,
+            "formatted_item": '<?xml version="1.0"?><item>caf\u00e9</item>',
+        }
+        self.item["encoded_item"] = self.item["formatted_item"].encode("utf-8")
+
+    async def test_xml_is_sent_unchanged_and_signed(self):
+        self.item.update(delivery_content_type="application/xml", delivery_media=[])
+        with aioresponses() as http_mock:
+            http_mock.post("http://example.com/push", status=201)
+            async with aiohttp.ClientSession() as session:
+                with mock.patch.object(self.service, "http_session", mock.AsyncMock(return_value=session)):
+                    await self.service._transmit(self.item, {})
+
+            request = http_mock.requests[("POST", URL("http://example.com/push"))][0]
+            body = request.kwargs["data"]
+            headers = request.kwargs["headers"]
+            self.assertEqual(body, self.item["encoded_item"])
+            self.assertEqual(headers["Content-type"], "application/xml")
+            self.assertEqual(headers["x-superdesk-signature"], "sha1=" + hmac.new(b"secret", body, "sha1").hexdigest())
+
+    async def test_manifest_delivery_does_not_decode_or_reserialize_json(self):
+        self.item.update(
+            formatted_item='{"headline":"café"}',
+            encoded_item=b'{"headline":"caf\xc3\xa9"}',
+            delivery_content_type="application/json",
+            delivery_media=[],
+        )
+        with (
+            mock.patch("superdesk.publish.transmitters.http_push.json.loads", side_effect=AssertionError("decoded")),
+            mock.patch("superdesk.publish.transmitters.http_push.get_resource_service") as get_service,
+            mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push,
+        ):
+            await self.service._transmit(self.item, {})
+
+        get_service.assert_not_called()
+        push.assert_awaited_once_with(
+            self.destination,
+            b'{"headline":"caf\xc3\xa9"}',
+            {"Content-type": "application/json", "Accept": "application/json"},
+        )
+
+    async def test_manifest_uploads_media_without_looking_up_item(self):
+        self.destination["config"]["assets_url"] = "http://example.com/assets"
+        self.item.update(
+            delivery_content_type="application/xml",
+            delivery_media=[{"media": "image", "resource": "upload", "mimetype": "image/jpeg"}],
+        )
+        app = mock.Mock()
+        with (
+            mock.patch("superdesk.publish.transmitters.http_push.get_resource_service") as get_service,
+            mock.patch("superdesk.publish.transmitters.http_push.get_current_app", return_value=app),
+            mock.patch.object(self.service, "_media_exists", new_callable=mock.AsyncMock, return_value=False),
+            mock.patch.object(self.service, "_transmit_media", new_callable=mock.AsyncMock) as transmit_media,
+            mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push,
+        ):
+            await self.service._transmit(self.item, {})
+
+        get_service.assert_not_called()
+        app.media.get.assert_called_once_with("image", resource="upload")
+        transmit_media.assert_awaited_once_with(app.media.get.return_value, self.destination, exists=False)
+        push.assert_awaited_once()
+
+    async def test_custom_xml_formatter_inherits_content_type(self):
+        from superdesk.publish.formatters.newsml_g2_formatter import NewsMLG2Formatter
+
+        with mock.patch("superdesk.publish.formatters.formatters", []) as formatters, mock.patch(
+            "superdesk.publish.transmitters.http_push.formatters", formatters
+        ):
+
+            class CustomFormatter(NewsMLG2Formatter):
+                type = "custom-newsml"
+
+            self.destination["format"] = "custom-newsml"
+            with mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push:
+                await self.service._transmit(self.item, {})
+
+        assert push.await_args is not None
+        self.assertEqual(push.await_args.args[2]["Content-type"], "application/xml")
+
+    async def test_binary_and_configured_content_type_are_not_parsed_as_json(self):
+        self.destination["format"] = "idml"
+        self.destination["config"]["content_type"] = "application/vnd.example"
+        self.item["formatted_item"] = '{"not": "the binary"}'
+        self.item["encoded_item"] = b"\x00\xffbinary"
+        with mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push:
+            await self.service._transmit(self.item, {})
+
+        assert push.await_args is not None
+        self.assertEqual(push.await_args.args[1], b"\x00\xffbinary")
+        self.assertEqual(push.await_args.args[2]["Content-type"], "application/vnd.example")
+
+    async def test_unknown_format_uses_opaque_output(self):
+        self.destination["format"] = "custom"
+        self.item["encoded_item"] = b"plain text"
+        with mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push:
+            await self.service._transmit(self.item, {})
+
+        push.assert_awaited_once_with(
+            self.destination,
+            b"plain text",
+            {"Content-type": "application/octet-stream", "Accept": "*/*"},
+        )
+
+    async def test_transmit_uses_stored_encoded_formatter_output(self):
+        self.destination["format"] = "idml"
+        self.item.update(
+            subscriber_id="subscriber",
+            formatted_item="",
+            encoded_item_id="stored",
+            delivery_content_type="application/octet-stream",
+            delivery_media=[],
+        )
+        subscriber = mock.Mock(is_active=True)
+        subscriber_service = mock.Mock(find_by_id=mock.AsyncMock(return_value=subscriber))
+        stored_file = mock.Mock(to_bytes=mock.AsyncMock(return_value=b"\x00\xffbinary"))
+        app = mock.Mock()
+        app.storage.get_async = mock.AsyncMock(return_value=stored_file)
+        with (
+            mock.patch(
+                "superdesk.publish.publish_service.SubscribersResource.get_service", return_value=subscriber_service
+            ),
+            mock.patch("superdesk.publish.publish_service.get_current_app", return_value=app),
+            mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push,
+        ):
+            await self.service.transmit(self.item)
+
+        app.storage.get_async.assert_awaited_once_with("stored")
+        push.assert_awaited_once_with(
+            self.destination,
+            b"\x00\xffbinary",
+            {"Content-type": "application/octet-stream", "Accept": "*/*"},
+        )
+
+    async def test_json_retains_existing_serialization_and_media_source(self):
+        self.destination["format"] = "ninjs"
+        self.item["formatted_item"] = '{"headline":"caf\\u00e9"}'
+        self.item["encoded_item"] = b"ignored"
+        with (
+            mock.patch.object(self.service, "_copy_published_media_files", new_callable=mock.AsyncMock) as copy_media,
+            mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push,
+        ):
+            await self.service._transmit(self.item, {})
+
+        copy_media.assert_awaited_once_with({"headline": "caf\u00e9"}, self.destination)
+        push.assert_awaited_once_with(self.destination, '{"headline": "caf\\u00e9"}', self.service.headers)
+
+    async def test_xml_assets_use_published_version_and_skip_empty_renditions(self):
+        self.destination["config"]["assets_url"] = "http://example.com/assets"
+        published = {
+            "associations": {
+                "picture": {"renditions": {"original": {"media": "image", "mimetype": "image/jpeg"}, "crop": None}},
+                "empty": None,
+            }
+        }
+        published_service = mock.Mock(find_one_async=mock.AsyncMock(return_value=published))
+        app = mock.Mock()
+        with (
+            mock.patch("superdesk.publish.transmitters.http_push.get_resource_service", return_value=published_service),
+            mock.patch("superdesk.publish.transmitters.http_push.get_current_app", return_value=app),
+            mock.patch.object(self.service, "_media_exists", new_callable=mock.AsyncMock, return_value=False),
+            mock.patch.object(self.service, "_transmit_media", new_callable=mock.AsyncMock) as transmit_media,
+            mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push,
+        ):
+            await self.service._transmit(self.item, {})
+
+        published_service.find_one_async.assert_awaited_once_with(req=None, item_id="item1", _current_version=2)
+        app.media.get.assert_called_once_with("image", resource="upload")
+        transmit_media.assert_awaited_once_with(app.media.get.return_value, self.destination, exists=False)
+        push.assert_awaited_once()
+
+    async def test_missing_published_item_fails_instead_of_skipping_assets(self):
+        self.destination["config"]["assets_url"] = "http://example.com/assets"
+        published_service = mock.Mock(find_one_async=mock.AsyncMock(return_value=None))
+        with (
+            mock.patch("superdesk.publish.transmitters.http_push.get_resource_service", return_value=published_service),
+            mock.patch("superdesk.errors.notifications_enabled", return_value=False),
+            mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push,
+        ):
+            with self.assertRaises(PublishHTTPPushServerError) as raised:
+                await self.service._transmit(self.item, {})
+
+        self.assertIn("item1 version 2 not found", str(raised.exception.system_exception))
+        push.assert_not_awaited()
+
+    async def test_packaged_item_does_not_post(self):
+        self.destination["config"]["packaged"] = True
+        self.item["published_in_package"] = "package"
+        with mock.patch.object(self.service, "_push_item", new_callable=mock.AsyncMock) as push:
+            await self.service._transmit(self.item, {})
+        push.assert_not_awaited()
+
+    async def test_xml_http_errors_keep_client_and_server_classification(self):
+        with mock.patch("superdesk.errors.notifications_enabled", return_value=False):
+            for status, error in ((403, PublishHTTPPushClientError), (503, PublishHTTPPushServerError)):
+                with self.subTest(status=status), aioresponses() as http_mock:
+                    http_mock.post("http://example.com/push", status=status)
+                    async with aiohttp.ClientSession() as session:
+                        with mock.patch.object(self.service, "http_session", mock.AsyncMock(return_value=session)):
+                            with self.assertRaises(error):
+                                await self.service._transmit(self.item, {})
 
 
 def get_fixture(fixture):
@@ -242,6 +455,53 @@ class HTTPPushServiceTestCase(TestCase):
 
                 for media in images:
                     http_mock.assert_called_with(f"http://example.com/{media}", method="GET")
+
+    async def test_push_xml_with_published_media(self):
+        self.app.data.insert(
+            "published",
+            [
+                {"item_id": "item1", "_current_version": 1, "renditions": {"original": {"media": "old-image"}}},
+                {
+                    "item_id": "item1",
+                    "_current_version": 2,
+                    "renditions": {
+                        "original": {"media": "media-id", "mimetype": "text/plain"},
+                        "crop": None,
+                    },
+                },
+            ],
+        )
+        destination = {
+            "format": "newsmlg2",
+            "config": {"resource_url": "http://example.com/push", "assets_url": "http://example.com/assets"},
+        }
+        queue_item = {
+            "item_id": "item1",
+            "item_version": 2,
+            "formatted_item": "<newsItem/>",
+            "encoded_item": b"<newsItem/>",
+            "destination": destination,
+        }
+        with (
+            aioresponses(passthrough=[self.app.config["ELASTICSEARCH_URL"]]) as http_mock,
+            mock.patch.object(self.app.media, "get", return_value=TestMedia(b"binary")),
+        ):
+            http_mock.get("http://example.com/assets/media-id", status=404)
+            http_mock.post("http://example.com/assets", status=201)
+            http_mock.post("http://example.com/push", status=201)
+
+            await HTTPPushService()._transmit(queue_item, {})
+
+        self.assertEqual(
+            list(http_mock.requests),
+            [
+                ("GET", URL("http://example.com/assets/media-id")),
+                ("POST", URL("http://example.com/assets")),
+                ("POST", URL("http://example.com/push")),
+            ],
+        )
+        request = http_mock.requests[("POST", URL("http://example.com/push"))][0]
+        self.assertEqual(request.kwargs["data"], b"<newsItem/>")
 
     async def test_push_attachments(self):
         test_file = TestMedia(b"bin")

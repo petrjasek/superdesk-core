@@ -1,11 +1,18 @@
 from typing import Annotated
 from enum import Enum, unique
 from datetime import datetime
+from typing_extensions import TypedDict
 
 from superdesk.core.resources import ResourceModelWithObjectId, fields
 from superdesk.core.resources.validators import validate_data_relation_async
 from superdesk.default_settings import ExchangeConfig
 from .subscribers import SubscriberDestination
+
+
+class PublishMediaFile(TypedDict):
+    media: str
+    resource: str
+    mimetype: str | None
 
 
 @unique
@@ -30,6 +37,8 @@ class PublishQueueResource(ResourceModelWithObjectId):
     state: PublishQueueState | None = None  # If None, will allow the resource service to choose the state
     item_encoding: str | None = None
     encoded_item_id: str | fields.ObjectId | None = None
+    delivery_content_type: str | None = None
+    delivery_media: list[PublishMediaFile] | None = None
 
     subscriber_id: Annotated[fields.ObjectId, validate_data_relation_async("subscribers")]
 

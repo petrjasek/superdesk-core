@@ -72,6 +72,13 @@ def register_transmitter_file_provider(provider: TransmitterFileProvider):
     registered_transmitter_file_providers.append(provider)
 
 
+def get_transmitter_files(transmitter_name: str, item: Dict[str, Any]) -> Dict[str, TransmitterFileEntry]:
+    media: Dict[str, TransmitterFileEntry] = {}
+    for provider in registered_transmitter_file_providers:
+        media.update(provider(transmitter_name, item))
+    return media
+
+
 def init_app(app) -> None:
     # XXX: we need to do imports for transmitters and formatters here
     #      so classes creation is done after PublishService is set

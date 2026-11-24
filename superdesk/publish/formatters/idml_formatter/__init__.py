@@ -15,6 +15,7 @@ class IDMLFormatter(Formatter):
 
     name = "Adobe InDesign (IDML)"
     type = "idml"
+    content_type = "application/octet-stream"
 
     def __init__(self):
         # works with python 3.6

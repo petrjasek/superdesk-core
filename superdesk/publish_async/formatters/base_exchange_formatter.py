@@ -9,6 +9,7 @@ from bson import ObjectId
 from quart_babel import gettext
 
 from superdesk.core import get_current_app
+from superdesk.attachments import get_attachment_public_url
 
 from superdesk.types import (
     PublishExchangeFormatter,
@@ -25,7 +26,8 @@ from superdesk import get_resource_service
 from superdesk.resource_fields import ID_FIELD, ITEM_TYPE, ASSOCIATIONS, VERSION
 from superdesk.metadata.item import PUBLISH_SCHEDULE, CONTENT_TYPE, INGEST_ID
 from superdesk.metadata.packages import GROUPS, GROUP_ID, REFS, RESIDREF, ROOT_GROUP
-from superdesk.publish import PUBLISHED_IN_PACKAGE
+from superdesk.publish import PUBLISHED_IN_PACKAGE, get_transmitter_files, registered_transmitters
+from superdesk.types.publish_queue import PublishMediaFile
 from superdesk.errors import SuperdeskPublishError, SuperdeskErrorWithNotifications
 from superdesk.publish_async.publish_cache import PublishCache
 from superdesk.publish_async.utils import generate_sequence_number, get_utc_schedule
@@ -216,9 +218,15 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
         :raises RuntimeError: Raised if the formatter returns an unexpected response.
         """
 
-        cache_id = PublishCache.generate_cache_id(
-            "format-item", formatter.name or formatter.__class__.__name__, request.item_id
-        )
+        destination_config = destination.config or {}
+        is_http_push = destination.delivery_type == "http_push"
+        delivery_content_type = destination_config.get("content_type") or formatter.content_type
+        assets_url = destination_config.get("assets_url")
+        has_assets = isinstance(assets_url, str) and bool(assets_url.strip())
+        cache_context = formatter.name or formatter.__class__.__name__
+        if is_http_push:
+            cache_context = f"{cache_context}-http-push-{delivery_content_type}-{has_assets}"
+        cache_id = PublishCache.generate_cache_id("format-item", cache_context, request.item_id)
         # Only cache the formatted item if the Formatter supports it and the item is not a package
         # (as package associations can be different based on the subscriber permissions)
         use_cache = formatter.use_cache and request.item_type != CONTENT_TYPE.COMPOSITE
@@ -259,7 +267,8 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
             # this document.
 
             try:
-                formatted_items = formatter.format(
+                format_item = formatter.format_for_delivery if is_http_push else formatter.format
+                formatted_items = format_item(
                     self.filter_item_fields(item) if embed_package_items else item.copy(),
                     subscriber_dict,
                     list(response.subscriber_codes.get(subscriber.id) or set()),
@@ -267,51 +276,52 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
                 if isawaitable(formatted_items):
                     formatted_items = await formatted_items
             except Exception as error:
-                logger.exception(
-                    "Failed to format item for subscriber destination",
-                    extra=dict(
-                        item_id=request.item_id,
-                        item_headline=item.get("headline"),
-                        subscriber_name=subscriber.name,
-                        destination_id=destination._id,
-                        destination_name=destination.name,
-                    ),
+                await self._record_format_error(
+                    error, request, item, subscriber, response, destination, lifecycle_started_at, lifecycle_started_ms
                 )
-                await self._create_publish_queue_item(
-                    request,
-                    item,
-                    subscriber,
-                    response,
-                    destination,
-                    "",
-                    PublishQueueState.ERROR,
-                    0,
-                    None,
-                    str(error),
-                    lifecycle_started_at,
-                    lifecycle_started_ms,
-                )
-
-                if isinstance(error, SuperdeskErrorWithNotifications):
-                    # Make sure to send email notifications if the error is designed for it
-                    # (Exception class makes sure that the email will only get sent once)
-                    await error.send_notifications()
-
                 return []
 
+            had_delivery_errors = False
             for publish_data in formatted_items:
                 if isinstance(publish_data, tuple):
                     pub_seq_num, formatted_doc = publish_data
                     encoded_item = None
+                    media_item = None
                 elif isinstance(publish_data, dict):
                     try:
                         pub_seq_num = publish_data["published_seq_num"]
                         formatted_doc = publish_data["formatted_item"]
                         encoded_item = publish_data.get("encoded_item")
+                        media_item = publish_data.get("media_item")
                     except KeyError:
                         raise RuntimeError("Invalid response from formatter")
                 else:
                     raise RuntimeError("Invalid response from formatter")
+
+                delivery_media = None
+                if is_http_push and delivery_content_type:
+                    is_json = delivery_content_type.split(";", 1)[0].strip().lower() == "application/json"
+                    if not has_assets or not is_json or media_item is not None:
+                        delivery_media = []
+                        if has_assets:
+                            try:
+                                delivery_media = await self._get_delivery_media(
+                                    media_item if media_item is not None else item,
+                                    embed_package_items and media_item is None,
+                                )
+                            except Exception as error:
+                                had_delivery_errors = True
+                                await self._record_format_error(
+                                    error,
+                                    request,
+                                    item,
+                                    subscriber,
+                                    response,
+                                    destination,
+                                    lifecycle_started_at,
+                                    lifecycle_started_ms,
+                                )
+                                continue
 
                 publish_queue_item = await self._create_publish_queue_item(
                     request,
@@ -329,14 +339,54 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
                     encoded_item,
                     lifecycle_started_at=lifecycle_started_at,
                     lifecycle_started_ms=lifecycle_started_ms,
+                    delivery_content_type=delivery_content_type if is_http_push else None,
+                    delivery_media=delivery_media,
                 )
 
                 tasks.append(publish_queue_item)
 
-            if use_cache:
+            if use_cache and not had_delivery_errors:
                 task_cache[cache_id] = tasks
 
         return tasks
+
+    async def _record_format_error(
+        self,
+        error: Exception,
+        request: PublishRequest,
+        item: dict,
+        subscriber: SubscribersResource,
+        response: PublishRequestResponse,
+        destination: SubscriberDestination,
+        lifecycle_started_at: datetime | None,
+        lifecycle_started_ms: int | None,
+    ) -> None:
+        logger.exception(
+            "Failed to format item or prepare delivery media for subscriber destination",
+            extra=dict(
+                item_id=request.item_id,
+                item_headline=item.get("headline"),
+                subscriber_name=subscriber.name,
+                destination_id=destination._id,
+                destination_name=destination.name,
+            ),
+        )
+        await self._create_publish_queue_item(
+            request,
+            item,
+            subscriber,
+            response,
+            destination,
+            "",
+            PublishQueueState.ERROR,
+            0,
+            None,
+            str(error),
+            lifecycle_started_at,
+            lifecycle_started_ms,
+        )
+        if isinstance(error, SuperdeskErrorWithNotifications):
+            await error.send_notifications()
 
     async def _create_publish_queue_item(
         self,
@@ -352,6 +402,8 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
         error_message: str | None = None,
         lifecycle_started_at: datetime | None = None,
         lifecycle_started_ms: int | None = None,
+        delivery_content_type: str | None = None,
+        delivery_media: list[PublishMediaFile] | None = None,
     ) -> PublishQueueResource:
         if lifecycle_started_ms is None and lifecycle_started_at:
             lifecycle_started_ms = to_epoch_ms(lifecycle_started_at)
@@ -364,6 +416,8 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
             publishing_action=request.published_state,
             item_version=item[VERSION],
             formatted_item=formatted_doc,
+            delivery_content_type=delivery_content_type,
+            delivery_media=delivery_media,
             published_in_package=item.get(PUBLISHED_IN_PACKAGE, None),
             publish_schedule=get_utc_schedule(item, PUBLISH_SCHEDULE) or None,
             unique_name=item.get("unique_name", None),
@@ -399,6 +453,54 @@ class BasePublishExchangeFormatter(PublishExchangeFormatter):
         await PublishQueueResource.get_service().create([publish_queue_item])
 
         return publish_queue_item
+
+    async def _get_delivery_media(self, item: dict, include_package_items: bool) -> list[PublishMediaFile]:
+        sources = [item]
+        if include_package_items:
+            sources.extend(
+                ref["package_item"]
+                for group in item.get(GROUPS, [])
+                for ref in group.get(REFS, [])
+                if ref.get("package_item")
+            )
+
+        files = {}
+        transmitter_name = registered_transmitters["http_push"].NAME
+        for source in sources:
+            source = deepcopy(source)
+            await self._resolve_delivery_attachments(source)
+            files.update(get_transmitter_files(transmitter_name, source))
+        return [
+            {"media": str(media_id), "resource": entry.get("resource", "upload"), "mimetype": entry.get("mimetype")}
+            for media_id, entry in files.items()
+        ]
+
+    async def _resolve_delivery_attachments(self, item: dict) -> None:
+        items = [item]
+        for association in (item.get(ASSOCIATIONS) or {}).values():
+            if association is not None:
+                items.append(association)
+                items.extend(child for child in (association.get(ASSOCIATIONS) or {}).values() if child is not None)
+
+        attachments_service = None
+        for source in items:
+            attachments = source.get("attachments")
+            if not attachments:
+                continue
+            resolved = []
+            for attachment in attachments:
+                if "attachment" not in attachment:
+                    resolved.append(attachment)
+                    continue
+                if attachments_service is None:
+                    attachments_service = cast(Any, get_resource_service("attachments"))
+                attachment_id = attachment["attachment"]
+                document = await attachments_service.find_one_async(req=None, _id=attachment_id)
+                if document is None:
+                    raise ValueError(f"Attachment {attachment_id} not found")
+                if await get_attachment_public_url(document):
+                    resolved.append({"media": document["media"], "mimetype": document["mimetype"]})
+            source["attachments"] = resolved
 
     def _populate_content_api_completion_timing(
         self,

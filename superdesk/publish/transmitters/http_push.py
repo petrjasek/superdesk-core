@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from typing import Never
+from typing import Never, cast
 import json
 import hmac
 import logging
@@ -18,9 +18,12 @@ from contextlib import asynccontextmanager
 
 import aiohttp
 
+from superdesk import get_resource_service
 from superdesk.core import get_current_app, get_config
 from superdesk.core.web import AsyncHttpClientSessionMixin
-from superdesk.publish import register_transmitter, registered_transmitter_file_providers
+from superdesk.eve_async import AsyncBaseService
+from superdesk.publish import get_transmitter_files, register_transmitter
+from superdesk.publish.formatters import formatters
 
 from superdesk.errors import PublishHTTPPushError, PublishHTTPPushServerError, PublishHTTPPushClientError
 from superdesk.publish import PUBLISHED_IN_PACKAGE
@@ -74,8 +77,10 @@ class HTTPPushService(PublishService, AsyncHttpClientSessionMixin):
         metadata extracted from binary. Differs based on binary type, eg. could be exif for pictures.
 
     The response status code is checked - on success it should be ``201 Created``.
+    The destination's ``content_type`` config overrides the formatter's MIME type.
+    Unknown non-JSON formats default to ``application/octet-stream``.
     If secret_token is set for destination the x-superdesk-signature header will be added
-    for both json and multipart POST requests.
+    for both item and multipart POST requests.
     """
 
     NAME = "HTTP Push"
@@ -87,13 +92,79 @@ class HTTPPushService(PublishService, AsyncHttpClientSessionMixin):
         """
         @see: PublishService._transmit
         """
-        item = json.loads(queue_item["formatted_item"])
+        media = queue_item.get("delivery_media")
+        if media is None:
+            await self._transmit_legacy(queue_item)
+            return
+
         destination = queue_item.get("destination", {})
+        config = destination.get("config") or {}
+        content_type = queue_item.get("delivery_content_type")
+        if not content_type:
+            await self._raise_publish_error(500, Exception("HTTP Push delivery content type is missing"), destination)
 
-        await self._copy_published_media_files(json.loads(queue_item["formatted_item"]), destination)
+        await self._copy_media_files(media, destination)
+        if not queue_item.get(PUBLISHED_IN_PACKAGE) or not config.get("packaged", False):
+            data = queue_item.get("encoded_item")
+            if data is None:
+                data = queue_item["formatted_item"].encode(queue_item.get("item_encoding") or "utf-8")
+            accept = (
+                "application/json" if content_type.split(";", 1)[0].strip().lower() == "application/json" else "*/*"
+            )
+            await self._push_item(destination, data, {"Content-type": content_type, "Accept": accept})
 
-        if not queue_item.get(PUBLISHED_IN_PACKAGE) or not destination.get("config", {}).get("packaged", False):
-            await self._push_item(destination, json.dumps(item))
+    async def _transmit_legacy(self, queue_item):
+        destination = queue_item.get("destination", {})
+        config = destination.get("config") or {}
+        content_type = config.get("content_type")
+        if not content_type:
+            content_type = next(
+                (
+                    formatter.content_type
+                    for formatter in formatters
+                    if getattr(formatter, "type", None) == destination.get("format")
+                ),
+                None,
+            )
+
+        item = None
+        is_json = False
+        if content_type is None or content_type.split(";", 1)[0].strip().lower() == "application/json":
+            try:
+                item = json.loads(queue_item["formatted_item"])
+                is_json = True
+            except json.JSONDecodeError:
+                if content_type is not None:
+                    raise
+
+        if is_json:
+            await self._copy_published_media_files(item, destination)
+            data = json.dumps(item)
+            headers = self.headers if not config.get("content_type") else {**self.headers, "Content-type": content_type}
+        else:
+            assets_url = self._get_assets_url(destination)
+            if isinstance(assets_url, str) and assets_url.strip():
+                published_service = cast(AsyncBaseService, get_resource_service("published"))
+                item = await published_service.find_one_async(
+                    req=None, item_id=queue_item["item_id"], _current_version=queue_item["item_version"]
+                )
+                if item is None:
+                    await self._raise_publish_error(
+                        500,
+                        Exception(
+                            f"Published item {queue_item['item_id']} version {queue_item['item_version']} not found"
+                        ),
+                        destination,
+                    )
+                await self._copy_published_media_files(item, destination)
+
+            data = queue_item.get("encoded_item")
+            if data is None:
+                data = queue_item["formatted_item"].encode(queue_item.get("item_encoding") or "utf-8")
+            headers = {"Content-type": content_type or "application/octet-stream", "Accept": "*/*"}
+
+        if not queue_item.get(PUBLISHED_IN_PACKAGE) or not config.get("packaged", False):
+            await self._push_item(destination, data, headers)
 
     @classmethod
     def _create_http_session(cls) -> aiohttp.ClientSession:
@@ -128,9 +199,11 @@ class HTTPPushService(PublishService, AsyncHttpClientSessionMixin):
         logger.exception(message)
         await self._raise_publish_error(500, Exception(message), destination)
 
-    async def _push_item(self, destination, data):
+    async def _push_item(self, destination, data, current_headers=None):
         resource_url = self._get_resource_url(destination)
-        headers = await self._get_headers(data, destination, self.headers)
+        headers = await self._get_headers(
+            data, destination, current_headers if current_headers is not None else self.headers
+        )
         async with self._post(destination, resource_url, headers, data):
             pass
 
@@ -148,12 +221,22 @@ class HTTPPushService(PublishService, AsyncHttpClientSessionMixin):
         if not (isinstance(assets_url, str) and assets_url.strip()):
             return
 
-        media = {}
-        for get_files in registered_transmitter_file_providers:
-            media.update(get_files(self.NAME, item))
+        media = get_transmitter_files(self.NAME, item)
+        await self._copy_media_files(
+            [
+                {"media": media_id, "resource": rendition.get("resource", "upload")}
+                for media_id, rendition in media.items()
+            ],
+            destination,
+        )
 
+    async def _copy_media_files(self, media, destination):
+        assets_url = self._get_assets_url(destination)
+        if not (isinstance(assets_url, str) and assets_url.strip()) or not media:
+            return
         app = get_current_app()
-        for media_id, rendition in media.items():
+        for rendition in media:
+            media_id = rendition["media"]
             if not await self._media_exists(media_id, destination):
                 binary = app.media.get(media_id, resource=rendition.get("resource", "upload"))
                 await self._transmit_media(binary, destination, exists=False)

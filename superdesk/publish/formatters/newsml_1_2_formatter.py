@@ -51,6 +51,7 @@ class NewsML12Formatter(Formatter):
 
     name = "NewsML 1.2"
     type = "newsml12"
+    content_type = "application/xml"
 
     async def format(
         self, article: dict, subscriber: dict | None, codes: list | None = None

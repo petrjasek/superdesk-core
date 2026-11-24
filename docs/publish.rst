@@ -534,6 +534,26 @@ Available core transmitters:
 
 .. autoclass:: HTTPPushService
 
+HTTP Push sends the encoded formatter output unchanged and signs the exact bytes sent.
+The publish queue stores the delivery MIME type and a manifest of media IDs, storage
+resources and MIME types, selected when the item is formatted. This keeps transmission
+independent of the payload format and preserves the selected media across retries.
+
+Formatters may declare a ``content_type`` attribute, inherited by subclasses; the
+NewsML and NITF formatters declare ``application/xml``. A destination's
+``config.content_type`` overrides it. A formatter can override
+``format_for_delivery`` to return dictionaries containing ``published_seq_num``,
+``formatted_item``, optional ``encoded_item`` and ``media_item``. The latter is a
+structured representation used by the registered transmitter file providers; NINJS
+supplies its formatted representation to preserve its rendition filtering. Other
+formats use the source item and, for embedded packages, its package items.
+
+Existing queue entries, formatters without a MIME type and JSON formatters without
+``media_item`` (when assets are enabled) retain the legacy compatibility path. That
+path detects JSON and, for other formats, fetches the published item and version to
+discover media. Configure the MIME type and provide ``media_item`` where needed to
+use manifest-based delivery for custom formatters.
+
 .. autoclass:: FTPPublishService
 
 .. autoclass:: FilePublishService

@@ -28,6 +28,8 @@ def parse_media(media: Dict[str, TransmitterFileEntry], item: Dict[str, Any], re
     for key, rendition in (item.get("renditions") or {}).items():
         if len(renditions_filter) and key not in renditions_filter:
             continue
+        elif rendition is None:
+            continue
         elif not rendition.get("media"):
             guid = item["guid"]
             logger.warning(f"media missing on rendition {key} of item {guid}")

@@ -15,6 +15,7 @@ from superdesk.types import (
 )
 from superdesk.publish_async.formatters import BasePublishExchangeFormatter
 from superdesk.publish.formatters import Formatter, NINJS2Formatter, FormatReturnType
+from superdesk.publish.transmitters.http_push import HTTPPushService
 from superdesk.metadata.item import INGEST_ID
 from superdesk import get_resource_service
 from superdesk.lifecycle_timing import to_epoch_ms
@@ -27,6 +28,23 @@ class MockFormatter(Formatter):
 
     async def format(self, article: dict, subscriber: dict | None, codes: list | None = None) -> FormatReturnType:
         raise Exception("Mock formatter failed")
+
+
+class MockXMLFormatter(Formatter):
+    type = "mock-xml"
+    name = "Mock XML"
+    content_type = "application/xml"
+
+    async def format(self, article: dict, subscriber: dict | None, codes: list | None = None) -> FormatReturnType:
+        return [(1, "<newsItem/>")]
+
+
+class CustomNINJSFormatter(NINJS2Formatter):
+    type = "custom-ninjs"
+    name = "Custom NINJS"
+
+    async def format(self, article: dict, subscriber: dict | None, codes: list | None = None) -> FormatReturnType:
+        return [(1, '{"custom": true}')]
 
 
 class BaseExchangeFormatterTestCase(TestCase):
@@ -95,6 +113,204 @@ class BaseExchangeFormatterTestCase(TestCase):
 
         self.assertEqual(publish_queue["dest_3"].state, PublishQueueState.ERROR)
         self.assertEqual(publish_queue["dest_3"].error_message, "Mock formatter failed")
+
+    async def test_http_push_manifest_uses_formatted_ninjs_and_cache_isolated_by_destination(self):
+        self.subscriber.destinations = [
+            SubscriberDestination(name="File", format="ninjs2", delivery_type="file"),
+            SubscriberDestination(
+                name="HTTP without assets",
+                format="ninjs2",
+                delivery_type="http_push",
+                config={"resource_url": "http://example.com"},
+            ),
+            SubscriberDestination(
+                name="HTTP with assets",
+                format="ninjs2",
+                delivery_type="http_push",
+                config={"resource_url": "http://example.com", "assets_url": "http://example.com/assets"},
+            ),
+            SubscriberDestination(
+                name="HTTP with assets cached",
+                format="ninjs2",
+                delivery_type="http_push",
+                config={"resource_url": "http://example.com", "assets_url": "http://example.com/assets"},
+            ),
+        ]
+        item = {
+            "_id": "picture",
+            "guid": "picture",
+            "type": "picture",
+            "_current_version": 1,
+            "renditions": {
+                "original": {"media": "original", "mimetype": "image/jpeg"},
+                "unpublished": {"media": "hidden", "mimetype": "image/jpeg"},
+            },
+        }
+        request = PublishRequest(
+            item=item, item_id="picture", operation="publish", published_state="published", item_type="picture"
+        )
+        with mock.patch("superdesk.publish.formatters.ninjs_formatter.get_renditions_spec", return_value={}):
+            tasks, _ = await self.formatter.get_tasks_for_subscriber(
+                request, item, self.subscriber, PublishRequestResponse(), {}
+            )
+
+        queues = {}
+        for task in tasks:
+            assert task.destination is not None
+            queues[task.destination.name] = task
+        self.assertIsNone(queues["File"].delivery_media)
+        self.assertEqual(queues["HTTP without assets"].delivery_media, [])
+        expected = [{"media": "original", "resource": "upload", "mimetype": "image/jpeg"}]
+        self.assertEqual(queues["HTTP with assets"].delivery_media, expected)
+        self.assertEqual(queues["HTTP with assets cached"].delivery_media, expected)
+        self.assertEqual(queues["HTTP with assets"].delivery_content_type, "application/json")
+        stored = await PublishQueueResource.get_service().find_by_id(queues["HTTP with assets"].id)
+        assert stored is not None
+        self.assertEqual(stored.delivery_media, expected)
+
+    async def test_http_push_xml_manifest_includes_embedded_package_media(self):
+        item = {
+            "groups": [
+                {"refs": [{"package_item": {"renditions": {"original": {"media": "image", "mimetype": "image/jpeg"}}}}]}
+            ]
+        }
+        self.assertEqual(
+            await self.formatter._get_delivery_media(item, include_package_items=True),
+            [{"media": "image", "resource": "upload", "mimetype": "image/jpeg"}],
+        )
+
+    async def test_http_push_manifest_resolves_only_public_attachment_references(self):
+        attachments = {
+            "public": {"media": "attachment-media", "mimetype": "application/pdf"},
+            "internal": {"media": "private-media", "mimetype": "application/pdf", "internal": True},
+        }
+        service = mock.Mock(find_one_async=mock.AsyncMock(side_effect=lambda req, _id: attachments.get(_id)))
+        item = {
+            "attachments": [{"attachment": "public"}],
+            "associations": {"related": {"attachments": [{"attachment": "internal"}]}},
+        }
+        with (
+            mock.patch(
+                "superdesk.publish_async.formatters.base_exchange_formatter.get_resource_service", return_value=service
+            ),
+            mock.patch.object(self.app.media, "url_for_external", return_value="https://example.com/attachment"),
+        ):
+            media = await self.formatter._get_delivery_media(item, include_package_items=False)
+
+        self.assertEqual(
+            media, [{"media": "attachment-media", "resource": "attachments", "mimetype": "application/pdf"}]
+        )
+        self.assertEqual(item["attachments"], [{"attachment": "public"}])
+
+    async def test_http_push_manifest_rejects_missing_attachment_reference(self):
+        service = mock.Mock(find_one_async=mock.AsyncMock(return_value=None))
+        with mock.patch(
+            "superdesk.publish_async.formatters.base_exchange_formatter.get_resource_service", return_value=service
+        ):
+            with self.assertRaisesRegex(ValueError, "Attachment missing not found"):
+                await self.formatter._get_delivery_media({"attachments": [{"attachment": "missing"}]}, False)
+
+    async def test_http_push_xml_creates_a_persisted_manifest(self):
+        self.subscriber.destinations = [
+            SubscriberDestination(
+                name="HTTP XML",
+                format="mock-xml",
+                delivery_type="http_push",
+                config={"assets_url": "http://example.com/assets"},
+            )
+        ]
+        item = {
+            "_id": "picture",
+            "guid": "picture",
+            "type": "picture",
+            "_current_version": 1,
+            "renditions": {"original": {"media": "image", "mimetype": "image/jpeg"}, "crop": None},
+        }
+        request = PublishRequest(
+            item=item, item_id="picture", operation="publish", published_state="published", item_type="picture"
+        )
+        tasks, _ = await self.formatter.get_tasks_for_subscriber(
+            request, item, self.subscriber, PublishRequestResponse(), {}
+        )
+        stored = await PublishQueueResource.get_service().find_by_id(tasks[0].id)
+        assert stored is not None
+        self.assertEqual(stored.delivery_content_type, "application/xml")
+        self.assertEqual(stored.delivery_media, [{"media": "image", "resource": "upload", "mimetype": "image/jpeg"}])
+        self.assertIsNone(item["renditions"]["crop"])
+        queue_item = stored.to_dict(context={"use_objectid": True})
+        queue_item["encoded_item"] = b"<newsItem/>"
+        transmitter = HTTPPushService()
+        with (
+            mock.patch("superdesk.publish.transmitters.http_push.json.loads", side_effect=AssertionError("decoded")),
+            mock.patch("superdesk.publish.transmitters.http_push.get_resource_service") as get_service,
+            mock.patch.object(transmitter, "_copy_media_files", new_callable=mock.AsyncMock) as copy_media,
+            mock.patch.object(transmitter, "_push_item", new_callable=mock.AsyncMock) as push,
+        ):
+            await transmitter._transmit(queue_item, {})
+        get_service.assert_not_called()
+        copy_media.assert_awaited_once_with(stored.delivery_media, queue_item["destination"])
+        push.assert_awaited_once_with(
+            queue_item["destination"], b"<newsItem/>", {"Content-type": "application/xml", "Accept": "*/*"}
+        )
+
+    async def test_custom_ninjs_format_override_uses_legacy_media_handling(self):
+        self.subscriber.destinations = [
+            SubscriberDestination(
+                name="Custom HTTP",
+                format="custom-ninjs",
+                delivery_type="http_push",
+                config={"assets_url": "http://example.com/assets"},
+            )
+        ]
+        item = {"_id": "story", "guid": "story", "type": "text", "_current_version": 1}
+        request = PublishRequest(
+            item=item, item_id="story", operation="publish", published_state="published", item_type="text"
+        )
+        tasks, _ = await self.formatter.get_tasks_for_subscriber(
+            request, item, self.subscriber, PublishRequestResponse(), {}
+        )
+        self.assertEqual(tasks[0].formatted_item, '{"custom": true}')
+        self.assertIsNone(tasks[0].delivery_media)
+
+    async def test_manifest_failure_is_recorded_in_publish_queue(self):
+        self.subscriber.destinations = [
+            SubscriberDestination(
+                name="HTTP XML",
+                format="mock-xml",
+                delivery_type="http_push",
+                config={"assets_url": "http://example.com/assets"},
+            ),
+            SubscriberDestination(
+                name="HTTP XML 2",
+                format="mock-xml",
+                delivery_type="http_push",
+                config={"assets_url": "http://example.com/assets"},
+            ),
+        ]
+        item = {
+            "_id": "story",
+            "guid": "story",
+            "type": "text",
+            "_current_version": 1,
+            "attachments": [{"attachment": "missing"}],
+        }
+        request = PublishRequest(
+            item=item, item_id="story", operation="publish", published_state="published", item_type="text"
+        )
+        service = mock.Mock(find_one_async=mock.AsyncMock(return_value=None))
+        with mock.patch(
+            "superdesk.publish_async.formatters.base_exchange_formatter.get_resource_service", return_value=service
+        ):
+            tasks, _ = await self.formatter.get_tasks_for_subscriber(
+                request, item, self.subscriber, PublishRequestResponse(), {}
+            )
+        self.assertEqual(tasks, [])
+        queues = [queue async for queue in PublishQueueResource.get_service().get_all()]
+        self.assertEqual(len(queues), 2)
+        for queue in queues:
+            self.assertEqual(queue.state, PublishQueueState.ERROR)
+            assert queue.error_message is not None
+            self.assertIn("Attachment missing not found", queue.error_message)
 
     async def test_sets_queue_lifecycle_start_from_lifecycle_started_at(self):
         lifecycle_started_at = utcnow() - timedelta(minutes=10)

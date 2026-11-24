@@ -35,6 +35,8 @@ class Formatter:
     name: str | None
     #: If set, formatted article will be re-used between destinations and subscribers.
     use_cache: bool = True
+    #: MIME type of the formatted output, when known.
+    content_type: str | None = None
 
     can_preview: bool = False
     can_export: bool = False
@@ -64,6 +66,12 @@ class Formatter:
         :raises FormatterError: if the formatter fails to format an article
         """
         raise NotImplementedError()
+
+    def format_for_delivery(
+        self, article: dict, subscriber: dict | None, codes: list | None = None
+    ) -> FormatReturnType | Awaitable[FormatReturnType]:
+        """Format for the publish queue, optionally including a ``media_item`` in each result."""
+        return self.format(article, subscriber, codes)
 
     def export(self, article, subscriber, codes=None):
         """Formats the article and returns the output string for export"""

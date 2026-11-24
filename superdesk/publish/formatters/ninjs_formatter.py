@@ -34,11 +34,11 @@ import json
 import superdesk
 import logging
 
-from typing import List, Literal, Sequence, Tuple, TypedDict
+from typing import Awaitable, List, Literal, Sequence, Tuple, TypedDict
 
 from superdesk.core import get_app_config
 from superdesk.resource_fields import VERSION
-from superdesk.publish.formatters import Formatter
+from superdesk.publish.formatters import Formatter, FormatReturnType
 from superdesk.errors import FormatterError
 from superdesk.metadata.item import ITEM_TYPE, CONTENT_TYPE, EMBARGO, GUID_FIELD, ASSOCIATIONS
 from superdesk.metadata.packages import RESIDREF, GROUP_ID, GROUPS, ROOT_GROUP, REFS
@@ -132,6 +132,7 @@ class NINJSFormatter(Formatter):
 
     type = "ninjs"
     name = "NINJS"
+    content_type = "application/json"
 
     direct_copy_properties: Tuple[str, ...] = (
         "versioncreated",
@@ -176,11 +177,25 @@ class NINJSFormatter(Formatter):
     async def format(
         self, article: dict, subscriber: dict | None, codes: list | None = None
     ) -> list[tuple[int, str] | dict]:
+        sequence, formatted, _ = await self._format_output(article, subscriber)
+        return [(sequence, formatted)]
+
+    def format_for_delivery(
+        self, article: dict, subscriber: dict | None, codes: list | None = None
+    ) -> FormatReturnType | Awaitable[FormatReturnType]:
+        if type(self).format is not NINJSFormatter.format:
+            return self.format(article, subscriber, codes)
+        return self._format_for_delivery(article, subscriber)
+
+    async def _format_for_delivery(self, article: dict, subscriber: dict | None) -> FormatReturnType:
+        sequence, formatted, ninjs = await self._format_output(article, subscriber)
+        return [{"published_seq_num": sequence, "formatted_item": formatted, "media_item": ninjs}]
+
+    async def _format_output(self, article: dict, subscriber: dict | None) -> tuple[int, str, dict]:
         try:
             pub_seq_num = await generate_sequence_number(subscriber)
-
             ninjs = await self._transform_to_ninjs(article, subscriber)
-            return [(pub_seq_num, json.dumps(ninjs, default=json_serialize_datetime_objectId))]
+            return pub_seq_num, json.dumps(ninjs, default=json_serialize_datetime_objectId), ninjs
         except Exception as ex:
             raise await FormatterError.ninjsFormatterError(ex, subscriber).send_notifications()
 
