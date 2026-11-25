@@ -14,7 +14,6 @@ import os
 import hmac
 import json
 import re
-import unittest
 import aiohttp
 from aioresponses import aioresponses
 from yarl import URL
@@ -28,9 +27,10 @@ from superdesk.publish.transmitters.http_push import HTTPPushService
 from unittest import mock
 from superdesk.errors import PublishHTTPPushServerError, PublishHTTPPushClientError
 from superdesk.tests import TestCase
+from superdesk.tests.async_case import IsolatedAsyncioTestCase
 
 
-class HTTPPushFormatTestCase(unittest.IsolatedAsyncioTestCase):
+class HTTPPushFormatTestCase(IsolatedAsyncioTestCase):
     def setUp(self):
         self.service = HTTPPushService()
         self.destination = {
