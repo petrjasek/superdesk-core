@@ -41,7 +41,7 @@ class MockFormatter(Formatter):
 class MockXMLFormatter(Formatter):
     type = "mock-xml"
     name = "Mock XML"
-    content_type = "application/xml"
+    content_type: str | None = "application/xml"
     media_from_source = True
 
     async def format(self, article: dict, subscriber: dict | None, codes: list | None = None) -> FormatReturnType:

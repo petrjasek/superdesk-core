@@ -115,7 +115,7 @@ class FTPPublishService(PublishService):
             media_id = rendition["media"]
             if not self._media_exists(rendition, remote_items):
                 binary = await app.media.get_async(media_id, resource=rendition.get("resource", "upload"))
-                await self._transmit_media(binary, rendition, ftp)
+                await self._upload_associated_media(binary, rendition, ftp)
 
     def _media_exists(self, rendition, items):
         for file in items:
@@ -123,9 +123,9 @@ class FTPPublishService(PublishService):
                 return True
         return False
 
-    async def _transmit_media(
+    async def _upload_associated_media(
         self, binary: bytes, rendition: PublishMediaFile | TransmitterFileEntry, ftp: FTPClient
-    ):  # type: ignore[override]
+    ):
         await ftp.upload_data(get_rendition_file_name(rendition), binary)
 
 

@@ -94,6 +94,7 @@ class CustomizedService(publish_service.PublishServiceBase):
 class FilenameCustomizedServiceTest(Base):
     async def asyncSetUp(self):
         await super().asyncSetUp()
+        self.addCleanup(publish_service.set_publish_service, publish_service.get_publish_service())
         publish_service.set_publish_service(CustomizedService)
         self.service = publish_service.PublishService()
 
